@@ -23,7 +23,7 @@ def _table(entries):
     print(f"{'file':<{w}}  routers  links  avg degree  diameter  seconds")
     for e in entries:
         print(f"{e['file']:<{w}}  {e['routers']:>7}  {e['links']:>5}  {e['average_degree']:>10}  "
-              f"{str(e['diameter']):>8}  {e.pop('_seconds'):>7}")
+              f"{e['diameter']!s:>8}  {e.pop('_seconds'):>7}")
 
 
 def _run(jobs, out, argv):

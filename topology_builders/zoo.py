@@ -66,7 +66,9 @@ def denser(path, average_degree, method="random", seed=1):
         raise ValueError(f"average degree {average_degree} is above the full mesh on {n} routers ({n - 1})")
     if target < m:
         raise ValueError(f"{info['name']} already has average degree {2 * m / n:.3f} > {average_degree}")
-    key = lambda v: int(v[1:])  # noqa: E731
+    def key(v):
+        return int(v[1:])
+
     missing = sorted((tuple(sorted(e, key=key)) for e in nx.non_edges(g)), key=lambda e: (key(e[0]), key(e[1])))
     pos = nx.get_node_attributes(g, "pos")
     if method == "random":

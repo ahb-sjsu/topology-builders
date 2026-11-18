@@ -48,7 +48,8 @@ python -m topology_builders build k-ary-n-fly --k 4 --stages 3 --out fly-4x3.jso
 Without `--degrees`, `zoo` steps from just above the graph's own average degree to the full mesh. The Zoo data is
 not included, because TopoHub's packaging states no licence: point `zoo` at a local copy.
 
-Tests: `python -m pytest`. They check each family against its definition: degrees and connectivity; that the
+Tests: `python -m pytest`. CI runs them, and ruff, on Python 3.10 to 3.13 on every push. They check each family
+against its definition: degrees and connectivity; that the
 flattened butterfly equals networkx's Cartesian product of complete graphs and the hypercube; that the butterfly has
 exactly one forward path between each first-stage and each last-stage switch; and that zoo additions keep the
 original links, nest, and with nearest-first add the shortest links.
