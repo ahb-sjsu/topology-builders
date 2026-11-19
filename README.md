@@ -48,22 +48,59 @@ python -m topology_builders build k-ary-n-fly --k 4 --stages 3 --out fly-4x3.jso
 Without `--degrees`, `zoo` steps from just above the graph's own average degree to the full mesh. The Zoo data is
 not included, because TopoHub's packaging states no licence: point `zoo` at a local copy.
 
+## FRR IS-IS labs
+
+`clab` turns one topology file into a [containerlab](https://containerlab.dev) lab of FRR routers running IS-IS:
+
+```
+python -m topology_builders clab out/n64/random-regular-n64-d8-s1.json --out labs/rr64-d8
+containerlab deploy -t labs/rr64-d8/off/random-regular-n64-d8-s1-off.clab.yml
+```
+
+By default it writes two labs, in `off/` and `on/`, which differ only in one line: `flood-reduction` under
+`router isis`, the switch added by FRR pull request 24128 (draft-ietf-lsr-distoptflood). The `on` lab needs an FRR
+image built with that change; FRR releases reject the command. The configuration follows that pull request's
+topotest:
+
+- level-2-only, with a passive loopback /32 on each router (10.255.0.0/16);
+- each link point-to-point, with its own /31 (10.0.0.0/9);
+- hello interval 1 s, hello multiplier 3, lsp-gen-interval 2 (each can be changed on the command line).
+
+Each lab directory holds the containerlab file, one directory per router, `lab.json` (every router's loopback,
+NET and port count, and every link's ports and addresses) and `manifest.json` (SHA-256 of each file). Node kind
+`linux` (the default) mounts `frr.conf`, `daemons` and `vtysh.conf` into any FRR image and works with every
+containerlab version. `--kind frr` uses containerlab's own FRR kind, which needs containerlab 0.80.0 or later. TopoHub
+files can be given directly; their nodes are renamed r0, r1, ... in order, and `lab.json` keeps the original ids.
+
+`python3 tools/check_isis.py <lab directory> [timeout]` checks a deployed lab through `docker exec`: every router
+must have one adjacency Up per link and an LSP from every router. It retries every 5 s until the timeout (default
+120 s) and exits non-zero if the lab never gets there.
+
 Tests: `python -m pytest`. CI runs them, and ruff, on Python 3.10 to 3.13 on every push. They check each family
 against its definition: degrees and connectivity; that the
 flattened butterfly equals networkx's Cartesian product of complete graphs and the hypercube; that the butterfly has
 exactly one forward path between each first-stage and each last-stage switch; and that zoo additions keep the
-original links, nest, and with nearest-first add the shortest links.
+original links, nest, and with nearest-first add the shortest links. For the labs they check that ports run eth1 to
+ethN on every router, that both ends of each link share a /31, that the containerlab file matches the link list, and
+that the `on` and `off` configurations differ only in the `flood-reduction` line.
 
 Measured on an HP Z840 (Xeon E5-2690 v3; Python 3.12.3, networkx 3.6.1), 2026-11-18:
 
-- all 10 tests pass;
+- all 17 tests pass;
 - the 64-router sweep with seeds 1, 2 and 3: 50 topologies, all connected, in 1.0 s in all (0.03 s or less each),
   and a second run gives byte-identical files (50 of 50 SHA-256 equal);
-- random-regular at 256 routers, d = 3 to 255: 14 topologies in 3.1 s in all, the largest with 32,640 links.
+- random-regular at 256 routers, d = 3 to 255: 14 topologies in 3.1 s in all, the largest with 32,640 links;
+- two `off` labs deployed with containerlab 0.78.2 and FRR 10.2.1. In each, every router had one IS-IS adjacency Up
+  per link and an LSP from every router: the 8-router flattened butterfly 4 x 2 within 8 s of deployment, and a
+  32-router random regular graph of degree 6 (96 links) within 5 s. The 32-router lab took 16 s to deploy, and
+  each router used about 20 MiB. In the 8-router lab, router r0 had IS-IS routes to all 7 other loopbacks and
+  reached a loopback two hops away.
 
 ## Not here yet
 
-- Emitters: FRR IS-IS configurations and containerlab topology files.
+- Runs with flood reduction on, which need an FRR image built from FRR pull request 24128.
+- Measuring a run: CPU, and the flooding counters that `show isis summary` reports with flood reduction on.
+- An exporter to netlab, as a second, independent path to FRR IS-IS.
 - Fat-tree (three-tier Clos) by radix.
 
 [SURVEY.md](SURVEY.md) lists the existing builders and lab tools, with licences and status, so that this repository

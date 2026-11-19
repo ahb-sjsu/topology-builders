@@ -4,6 +4,7 @@ import os
 import sys
 import time
 
+from . import clab as C
 from . import families as F
 from . import output as O
 from . import sweep as S
@@ -71,6 +72,23 @@ def main(argv=None):
     b.add_argument("--stages", type=int, help="k-ary-n-fly")
     b.add_argument("--out", required=True, help="output file")
 
+    c = sub.add_parser("clab", help="a containerlab lab of FRR routers running IS-IS, from one topology file")
+    c.add_argument("topology", help="topology file (node-link JSON, as written by this package or TopoHub)")
+    c.add_argument("--out", required=True, help="output directory")
+    c.add_argument("--name", help="lab name (default: from the file name); -on or -off is appended")
+    c.add_argument("--flood-reduction", choices=("on", "off", "both"), default="both",
+                   help="write FRR's flood-reduction line (FRR pull request 24128); both (default): one lab in "
+                        "<out>/off and one in <out>/on")
+    c.add_argument("--kind", choices=("linux", "frr"), default="linux",
+                   help="containerlab node kind (default linux; frr needs containerlab 0.80.0 or later)")
+    c.add_argument("--image", help=f"FRR image (default {C.IMAGES['linux']}, or {C.IMAGES['frr']} for --kind frr)")
+    c.add_argument("--hello-interval", type=int, default=1, help="seconds (default 1)")
+    c.add_argument("--hello-multiplier", type=int, default=3, help="default 3")
+    c.add_argument("--lsp-gen-interval", type=int, default=2, help="seconds (default 2)")
+    c.add_argument("--area", default="49.0001", help="IS-IS area (default 49.0001)")
+    c.add_argument("--debug-flooding", action="store_true",
+                   help="add 'debug isis flooding' (verbose: it changes CPU measurements)")
+
     a = p.parse_args(argv)
     if a.command == "sweep":
         _run(S.plan(a.routers, a.families.split(","), _ints(a.seeds)), a.out, argv)
@@ -86,6 +104,16 @@ def main(argv=None):
                     jobs.append((f"zoo-{name}-avg{d:g}-{a.method}{tag}.json",
                                  lambda p=path, d=d, sd=sd: Z.denser(p, d, a.method, sd if sd is not None else 1)))
         _run(jobs, a.out, argv)
+    elif a.command == "clab":
+        base = C.lab_name(a.name or os.path.splitext(os.path.basename(a.topology))[0])
+        for on in {"on": [True], "off": [False], "both": [False, True]}[a.flood_reduction]:
+            tag = "on" if on else "off"
+            out = os.path.join(a.out, tag) if a.flood_reduction == "both" else a.out
+            m = C.write_lab(a.topology, out, name=f"{base}-{tag}", flood_reduction=on, kind=a.kind,
+                            image=a.image, hello_interval=a.hello_interval, hello_multiplier=a.hello_multiplier,
+                            lsp_gen_interval=a.lsp_gen_interval, area=a.area, debug_flooding=a.debug_flooding)
+            print(f"{out}: lab {m['name']}, {m['routers']} routers, {m['links']} links, flood-reduction {tag}. "
+                  f"Deploy: containerlab deploy -t {os.path.join(out, m['name'] + '.clab.yml')}")
     else:
         if a.family == "random-regular":
             g = F.random_regular(a.routers, a.degree, a.seed)
