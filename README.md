@@ -64,8 +64,10 @@ Measured on an HP Z840 (Xeon E5-2690 v3; Python 3.12.3, networkx 3.6.1), 2026-11
 ## Not here yet
 
 - Emitters: FRR IS-IS configurations and containerlab topology files.
-- A survey of existing builders, so that this repository links to and wraps them rather than rewriting them.
 - Fat-tree (three-tier Clos) by radix.
+
+[SURVEY.md](SURVEY.md) lists the existing builders and lab tools, with licences and status, so that this repository
+can link to and wrap them rather than rewrite them.
 
 ## License
 
