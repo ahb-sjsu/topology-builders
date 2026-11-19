@@ -186,7 +186,8 @@ def write_lab(source, out, name=None, flood_reduction=False, kind="linux", image
             put(f"{r['name']}/daemons", daemons_file())
             put(f"{r['name']}/vtysh.conf", "service integrated-vtysh-config\n")
     lab = {"name": name, "settings": settings, "source": os.path.basename(source), "source_sha256": source_sha,
-           "topology": {k: g.graph.get(k) for k in ("family", "parameters", "routers", "links", "average_degree")},
+           "topology": {k: g.graph.get(k) for k in ("family", "parameters", "routers", "links", "average_degree",
+                                                    "diameter", "mean_distance", "two_hop_multiplicity")},
            "routers": routers, "links": links}
     put("lab.json", json.dumps(lab, sort_keys=True, indent=1) + "\n")
     manifest = {"format": FORMAT, "builder": O.builder_info(), "name": name, "settings": settings,

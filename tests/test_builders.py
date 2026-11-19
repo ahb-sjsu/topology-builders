@@ -125,3 +125,35 @@ def test_sweep_command(tmp_path):
     for fam in S.FAMILIES:
         avg = [e["average_degree"] for e in files if e["family"] == fam]
         assert avg == sorted(avg) and avg[-1] == densest[fam], fam
+
+
+def test_distance_and_two_hop_figures():
+    cube = O.summary(F.flattened_butterfly([2] * 6))
+    # 6-cube: 6 neighbours and 15 routers two hops away out of 63; every two-hop pair shares exactly 2 neighbours.
+    assert (cube["diameter"], cube["two_hop_multiplicity"], cube["pairs_within_2"]) == (6, 2.0, round(21 / 63, 4))
+    assert cube["mean_distance"] == round(6 * 32 / 63, 4)
+    mesh = O.summary(F.flattened_butterfly([8]))
+    assert (mesh["diameter"], mesh["mean_distance"], mesh["pairs_within_2"], mesh["two_hop_multiplicity"]) == (
+        1, 1.0, 1.0, None)
+    ls = O.summary(F.leaf_spine(62, 2))
+    # Two leaves share both spines; the two spines share all 62 leaves.
+    assert ls["two_hop_multiplicity"] == round((1891 * 2 + 62) / 1892, 4) and ls["diameter"] == 2
+    path = nx.relabel_nodes(nx.path_graph(4), {i: f"r{i}" for i in range(4)})
+    p = O.summary(path)
+    assert (p["diameter"], p["mean_distance"], p["pairs_within_2"], p["two_hop_multiplicity"]) == (
+        3, round(10 / 6, 4), round(5 / 6, 4), 1.0)
+    two = nx.Graph()
+    two.add_nodes_from(["r0", "r1"])
+    assert O.summary(two)["diameter"] is None and O.summary(two)["mean_distance"] is None
+    one = nx.Graph()
+    one.add_node("r0")
+    assert O.summary(one)["diameter"] == 0
+    assert O.distances(F.random_regular(16, 4, 1))[1] == 32
+
+
+def test_size_limits_leave_figures_out(monkeypatch):
+    monkeypatch.setattr(O, "DIAMETER_LIMIT", 1)
+    monkeypatch.setattr(O, "PATHS_LIMIT", 1)
+    s = O.summary(F.random_regular(16, 4, 1))
+    assert s["connected"] and s["diameter"] is None and s["mean_distance"] is None
+    assert s["two_hop_multiplicity"] is None

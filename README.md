@@ -45,8 +45,14 @@ It can be read with `networkx.node_link_graph(data, edges="edges")`. Routers are
 attributes record:
 
 - the family, its parameters and how it was built;
-- routers, links, average degree, density, minimum and maximum degree, whether it is connected, and the diameter in
-  hops (left out, as null, when routers x links is over 20 million);
+- routers, links, average degree, density, minimum and maximum degree, and whether it is connected;
+- the diameter and mean distance in hops, and the share of router pairs at most two hops apart (left out, as null,
+  when routers x links is over 20 million);
+- the two-hop multiplicity: for two routers two hops apart, the mean number of neighbours they share, which is how
+  many two-hop paths join them (left out when the sum of squared degrees is over 20 million). A flooding rule that
+  looks two hops ahead can drop copies only where it is above 1. It is 2 in every flattened butterfly; in a random
+  regular graph of degree d it is close to 1 until d²/N is, then grows roughly as d²/N. That may be why butterflies
+  gain far more from flooding reduction than random graphs of the same degree;
 - the versions of this package, Python and networkx.
 
 The `sweep` and `zoo` commands also write `manifest.json`, with each file's SHA-256 and summary. Nodes, edges and
@@ -135,7 +141,7 @@ Measured on an HP Z840 (Xeon E5-2690 v3; Python 3.12.3, networkx 3.6.1), 2026-11
 - all 17 tests pass (38 now, with `measure` and `report`);
 - the 64-router sweep with seeds 1, 2 and 3: 50 topologies, all connected, in 1.0 s in all (0.03 s or less each),
   and a second run gives byte-identical files (50 of 50 SHA-256 equal);
-- random-regular at 256 routers, d = 3 to 255: 14 topologies in 3.1 s in all, the largest with 32,640 links;
+- random-regular at 256 routers, d = 3 to 255: 14 topologies in 3.1 s in all (15 s on 2026-11-19, with the distance and two-hop figures added to every file), the largest with 32,640 links;
 - two `off` labs deployed with containerlab 0.78.2 and FRR 10.2.1. In each, every router had one IS-IS adjacency Up
   per link and an LSP from every router: the 8-router flattened butterfly 4 x 2 within 8 s of deployment, and a
   32-router random regular graph of degree 6 (96 links) within 5 s. The 32-router lab took 16 s to deploy, and
@@ -244,8 +250,9 @@ Two options record more about each event window:
   origin to the last router holding it). The routers share one clock, the host's. Debug logging costs CPU, so
   timing runs are kept out of the CPU tables.
 
-`topology-builders report <files>` prints, per topology, the event windows of one kind (`--event`, default link)
-pooled and paired, bring-up, and, when present, convergence times and the CPU per handler. `--pool-seeds` merges
+`topology-builders report <files>` prints, per topology, its diameter and two-hop multiplicity (for labs written
+by this version or later), the event windows of one kind (`--event`, default link) pooled and paired, bring-up, and,
+when present, convergence times and the CPU per handler. `--pool-seeds` merges
 graphs that differ only in their seed into one row, with each saving's range across graphs.
 
 Runs of 2026-11-19 on the HP Z840 above, with the image from FRR pull request 24128 at e263c441, 2 repeats of each

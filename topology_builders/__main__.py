@@ -23,10 +23,10 @@ def _floats(text):
 
 def _table(entries):
     w = max([len(e["file"]) for e in entries] + [4])
-    print(f"{'file':<{w}}  routers  links  avg degree  diameter  seconds")
+    print(f"{'file':<{w}}  routers  links  avg degree  diameter  2-hop multiplicity  seconds")
     for e in entries:
         print(f"{e['file']:<{w}}  {e['routers']:>7}  {e['links']:>5}  {e['average_degree']:>10}  "
-              f"{e['diameter']!s:>8}  {e.pop('_seconds'):>7}")
+              f"{e['diameter']!s:>8}  {e['two_hop_multiplicity']!s:>18}  {e.pop('_seconds'):>7}")
 
 
 def _run(jobs, out, argv):
@@ -182,7 +182,7 @@ def main(argv=None):
             g = F.kary_nfly(a.k, a.stages)
         e = O.write(g, a.out)
         print(f"{a.out}: {e['routers']} routers, {e['links']} links, average degree {e['average_degree']}, "
-              f"diameter {e['diameter']}, sha256 {e['sha256']}")
+              f"diameter {e['diameter']}, two-hop multiplicity {e['two_hop_multiplicity']}, sha256 {e['sha256']}")
 
 
 if __name__ == "__main__":

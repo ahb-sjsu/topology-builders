@@ -67,7 +67,8 @@ def rows(records, kind="link"):
         side = {"off": [r for r in recs if not r["settings"]["flood_reduction"]],
                 "on": [r for r in recs if r["settings"]["flood_reduction"]]}
         row = {"topology": label(t), "pool": label(t, seed=False), "family": t.get("family"),
-               "routers": t.get("routers"), "links": t.get("links"),
+               "routers": t.get("routers"), "links": t.get("links"), "diameter": t.get("diameter"),
+               "two_hop_multiplicity": t.get("two_hop_multiplicity"),
                "average_degree": t.get("average_degree"), "runs": {k: len(v) for k, v in side.items()}}
         windows, bring_up, pairs = {}, {}, {}
         for k, rs in side.items():
@@ -110,8 +111,12 @@ def pooled(table):
         groups.setdefault((r["family"] or "", r["average_degree"] or 0, r["pool"]), []).append(r)
     out = []
     for (_, _, name), rs in sorted(groups.items()):
+        mult = [r["two_hop_multiplicity"] for r in rs if r.get("two_hop_multiplicity") is not None]
+        diam = [r["diameter"] for r in rs if r.get("diameter") is not None]
         row = {"topology": name, "pool": name, "family": rs[0]["family"], "routers": rs[0]["routers"],
                "links": rs[0]["links"], "average_degree": rs[0]["average_degree"], "graphs": len(rs),
+               "two_hop_multiplicity": round(mean(mult), 4) if mult else None,
+               "diameter": max(diam) if diam else None,
                "runs": {k: sum(r["runs"][k] for r in rs) for k in ("off", "on")}}
         for key in ("lsp_saving", "net_saving", "bring_up_lsp_saving", "bring_up_ms_saving"):
             vals = [r[key] for r in rs if r[key] is not None]
@@ -223,15 +228,18 @@ def _pct(x):
 def text(table, kind="link"):
     """The rows as two plain-text tables: changes of the given kind, then bring-up."""
     w = max([len(r["topology"]) for r in table] + [8])
-    title = (f"{kind.capitalize()} changes: every {kind}-down and {kind}-up window; mean LSPs sent and isisd ms net "
-             "of the quiet window, off -> on; pairs with the on figure lower; windows satisfied")
-    head = (f"{'topology':<{w}} {'degree':>6} {'LSPs off':>9} {'on':>7} {'saving':>6} {'pairs':>5} "
-            f"{'net ms off':>10} {'on':>7} {'saving':>6} {'pairs':>5} {'median':>6} {'satisfied':>9}")
+    title = (f"{kind.capitalize()} changes: every {kind}-down and {kind}-up window; diameter and two-hop "
+             "multiplicity of the topology; mean LSPs sent and isisd ms net of the quiet window, off -> on; pairs "
+             "with the on figure lower; windows satisfied")
+    head = (f"{'topology':<{w}} {'degree':>6} {'diam':>4} {'2-hop':>5} {'LSPs off':>9} {'on':>7} {'saving':>6} "
+            f"{'pairs':>5} {'net ms off':>10} {'on':>7} {'saving':>6} {'pairs':>5} {'median':>6} {'satisfied':>9}")
     lines = [title, head]
     for r in table:
         o, n, p = r["windows"]["off"], r["windows"]["on"], r["pairs"]
         ok = f"{o['satisfied'] + n['satisfied']}/{o['windows'] + n['windows']}"
-        lines.append(f"{r['topology']:<{w}} {r['average_degree']!s:>6} {_n(o['lsps']):>9} {_n(n['lsps']):>7} "
+        mult = r.get("two_hop_multiplicity")
+        lines.append(f"{r['topology']:<{w}} {r['average_degree']!s:>6} {r.get('diameter') or '-'!s:>4} "
+                     f"{'-' if mult is None else f'{mult:.2f}':>5} {_n(o['lsps']):>9} {_n(n['lsps']):>7} "
                      f"{_pct(r['lsp_saving']):>6} {p['lsps_lower_on']:>2}/{p['n']:<2} {_n(o['net_ms']):>10} "
                      f"{_n(n['net_ms']):>7} {_pct(r['net_saving']):>6} {p['net_lower_on']:>2}/{p['n']:<2} "
                      f"{_pct(p['median_net_saving']):>6} {ok:>9}")
