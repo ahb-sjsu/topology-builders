@@ -119,10 +119,11 @@ def main(argv=None):
         records = M.run(a.labs, repeat=a.repeat, settle=a.settle, window=a.window, seed=a.seed, out=a.out,
                         max_wait=a.max_wait)
         print(f"{'lab':<28} {'reduction':<9} {'phase':<9} {'runs':>4} {'LSPs sent':>9} {'suppressed':>10} "
-              f"{'isisd ms':>8}  outcomes")
+              f"{'isisd ms':>8} {'net of quiet':>12}  outcomes")
         for r in M.summarize(records):
+            net = "" if r["isisd_net_ms"] is None else r["isisd_net_ms"]
             print(f"{r['lab']:<28} {'on' if r['flood_reduction'] else 'off':<9} {r['phase']:<9} {r['runs']:>4} "
-                  f"{r['lsps_sent']:>9} {r['suppressed_sends']:>10} {r['isisd_ms']:>8}  {r['outcomes']}")
+                  f"{r['lsps_sent']:>9} {r['suppressed_sends']:>10} {r['isisd_ms']:>8} {net:>12}  {r['outcomes']}")
         print(f"{len(records)} runs appended to {a.out}")
     elif a.command == "clab":
         base = C.lab_name(a.name or os.path.splitext(os.path.basename(a.topology))[0])

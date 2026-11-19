@@ -46,6 +46,18 @@ def test_outcome():
     assert M.outcome({"r0": after, "r1": None}, before, ("r0", "r1"))[0] == "unknown"
 
 
+def test_steady_and_net():
+    before = {"r0.00-00": 3, "r1.00-00": 3}
+    assert M.steady({"r0": dict(before), "r1": dict(before)}, before) == ("satisfied", {"routers_changed": []})
+    changed = {"r0.00-00": 4, "r1.00-00": 3}
+    assert M.steady({"r0": changed, "r1": dict(before)}, before) == ("violated", {"routers_changed": ["r0"]})
+    assert M.steady({"r0": None, "r1": before}, before)[0] == "unknown"
+    window = {"counters": {"tx_l2_lsp": 40, "tx_p2p_iih": 100}, "cpu_ms": {"isisd": 900.0}, "unreadable": []}
+    quiet = {"counters": {"tx_p2p_iih": 98}, "cpu_ms": {"isisd": 850.0}, "unreadable": []}
+    assert M.net(window, quiet) == {"counters": {"tx_l2_lsp": 40, "tx_p2p_iih": 2}, "cpu_ms": {"isisd": 50.0}}
+    assert M.net(window, dict(quiet, unreadable=["r3"])) is None
+
+
 def test_pick_link_and_order():
     links = [{"a": f"r{i}", "a_port": "eth1", "b": f"r{i + 1}", "b_port": "eth1"} for i in range(20)]
     lab = {"source_sha256": "ab" * 32, "links": links}
@@ -63,7 +75,8 @@ def test_totals_and_summarize():
     assert total["counters"] == {"fr_suppressed_sends": 2, "tx_l2_lsp": 4} and total["cpu_ms"] == {"isisd": 10.0}
     assert total["unreadable"] == ["r1"] and per["r1"] is None
     rec = {"lab": "x-on", "settings": {"flood_reduction": True},
-           "phases": [{"phase": "link-down", "outcome": "satisfied", **total}]}
+           "phases": [{"phase": "link-down", "outcome": "satisfied", **total,
+                       "net_of_quiet": {"counters": {}, "cpu_ms": {"isisd": 3.0}}}]}
     rows = M.summarize([rec, rec])
     assert rows == [{"lab": "x-on", "flood_reduction": True, "phase": "link-down", "runs": 2, "lsps_sent": 4.0,
-                     "suppressed_sends": 2.0, "isisd_ms": 10.0, "outcomes": {"satisfied": 2}}]
+                     "suppressed_sends": 2.0, "isisd_ms": 10.0, "isisd_net_ms": 3.0, "outcomes": {"satisfied": 2}}]

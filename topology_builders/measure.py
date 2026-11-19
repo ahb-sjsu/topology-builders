@@ -7,13 +7,18 @@ One run of one lab:
    checking every 5 s (the run records how long that took).
 3. Snapshot every router: the PDU counters and flooding-reduction counters of `show isis summary`, and the CPU time
    of isisd and zebra from /proc. This is the bring-up phase.
-4. Take one link down, wait a fixed window without querying, snapshot, then check that every router holds the
+4. A quiet window: snapshot, wait the window length with no event and no queries, snapshot, then check that no
+   router's LSPs changed. It measures the background work (hellos, timers) that every window contains.
+5. Take one link down: snapshot, take it down, wait the window, snapshot, then check that every router holds the
    same LSPs, including a newer LSP from each end of the link. Bring the link back up and do the same again.
-5. Destroy the lab.
+6. Destroy the lab.
 
-Counters and CPU in the link windows are differences between snapshots, so the checks between windows are not
-counted in them. Bring-up counts from the routers' start, so it includes the convergence check. A window's outcome is satisfied when every router holds the same LSPs and the new ones, violated when it does not,
-and unknown when a router could not be read. Each run is one JSON line.
+Every window is the difference between a snapshot taken just before it and one at its end, so the checks between
+windows are never counted. The link windows are also reported net of the quiet window, which has the same length:
+the work the event caused. Bring-up counts from the routers' start, so it includes the convergence check. A link
+window's outcome is satisfied when every router holds the same LSPs and the new ones, violated when it does not,
+and unknown when a router could not be read; the quiet window's is satisfied when nothing changed. Each run is one
+JSON line.
 
 Labs given together (the off and on labs of one topology) take turns, and the order alternates between repeats.
 They must have the same topology file; the same link is used for all of them."""
@@ -27,7 +32,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from . import output as O
 
-FORMAT = "topology-builders measure 0.1"
+FORMAT = "topology-builders measure 0.2"
 SECTIONS = {"TX counters per PDU type:": "tx", "RX counters per PDU type:": "rx",
             "Drop counters per PDU type:": "drop", "Flooding reduction:": "fr"}
 COUNTER = re.compile(r"^\s*([A-Za-z0-9 ]+?)\s*:\s*(\d+)\s*$")
@@ -82,6 +87,24 @@ def outcome(databases, before, ends):
                                          for lsp, seq in reference.items())]
     detail = {"routers_differing": differing, "ends_without_new_lsp": stale}
     return ("satisfied" if not differing and not stale else "violated"), detail
+
+
+def steady(databases, before):
+    """Outcome of the quiet window: satisfied when every router still holds exactly the LSPs it held before, so the
+    window saw background work only; violated when an LSP changed; unknown when a router could not be read."""
+    if any(db is None for db in databases.values()):
+        return "unknown", {"unreadable": sorted(r for r, db in databases.items() if db is None)}
+    changed = sorted(r for r, db in databases.items() if db != before)
+    return ("satisfied" if not changed else "violated"), {"routers_changed": changed}
+
+
+def net(total, quiet):
+    """A window's counters and CPU minus the quiet window's, which has the same length: the work the event caused.
+    None when a router could not be read in either window."""
+    if total["unreadable"] or quiet["unreadable"]:
+        return None
+    return {"counters": diff(total["counters"], quiet["counters"]),
+            "cpu_ms": {k: round(v, 1) for k, v in diff(total["cpu_ms"], quiet["cpu_ms"]).items()}}
 
 
 def pick_link(lab, seed):
@@ -239,22 +262,34 @@ def run_one(lab, link, settle, window, max_wait, repeat, position):
             time.sleep(5)
             ok, dbs = lab.converged()
         rec["converged"], rec["extra_wait_s"] = ok, round(time.time() - t0, 1)
-        snap = lab.snapshot()
-        total, per = totals(snap)
+        total, per = totals(lab.snapshot())
         rec["phases"].append({"phase": "bring-up", "seconds": settle, **total, "per_router": per,
                               "outcome": "satisfied" if ok else "violated"})
         before_db = next(iter(dbs.values())) if ok else {}
-        for phase, state in (("link-down", "down"), ("link-up", "up")):
-            lab.link(link["a"], link["a_port"], state)
+
+        def measured_window(event=None):
+            # A snapshot right before the window, after any checks, so the checks never fall inside a window.
+            base = lab.snapshot()
+            if event:
+                event()
             time.sleep(window)
-            after = lab.snapshot()
-            total, per = totals(after, snap)
+            return totals(lab.snapshot(), base)
+
+        quiet, per = measured_window()
+        dbs = lab.databases()
+        result, detail = steady(dbs, before_db)
+        rec["phases"].append({"phase": "quiet", "seconds": window, **quiet, "per_router": per, "outcome": result,
+                              "detail": detail})
+        if result != "unknown":
+            before_db = next(iter(dbs.values()))
+        for phase, state in (("link-down", "down"), ("link-up", "up")):
+            total, per = measured_window(lambda s=state: lab.link(link["a"], link["a_port"], s))
             dbs = lab.databases()
             result, detail = outcome(dbs, before_db, (link["a"], link["b"]))
-            rec["phases"].append({"phase": phase, "seconds": window, **total, "per_router": per,
-                                  "outcome": result, "detail": detail})
-            snap = after
-            before_db = next(iter(dbs.values())) if result != "unknown" else before_db
+            rec["phases"].append({"phase": phase, "seconds": window, **total, "net_of_quiet": net(total, quiet),
+                                  "per_router": per, "outcome": result, "detail": detail})
+            if result != "unknown":
+                before_db = next(iter(dbs.values()))
     finally:
         rec["host_end"] = host_state()
         rec["destroy_s"] = lab.containerlab("destroy")
@@ -293,10 +328,12 @@ def summarize(records):
         outcomes = {}
         for p in ps:
             outcomes[p["outcome"]] = outcomes.get(p["outcome"], 0) + 1
+        nets = [p["net_of_quiet"]["cpu_ms"].get("isisd", 0) for p in ps if p.get("net_of_quiet")]
         rows.append({"lab": lab, "flood_reduction": fr, "phase": phase, "runs": n,
                      "lsps_sent": round(sum(p["counters"].get("tx_l2_lsp", 0) for p in ps) / n, 1),
                      "suppressed_sends": round(sum(p["counters"].get("fr_suppressed_sends", 0) for p in ps) / n, 1),
                      "isisd_ms": round(sum(p["cpu_ms"].get("isisd", 0) for p in ps) / n, 1),
+                     "isisd_net_ms": round(sum(nets) / len(nets), 1) if nets else None,
                      "outcomes": outcomes})
     return rows
 
@@ -307,6 +344,9 @@ def line(rec):
     parts = [f"{rec['lab']} repeat {rec['repeat']} flood-reduction {fr}:"]
     for p in rec["phases"]:
         c = p["counters"]
+        cpu = f"isisd {p['cpu_ms'].get('isisd', 0):.0f} ms"
+        if p.get("net_of_quiet"):
+            cpu += f" ({p['net_of_quiet']['cpu_ms'].get('isisd', 0):+.0f} ms net of quiet)"
         parts.append(f"{p['phase']} LSPs sent {c.get('tx_l2_lsp', 0)}, suppressed {c.get('fr_suppressed_sends', 0)}, "
-                     f"isisd {p['cpu_ms'].get('isisd', 0):.0f} ms, {p['outcome']};")
+                     f"{cpu}, {p['outcome']};")
     return " ".join(parts)

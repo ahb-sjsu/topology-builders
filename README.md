@@ -95,7 +95,7 @@ totals.
 
 Measured on an HP Z840 (Xeon E5-2690 v3; Python 3.12.3, networkx 3.6.1), 2026-11-18:
 
-- all 17 tests pass (23 since `measure` was added);
+- all 17 tests pass (24 now, with `measure`);
 - the 64-router sweep with seeds 1, 2 and 3: 50 topologies, all connected, in 1.0 s in all (0.03 s or less each),
   and a second run gives byte-identical files (50 of 50 SHA-256 equal);
 - random-regular at 256 routers, d = 3 to 255: 14 topologies in 3.1 s in all, the largest with 32,640 links;
@@ -155,37 +155,46 @@ One run of one lab:
    checking every 5 s, for up to 120 s (`--max-wait`).
 3. Snapshot every router: the PDU counters of `show isis summary` (sent, received and dropped, per PDU type), its
    flooding-reduction counters, and the CPU time of isisd and zebra from /proc. This closes the bring-up phase.
-4. Take one link down, wait 30 s (`--window`) without querying, snapshot, then check that every router holds the
+4. A quiet window: snapshot, wait 30 s (`--window`) with no event and no queries, snapshot, then check that no
+   router's LSPs changed. It measures the background work (hellos every second on every link, timers) that every
+   window contains.
+5. Take one link down: snapshot, take it down, wait the same 30 s, snapshot, then check that every router holds the
    same LSPs, including a newer LSP from each end of the link. Bring the link back up and do the same.
-5. Destroy the lab.
+6. Destroy the lab.
 
-- Counters and CPU in the link phases are differences between snapshots, so the checks between them are not
-  counted. Bring-up counts from the routers' start, so it includes the convergence check.
-- Each phase has an outcome: satisfied when every router holds the same LSPs and the new ones, violated when not,
-  and unknown when a router could not be read.
+- Every window is the difference between a snapshot taken just before it and one at its end, so the checks between
+  windows are never counted. Bring-up counts from the routers' start, so it includes the convergence check.
+- The link windows are also reported net of the quiet window, which has the same length: the work the event caused.
+- Each link window has an outcome: satisfied when every router holds the same LSPs and the new ones, violated when
+  not, and unknown when a router could not be read. The quiet window is satisfied when nothing changed in it.
 - The link is chosen from the topology file and `--seed`, so the off and on labs use the same one. The labs take
   turns, and the order alternates between repeats.
 - Each run is one JSON line, with per-router figures and the host's load average and CPU temperature at start and
   end. A table of means per lab and phase is printed at the end.
 
-First runs, 2026-11-19, on the HP Z840 above with the image from FRR pull request 24128 at e263c441, 2 repeats of
-each lab. The host's load average was 10 to 15 from other work. LSPs sent, summed over all routers, mean off and on:
+Runs of 2026-11-19 on the HP Z840 above, with the image from FRR pull request 24128 at e263c441, 2 repeats of each
+lab. The host's load average was 4 to 11 from other work. Means, flood reduction off and on; LSPs sent and isisd CPU
+are summed over all routers:
 
-| Topology | Bring-up | Link down | Link up |
+| Topology | Window | LSPs sent | isisd CPU net of the quiet window |
 |---|---|---|---|
-| flattened butterfly 4 x 2: 8 routers, 16 links, degree 4 | 417.5 and 334 (-20%) | 45 and 17.5 (-61%) | 68.5 and 26 (-62%) |
-| random regular: 32 routers, 96 links, degree 6 | 10,715 and 9,103 (-15%) | 246 and 153.5 (-38%) | 394 and 234 (-41%) |
+| flattened butterfly 4 x 2: 8 routers, 16 links, degree 4 | link down | 44 and 18 (-59%) | 15 and 20 ms |
+| | link up | 73 and 26 (-64%) | 90 and 40 ms |
+| random regular: 32 routers, 96 links, degree 6 | link down | 265 and 150.5 (-43%) | 380 and 205 ms (-46%) |
+| | link up | 388 and 232.5 (-40%) | 720 and 385 ms (-47%) |
 
-- All 24 phases were satisfied: every router held every new LSP within the window, with flood reduction off and on.
-- The differences between off and on are much larger than between repeats (link down on 32 routers: 256 and 236
-  off, 157 and 150 on).
-- isisd CPU time over each 30 s window did not differ between off and on (link down on 32 routers: 3,305 and
-  3,315 ms). With hellos every second on every link, background work dominates a window of that length.
+- All 32 windows were satisfied, the quiet ones included: in them no LSP was sent and no router's LSPs changed.
+- On 32 routers the repeats do not overlap: net CPU for link down was 310 and 450 ms off, 190 and 220 ms on; for
+  link up, 700 and 740 ms off, 370 and 400 ms on.
+- On 8 routers the CPU an event causes is within the noise: the quiet windows alone ranged from 490 to 540 ms.
+- At bring-up, LSPs sent fell from 375.5 to 303 on 8 routers and from 10,623.5 to 9,091.5 on 32.
+- An earlier set of runs, without the quiet window, gave link-window LSP counts within 8% of these. Its CPU figure
+  for link up also counted the check that ends the link-down window; each window now starts from its own snapshot.
 - Two topologies of different families and sizes, and one link each, say nothing yet about the effect of density.
 
 ## Not here yet
 
-- A quiet control window, with no event, to subtract background CPU from the link windows.
+- A density sweep at a fixed number of routers, with several links and more repeats.
 - An exporter to netlab, as a second, independent path to FRR IS-IS.
 - Fat-tree (three-tier Clos) by radix.
 
