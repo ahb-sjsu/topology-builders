@@ -39,6 +39,12 @@ keys are sorted, so the same versions and parameters give byte-identical files.
 ## Use
 
 ```
+pip install topology-builders
+```
+
+The command is `topology-builders`; `python -m topology_builders` does the same.
+
+```
 python -m topology_builders sweep --routers 64 --seeds 1,2,3 --out out/n64
 python -m topology_builders zoo <topohub>/data/topozoo/TataNld.json --method nearest --degrees 4,8,16 --out out/tata
 python -m topology_builders build flattened-butterfly --radices 8,8 --out ff-8x8.json
@@ -72,7 +78,8 @@ NET and port count, and every link's ports and addresses) and `manifest.json` (S
 containerlab version. `--kind frr` uses containerlab's own FRR kind, which needs containerlab 0.80.0 or later. TopoHub
 files can be given directly; their nodes are renamed r0, r1, ... in order, and `lab.json` keeps the original ids.
 
-`python3 tools/check_isis.py <lab directory> [timeout]` checks a deployed lab through `docker exec`: every router
+`python3 tools/check_isis.py <lab directory> [timeout]`, in this repository (pip does not install it), checks a
+deployed lab through `docker exec`: every router
 must have one adjacency Up per link and an LSP from every router. It retries every 5 s until the timeout (default
 120 s) and exits non-zero if the lab never gets there.
 
@@ -103,7 +110,7 @@ Measured on an HP Z840 (Xeon E5-2690 v3; Python 3.12.3, networkx 3.6.1), 2026-11
 - An exporter to netlab, as a second, independent path to FRR IS-IS.
 - Fat-tree (three-tier Clos) by radix.
 
-[SURVEY.md](SURVEY.md) lists the existing builders and lab tools, with licences and status, so that this repository
+[SURVEY.md](https://github.com/ahb-sjsu/topology-builders/blob/main/SURVEY.md) lists the existing builders and lab tools, with licences and status, so that this repository
 can link to and wrap them rather than rewrite them.
 
 ## License

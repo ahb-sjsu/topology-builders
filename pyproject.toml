@@ -1,17 +1,39 @@
 [build-system]
-requires = ["setuptools>=64"]
+requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "topology-builders"
 version = "0.1.0"
-description = "Network topologies whose density can be stepped at a fixed number of routers"
-license = { text = "MIT" }
+description = "Network topologies whose density can be stepped at a fixed number of routers, and FRR IS-IS labs for containerlab"
+readme = "README.md"
 requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Andrew H. Bond", email = "andrew.bond@sjsu.edu" }]
+keywords = ["network-topology", "topology-generator", "containerlab", "frr", "is-is", "networkx"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Telecommunications Industry",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: System :: Networking",
+]
 dependencies = ["networkx"]
 
 [project.optional-dependencies]
 test = ["pytest", "pyyaml"]
+
+[project.scripts]
+topology-builders = "topology_builders.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/ahb-sjsu/topology-builders"
+Repository = "https://github.com/ahb-sjsu/topology-builders"
+Issues = "https://github.com/ahb-sjsu/topology-builders/issues"
 
 [tool.setuptools]
 packages = ["topology_builders"]
