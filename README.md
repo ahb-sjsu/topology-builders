@@ -89,11 +89,13 @@ flattened butterfly equals networkx's Cartesian product of complete graphs and t
 exactly one forward path between each first-stage and each last-stage switch; and that zoo additions keep the
 original links, nest, and with nearest-first add the shortest links. For the labs they check that ports run eth1 to
 ethN on every router, that both ends of each link share a /31, that the containerlab file matches the link list, and
-that the `on` and `off` configurations differ only in the `flood-reduction` line.
+that the `on` and `off` configurations differ only in the `flood-reduction` line. For `measure` they check the
+parsers against output captured from a live lab (`tests/fixtures`), the outcome rules, the choice of link and the
+totals.
 
 Measured on an HP Z840 (Xeon E5-2690 v3; Python 3.12.3, networkx 3.6.1), 2026-11-18:
 
-- all 17 tests pass;
+- all 17 tests pass (23 since `measure` was added);
 - the 64-router sweep with seeds 1, 2 and 3: 50 topologies, all connected, in 1.0 s in all (0.03 s or less each),
   and a second run gives byte-identical files (50 of 50 SHA-256 equal);
 - random-regular at 256 routers, d = 3 to 255: 14 topologies in 3.1 s in all, the largest with 32,640 links;
@@ -137,9 +139,53 @@ Built on the HP Z840 above, 2026-11-19, from FRR pull request 24128 at e263c441 
   75.4 C), it gave the same FRR and libyang packages and the same test result. The image ID differs: the classic
   builder took steps 1 to 17 from its cache and ran the rest again, from `ARG PKGVER` on, for a reason not found.
 
+## Measuring flooding and CPU
+
+`measure` deploys labs written by `clab` and measures them around a link going down and coming back up:
+
+```
+topology-builders clab rr32.json --out labs/rr32 --image frr-distoptflood:e263c441
+topology-builders measure labs/rr32/off labs/rr32/on --repeat 2 --out measurements.jsonl
+```
+
+One run of one lab:
+
+1. Deploy it, then wait 30 s (`--settle`) without querying the routers.
+2. Check that every router has one adjacency Up per link and the same LSPs as every other router; if not, keep
+   checking every 5 s, for up to 120 s (`--max-wait`).
+3. Snapshot every router: the PDU counters of `show isis summary` (sent, received and dropped, per PDU type), its
+   flooding-reduction counters, and the CPU time of isisd and zebra from /proc. This closes the bring-up phase.
+4. Take one link down, wait 30 s (`--window`) without querying, snapshot, then check that every router holds the
+   same LSPs, including a newer LSP from each end of the link. Bring the link back up and do the same.
+5. Destroy the lab.
+
+- Counters and CPU in the link phases are differences between snapshots, so the checks between them are not
+  counted. Bring-up counts from the routers' start, so it includes the convergence check.
+- Each phase has an outcome: satisfied when every router holds the same LSPs and the new ones, violated when not,
+  and unknown when a router could not be read.
+- The link is chosen from the topology file and `--seed`, so the off and on labs use the same one. The labs take
+  turns, and the order alternates between repeats.
+- Each run is one JSON line, with per-router figures and the host's load average and CPU temperature at start and
+  end. A table of means per lab and phase is printed at the end.
+
+First runs, 2026-11-19, on the HP Z840 above with the image from FRR pull request 24128 at e263c441, 2 repeats of
+each lab. The host's load average was 10 to 15 from other work. LSPs sent, summed over all routers, mean off and on:
+
+| Topology | Bring-up | Link down | Link up |
+|---|---|---|---|
+| flattened butterfly 4 x 2: 8 routers, 16 links, degree 4 | 417.5 and 334 (-20%) | 45 and 17.5 (-61%) | 68.5 and 26 (-62%) |
+| random regular: 32 routers, 96 links, degree 6 | 10,715 and 9,103 (-15%) | 246 and 153.5 (-38%) | 394 and 234 (-41%) |
+
+- All 24 phases were satisfied: every router held every new LSP within the window, with flood reduction off and on.
+- The differences between off and on are much larger than between repeats (link down on 32 routers: 256 and 236
+  off, 157 and 150 on).
+- isisd CPU time over each 30 s window did not differ between off and on (link down on 32 routers: 3,305 and
+  3,315 ms). With hellos every second on every link, background work dominates a window of that length.
+- Two topologies of different families and sizes, and one link each, say nothing yet about the effect of density.
+
 ## Not here yet
 
-- Measuring a run: CPU, and the flooding counters that `show isis summary` reports with flood reduction on.
+- A quiet control window, with no event, to subtract background CPU from the link windows.
 - An exporter to netlab, as a second, independent path to FRR IS-IS.
 - Fat-tree (three-tier Clos) by radix.
 

@@ -1,0 +1,35 @@
+vrf             : default
+Process Id      : 37
+System Id       : 0000.0000.0001
+Up time         : 00:00:16 ago
+Number of areas : 1
+Area 1:
+  Net: 49.0001.0000.0000.0001.00
+  TX counters per PDU type:
+    P2P IIH: 73
+     L2 LSP: 48
+    L2 CSNP: 8
+    L2 PSNP: 14
+   LSP RXMT: 0
+  RX counters per PDU type:
+    P2P IIH: 70
+     L2 LSP: 35
+    L2 CSNP: 8
+    L2 PSNP: 15
+  Drop counters per PDU type:
+  Advertise high metrics: Disabled
+  Level-2:
+    LSP0 regenerated: 3
+         LSPs purged: 0
+    Authentication: none
+    Flooding reduction:
+      reduced LSPs      : 7
+      fallbacks         : 12
+      selected          : 5
+      suppressed sends  : 12
+    SPF:
+      minimum interval  : 1
+    IPv4 route computation:
+      last run elapsed  : 00:00:11 ago
+      last run duration : 375 usec
+      run count         : 5

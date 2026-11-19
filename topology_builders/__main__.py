@@ -89,6 +89,16 @@ def main(argv=None):
     c.add_argument("--debug-flooding", action="store_true",
                    help="add 'debug isis flooding' (verbose: it changes CPU measurements)")
 
+    m = sub.add_parser("measure", help="deploy labs written by clab and measure flooding and CPU around a link flap")
+    m.add_argument("labs", nargs="+", help="lab directories of one topology, e.g. <out>/off <out>/on")
+    m.add_argument("--repeat", type=int, default=1, help="runs of each lab; the order alternates (default 1)")
+    m.add_argument("--settle", type=int, default=30, help="seconds after deploy before the first check (default 30)")
+    m.add_argument("--window", type=int, default=30, help="seconds after the link goes down, and up (default 30)")
+    m.add_argument("--seed", type=int, default=1, help="chooses the link (default 1)")
+    m.add_argument("--max-wait", type=int, default=120,
+                   help="seconds to keep checking for convergence after the settle time (default 120)")
+    m.add_argument("--out", default="measurements.jsonl", help="JSON lines, appended (default measurements.jsonl)")
+
     a = p.parse_args(argv)
     if a.command == "sweep":
         _run(S.plan(a.routers, a.families.split(","), _ints(a.seeds)), a.out, argv)
@@ -104,6 +114,16 @@ def main(argv=None):
                     jobs.append((f"zoo-{name}-avg{d:g}-{a.method}{tag}.json",
                                  lambda p=path, d=d, sd=sd: Z.denser(p, d, a.method, sd if sd is not None else 1)))
         _run(jobs, a.out, argv)
+    elif a.command == "measure":
+        from . import measure as M
+        records = M.run(a.labs, repeat=a.repeat, settle=a.settle, window=a.window, seed=a.seed, out=a.out,
+                        max_wait=a.max_wait)
+        print(f"{'lab':<28} {'reduction':<9} {'phase':<9} {'runs':>4} {'LSPs sent':>9} {'suppressed':>10} "
+              f"{'isisd ms':>8}  outcomes")
+        for r in M.summarize(records):
+            print(f"{r['lab']:<28} {'on' if r['flood_reduction'] else 'off':<9} {r['phase']:<9} {r['runs']:>4} "
+                  f"{r['lsps_sent']:>9} {r['suppressed_sends']:>10} {r['isisd_ms']:>8}  {r['outcomes']}")
+        print(f"{len(records)} runs appended to {a.out}")
     elif a.command == "clab":
         base = C.lab_name(a.name or os.path.splitext(os.path.basename(a.topology))[0])
         for on in {"on": [True], "off": [False], "both": [False, True]}[a.flood_reduction]:
