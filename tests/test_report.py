@@ -68,3 +68,46 @@ def test_read_and_command(tmp_path):
     out = subprocess.run([sys.executable, "-m", "topology_builders", "report", str(plain), str(packed), "--json"],
                          check=True, cwd=ROOT, capture_output=True, text=True).stdout
     assert json.loads(out)[0]["lsp_saving"] == 1 - 30 / 100
+
+
+def test_other_event_kinds_and_pooled_seeds():
+    def rr(seed):
+        return {"family": "random-regular", "parameters": {"routers": 8, "degree": 3, "seed": seed}, "routers": 8,
+                "links": 12, "average_degree": 3.0}
+
+    def node_record(on, sha, seed, lsps):
+        r = record(on, 0, (lsps, 100.0), (lsps, 100.0), sha=sha, topology=rr(seed))
+        for p in r["phases"]:
+            if p["phase"].startswith("link-"):
+                p["phase"], p["event"] = p["phase"].replace("link", "node"), p.pop("link")
+        return r
+    recs = [node_record(False, "s1", 1, 40), node_record(True, "s1", 1, 10),
+            node_record(False, "s2", 2, 50), node_record(True, "s2", 2, 25)]
+    assert R.rows(recs)[0]["windows"]["off"]["windows"] == 0
+    table = R.rows(recs, "node")
+    assert [r["lsp_saving"] for r in table] == [0.75, 0.5] and table[0]["pairs"]["n"] == 2
+    (pool,) = R.pooled(table)
+    assert pool["topology"] == "random regular, degree 3" and pool["graphs"] == 2 and pool["runs"] == {"off": 2, "on": 2}
+    assert pool["lsp_saving"] == 0.625 and pool["lsp_saving_range"] == [0.5, 0.75] and pool["pairs"]["n"] == 4
+    assert "Node changes" in R.text([pool], "node")
+
+
+def test_timing_and_profile_text():
+    recs = []
+    for on in (False, True):
+        r = record(on, 0, (40, 200.0), (60, 400.0))
+        r["timing"] = True
+        for p, ms in zip(r["phases"][2:], (120.0 if not on else 80.0, None)):
+            p["timing"] = {"max_ms": ms, "flood_ms": None if ms is None else ms / 4}
+        recs.append(r)
+        q = record(on, 0, (40, 200.0), (60, 400.0))
+        q["profile"] = True
+        for p in q["phases"][2:]:
+            p["net_of_quiet"]["event_cpu_ms"] = {"isis_receive": 30.0 if not on else 10.0, "lsp_tick": 5.0}
+        recs.append(q)
+    assert len(R.rows(recs)) == 1 and R.rows(recs)[0]["runs"] == {"off": 1, "on": 1}
+    t = R.timing_text(recs)
+    assert "120.0" in t and "80.0" in t and "30.0" in t and "20.0" in t and t.rstrip().endswith("1    1")
+    prof = R.profile_text(recs)
+    assert prof.index("isis_receive") < prof.index("lsp_tick") and "30.0" in prof and "10.0" in prof
+    assert R.timing_text([record(False, 0, (1, 1.0), (1, 1.0))]) == ""

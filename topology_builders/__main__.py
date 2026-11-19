@@ -91,6 +91,8 @@ def main(argv=None):
     c.add_argument("--debug-flooding", action="store_true",
                    help="add 'debug isis flooding' (verbose: it changes CPU measurements)")
     c.add_argument("--cpu-set", help="run every router on these CPUs only, e.g. 12-23,36-43 (containerlab cpu-set)")
+    c.add_argument("--timing-logs", action="store_true",
+                   help="log every LSP built or received, with microsecond times, for measure --timing (costs CPU)")
 
     m = sub.add_parser("measure", help="deploy labs written by clab and measure flooding and CPU around a link flap")
     m.add_argument("labs", nargs="+", help="lab directories of one topology, e.g. <out>/off <out>/on")
@@ -98,7 +100,16 @@ def main(argv=None):
     m.add_argument("--settle", type=int, default=30, help="seconds after deploy before the first check (default 30)")
     m.add_argument("--window", type=int, default=30, help="seconds after the link goes down, and up (default 30)")
     m.add_argument("--seed", type=int, default=1, help="chooses the links (default 1)")
-    m.add_argument("--links", type=int, default=1, help="links taken down and up, one after another (default 1)")
+    m.add_argument("--event", default="link",
+                   help="link: one link down and up; node: every link of one router at once; multi: --fail links "
+                        "at once, keeping the graph connected; several comma-separated, e.g. link,node,multi, run in "
+                        "that order (default link)")
+    m.add_argument("--links", "--events", dest="links", type=int, default=1,
+                   help="events per run, one after another (default 1)")
+    m.add_argument("--fail", type=int, default=2, help="links per multi event (default 2)")
+    m.add_argument("--timing", action="store_true",
+                   help="convergence time per window from the routers' logs (labs written with clab --timing-logs)")
+    m.add_argument("--profile", action="store_true", help="isisd CPU per event handler (show event cpu) per window")
     m.add_argument("--max-temp", type=float, default=80.0,
                    help="before each run, wait while the hottest CPU sensor is above this, deg C (default 80)")
     m.add_argument("--max-wait", type=int, default=120,
@@ -108,8 +119,13 @@ def main(argv=None):
     r = sub.add_parser("report", help="per topology, flood reduction off against on, from measure's JSON lines")
     r.add_argument("files", nargs="+", help="JSON-lines files written by measure (.jsonl or .jsonl.gz)")
     r.add_argument("--json", action="store_true", help="print the rows as JSON instead of tables")
+    r.add_argument("--event", choices=("link", "node", "multi"), default="link", help="which events (default link)")
+    r.add_argument("--pool-seeds", action="store_true",
+                   help="one row per family and parameters, pooling graphs that differ only in their seed")
 
     a = p.parse_args(argv)
+    if a.command == "measure" and not set(a.event.split(",")) <= {"link", "node", "multi"}:
+        p.error(f"--event takes link, node and multi, comma-separated; got {a.event}")
     if a.command == "sweep":
         _run(S.plan(a.routers, a.families.split(","), _ints(a.seeds)), a.out, argv)
     elif a.command == "zoo":
@@ -127,7 +143,8 @@ def main(argv=None):
     elif a.command == "measure":
         from . import measure as M
         records = M.run(a.labs, repeat=a.repeat, settle=a.settle, window=a.window, seed=a.seed, out=a.out,
-                        max_wait=a.max_wait, links=a.links, max_temp=a.max_temp)
+                        max_wait=a.max_wait, links=a.links, max_temp=a.max_temp, kind=a.event, fail=a.fail,
+                        timing=a.timing, profile=a.profile)
         print(f"{'lab':<28} {'reduction':<9} {'phase':<9} {'runs':>4} {'LSPs sent':>9} {'suppressed':>10} "
               f"{'isisd ms':>8} {'net of quiet':>12}  outcomes")
         for r in M.summarize(records):
@@ -137,8 +154,12 @@ def main(argv=None):
         print(f"{len(records)} runs appended to {a.out}")
     elif a.command == "report":
         from . import report as R
-        table = R.rows(R.read(a.files))
-        sys.stdout.write(json.dumps(table, indent=1) + "\n" if a.json else R.text(table))
+        records = R.read(a.files)
+        table = R.rows(records, a.event)
+        if a.pool_seeds:
+            table = R.pooled(table)
+        extra = "" if a.pool_seeds else R.timing_text(records, a.event) + R.profile_text(records, a.event)
+        sys.stdout.write(json.dumps(table, indent=1) + "\n" if a.json else R.text(table, a.event) + extra)
     elif a.command == "clab":
         base = C.lab_name(a.name or os.path.splitext(os.path.basename(a.topology))[0])
         for on in {"on": [True], "off": [False], "both": [False, True]}[a.flood_reduction]:
@@ -147,7 +168,7 @@ def main(argv=None):
             m = C.write_lab(a.topology, out, name=f"{base}-{tag}", flood_reduction=on, kind=a.kind,
                             image=a.image, hello_interval=a.hello_interval, hello_multiplier=a.hello_multiplier,
                             lsp_gen_interval=a.lsp_gen_interval, area=a.area, debug_flooding=a.debug_flooding,
-                            cpu_set=a.cpu_set)
+                            cpu_set=a.cpu_set, timing_logs=a.timing_logs)
             print(f"{out}: lab {m['name']}, {m['routers']} routers, {m['links']} links, flood-reduction {tag}. "
                   f"Deploy: containerlab deploy -t {os.path.join(out, m['name'] + '.clab.yml')}")
     else:

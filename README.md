@@ -1,8 +1,24 @@
 # Topology builders
 
+[![CI](https://github.com/ahb-sjsu/topology-builders/actions/workflows/ci.yml/badge.svg)](https://github.com/ahb-sjsu/topology-builders/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/topology-builders.svg)](https://pypi.org/project/topology-builders/)
+[![Python](https://img.shields.io/pypi/pyversions/topology-builders.svg)](https://pypi.org/project/topology-builders/)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+[![Code: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE)
+[![Text and data: CC BY 4.0](https://img.shields.io/badge/text%20%26%20data-CC%20BY%204.0-lightgrey.svg)](LICENSE-TEXT)
+
 Generators for network topologies whose density can be stepped while the number of routers stays fixed, so that
 an experiment can tell the effect of density from the effect of size. The first use is testing an IS-IS flooding
 reduction on denser and denser topologies.
+
+```mermaid
+flowchart LR
+    G["<b>sweep / zoo / build</b><br/>topology files<br/>(node-link JSON)"] --> C["<b>clab</b><br/>FRR IS-IS lab,<br/>off/ and on/"]
+    I["<b>tools/frr-image</b><br/>FRR built from<br/>any commit"] -.-> C
+    C --> M["<b>measure</b><br/>deploy, change links,<br/>snapshot routers"]
+    M --> J[("JSON lines,<br/>one per run")]
+    J --> R["<b>report</b><br/>off against on,<br/>per topology"]
+```
 
 ## Families
 
@@ -78,7 +94,20 @@ lab cannot take the whole host and its runs see the same CPUs every time.
 Run large labs inside a container or VM with its own network namespace, not directly on a host whose own network
 matters. A 64-router lab creates over a thousand interfaces in the namespace containerlab runs in. On one host,
 deploying a 512-link lab made systemd-networkd time out and give up on the host's uplink, whose DHCP lease then
-lapsed. We now run containerlab and its own Docker inside a privileged LXD container with nesting enabled.
+lapsed. We now run containerlab and its own Docker inside a privileged LXD container with nesting enabled:
+
+```mermaid
+flowchart TB
+    subgraph host["Host: its uplink and network manager never see a lab interface"]
+        subgraph lxd["LXD container: own network namespace, limited to a CPU set"]
+            D["Docker and containerlab"] --> R1["FRR router"] & R2["FRR router"] & R3["... one container per router"]
+            R1 <-. "veth pairs" .-> R2
+        end
+    end
+```
+
+In a test with an 8-router lab, the host's interface count did not change during deployment and systemd-networkd
+logged nothing about the lab.
 
 Each lab directory holds the containerlab file, one directory per router, `lab.json` (every router's loopback,
 NET and port count, and every link's ports and addresses) and `manifest.json` (SHA-256 of each file). Node kind
@@ -103,7 +132,7 @@ totals.
 
 Measured on an HP Z840 (Xeon E5-2690 v3; Python 3.12.3, networkx 3.6.1), 2026-11-18:
 
-- all 17 tests pass (29 now, with `measure` and `report`);
+- all 17 tests pass (38 now, with `measure` and `report`);
 - the 64-router sweep with seeds 1, 2 and 3: 50 topologies, all connected, in 1.0 s in all (0.03 s or less each),
   and a second run gives byte-identical files (50 of 50 SHA-256 equal);
 - random-regular at 256 routers, d = 3 to 255: 14 topologies in 3.1 s in all, the largest with 32,640 links;
@@ -149,7 +178,8 @@ Built on the HP Z840 above, 2026-11-19, from FRR pull request 24128 at e263c441 
 
 ## Measuring flooding and CPU
 
-`measure` deploys labs written by `clab` and measures them around a link going down and coming back up:
+`measure` deploys labs written by `clab` and measures them around events: a link going down and coming back up,
+a router failing, or several links failing at once.
 
 ```
 topology-builders clab rr32.json --out labs/rr32 --image frr-distoptflood:e263c441
@@ -157,6 +187,15 @@ topology-builders measure labs/rr32/off labs/rr32/on --repeat 2 --out measuremen
 ```
 
 One run of one lab:
+
+```mermaid
+flowchart LR
+    D[deploy] --> S["settle<br/>30 s"] --> K{"converged?"}
+    K -- "no: check<br/>every 5 s" --> K
+    K -- yes --> B["bring-up<br/>snapshot"] --> Q["quiet<br/>window"] --> E["event down:<br/>window, check"] --> U["event up:<br/>window, check"]
+    U -- "next event" --> E
+    U --> X[destroy]
+```
 
 1. Deploy it, then wait 30 s (`--settle`) without querying the routers.
 2. Check that every router has one adjacency Up per link and the same LSPs as every other router; if not, keep
@@ -166,9 +205,9 @@ One run of one lab:
 4. A quiet window: snapshot, wait 30 s (`--window`) with no event and no queries, snapshot, then check that no
    router's LSPs changed. It measures the background work (hellos every second on every link, timers) that every
    window contains.
-5. For each of `--links` links in turn (default 1): snapshot, take it down, wait the same 30 s, snapshot, then
-   check that every router holds the same LSPs, including a newer LSP from each end of the link. Bring the link
-   back up and do the same.
+5. For each event in turn (default: one link): snapshot, apply it, wait the same 30 s, snapshot, then check that
+   every router holds the same LSPs, including a newer LSP from every router the event touched. Undo it (bring the
+   links back up) and do the same.
 6. Destroy the lab.
 
 - Every window is the difference between a snapshot taken just before it and one at its end, so the checks between
@@ -182,6 +221,32 @@ One run of one lab:
   how long it waited.
 - Each run is one JSON line, with per-router figures and the host's load average and CPU temperature at start and
   end. A table of means per lab and phase is printed at the end.
+
+Events (`--event`, with `--links N` events of each kind per run):
+
+| Kind | What happens | Checked after the down window |
+|---|---|---|
+| `link` (default) | one link down, then up | every router holds the same LSPs, with a newer LSP from both ends |
+| `node` | every link of one router down at once, as when it fails; then all up | the failed router is left out; every other router holds the same LSPs, with a newer LSP from each of its neighbours |
+| `multi` | `--fail` links (default 2) down at once, chosen so the graph stays connected; then all up | as for `link`, for every end of every failed link |
+
+Several kinds can share one deployment, run in the order given: `--event link,node,multi`. The routers, links and
+sets are chosen from the topology file and `--seed`, so every variant gets the same ones.
+
+Two options record more about each event window:
+
+- `--profile`: isisd's own CPU accounting per event handler (`show event cpu`), cleared at the start of every window.
+  It shows where the CPU goes, for example route computation (`isis_run_spf_cb`) against receiving LSPs
+  (`isis_receive`), and the handler's call count gives the number of route computations.
+- `--timing`, for labs written with `clab --timing-logs`, in which every router logs each LSP it builds or receives
+  with microsecond timestamps. For each window it records, per router, when it first held every new LSP; the
+  convergence time (from the event to the last router holding them); and the flooding time alone (from each LSP's
+  origin to the last router holding it). The routers share one clock, the host's. Debug logging costs CPU, so
+  timing runs are kept out of the CPU tables.
+
+`topology-builders report <files>` prints, per topology, the event windows of one kind (`--event`, default link)
+pooled and paired, bring-up, and, when present, convergence times and the CPU per handler. `--pool-seeds` merges
+graphs that differ only in their seed into one row, with each saving's range across graphs.
 
 Runs of 2026-11-19 on the HP Z840 above, with the image from FRR pull request 24128 at e263c441, 2 repeats of each
 lab. The host's load average was 4 to 11 from other work. Means, flood reduction off and on; LSPs sent and isisd CPU
@@ -214,7 +279,8 @@ reduction, the 64 routers did not converge on the host's CPUs, and with it they 
 
 ## Not here yet
 
-- The density sweep for the flattened-butterfly and leaf-spine families, and more than one graph per degree.
+- Results of the flattened-butterfly and leaf-spine sweep, and of runs with several graphs per degree, timing,
+  failures and CPU per handler (running).
 - An exporter to netlab, as a second, independent path to FRR IS-IS.
 - Fat-tree (three-tier Clos) by radix.
 

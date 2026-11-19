@@ -1,3 +1,4 @@
+import calendar
 from pathlib import Path
 
 import pytest
@@ -95,3 +96,114 @@ def test_totals_and_summarize():
     rows = M.summarize([rec, rec])
     assert rows == [{"lab": "x-on", "flood_reduction": True, "phase": "link-down", "runs": 2, "lsps_sent": 4.0,
                      "suppressed_sends": 2.0, "isisd_ms": 10.0, "isisd_net_ms": 3.0, "outcomes": {"satisfied": 2}}]
+
+
+def event_cpu_text():
+    fmt = "%5d %10d.%03d %9d %8d %9d %8d %9d %9d %9d %10d  %s  %s"
+    head = ("Active   Runtime(ms)   Invoked Avg uSec Max uSecs Avg uSec Max uSecs"
+            "  CPU_Warn Wall_Warn Starv_Warn   Type  Event")
+    rows = [fmt % (0, 12, 345, 10, 1234, 2000, 1300, 2100, 0, 0, 0, "R    ", "isis_receive"),
+            fmt % (1, 0, 500, 2, 250, 300, 260, 310, 0, 0, 0, "  T  ", "lsp_tick")]
+    other = [fmt % (0, 1, 0, 1, 1000, 1000, 1000, 1000, 0, 0, 0, "R    ", "isis_receive")]
+    total = [fmt % (1, 13, 845, 13, 1065, 2000, 1100, 2100, 0, 0, 0, "RWT  ", "TOTAL")]
+    return "\n".join(["Showing statistics for pthread default", head, *rows, "",
+                      "Showing statistics for pthread Zebra API", head, *other, "",
+                      "Total Event statistics", head, *total])
+
+
+def test_parse_event_cpu_sums_pthreads_and_skips_the_total():
+    assert M.parse_event_cpu(event_cpu_text()) == {"isis_receive": [13.345, 11], "lsp_tick": [0.5, 2]}
+
+
+def test_log_lines_and_convergence():
+    t0 = calendar.timegm((2026, 11, 19, 18, 0, 0))
+
+    def at(us, what):
+        return f"2026/11/19 18:00:00.{us:06d} ISIS: [AB12C-DE34F] ISIS-Upd (1): {what}"
+    r0, r1 = "0000.0000.0001.00-00", "0000.0000.0002.00-00"
+    logs = {
+        "r0": at(100000, f"Building L2 LSP {r0}, len 100, seq 0x00000005, cksum 0x1234, lifetime 1199s refresh 900s")
+        + "\n" + at(120000, f"Rcvd L2 LSP {r1}, seq 0x00000004, cksum 0x1, lifetime 1199s, len 90, on eth1")
+        + "\n" + at(180000, f"Rcvd L2 LSP {r1}, seq 0x00000006, cksum 0x2, lifetime 1199s, len 90, on eth1"),
+        "r1": at(110000, f"Refreshed our L2 LSP {r1}, len 90, seq 0x00000006, cksum 0x2, lifetime 1199s refresh 900s")
+        + "\n" + at(150000, f"Rcvd L2 LSP {r0}, seq 0x00000005, cksum 0x1234, lifetime 1199s, len 100, on eth2"),
+        "r2": at(200000, f"Rcvd L2 LSP {r0}, seq 0x00000005, cksum 0x1234, lifetime 1199s, len 100, on eth1")
+        + "\nsomething else\n" + at(300000, f"Rcvd L2 LSP {r1}, seq 0x00000007, cksum 0x3, lifetime 1199s, len 90, on eth3"),
+    }
+    parsed = {r: M.parse_log_lsps(t) for r, t in logs.items()}
+    assert parsed["r0"][0] == (t0 + 0.1, "Building", r0, 5) and len(parsed["r2"]) == 2
+    c = M.convergence(parsed, {r0: 5, r1: 6}, t0 + 0.05)
+    assert c["per_router_ms"] == {"r0": 130.0, "r1": 100.0, "r2": 250.0}
+    assert (c["max_ms"], c["median_ms"], c["missing"]) == (250.0, 130.0, [])
+    # r0's LSP built at .100, last held at .200 (r2); r1's built at .110, last held at .300 (r2): 190 ms.
+    assert c["flood_ms"] == 190.0
+    c = M.convergence(dict(parsed, r3=None, r4=[]), {r0: 5, r1: 6}, t0 + 0.05)
+    assert c["max_ms"] is None and c["missing"] == ["r3", "r4"] and c["median_ms"] == 130.0 and c["flood_ms"] is None
+
+
+def test_logged_ids():
+    lab = {"routers": [{"name": "r0", "net": "49.0001.0000.0000.0001.00"},
+                       {"name": "r10", "net": "49.0001.0000.0000.000b.00"}]}
+    assert M.logged_ids(lab, ["r0.00-00", "r10.00-01", "x.00-00"]) == {"r0.00-00": "0000.0000.0001.00-00",
+                                                                        "r10.00-01": "0000.0000.000b.00-01"}
+
+
+def lab_of(g):
+    from topology_builders import clab as C
+    routers, links = C.plan(g)
+    return {"source_sha256": "ef" * 32, "routers": routers, "links": links}
+
+
+def test_pick_events_node_and_multi():
+    import networkx as nx
+
+    from topology_builders import families as F
+    lab = lab_of(F.leaf_spine(14, 2))
+    nodes = M.pick_events(lab, 1, "node", 3)
+    assert len({e["router"] for e in nodes}) == 3 and nodes == M.pick_events(lab, 1, "node", 3)
+    for e in nodes:
+        assert e["links"] and all(e["router"] in (x["a"], x["b"]) for x in e["links"])
+        ends, failed = M.event_ends(e)
+        assert failed == [e["router"]] and e["router"] not in ends and len(ends) == len(e["links"])
+    multi = M.pick_events(lab, 1, "multi", 4, fail=3)
+    assert multi == M.pick_events(lab, 1, "multi", 4, fail=3) and len(multi) == 4
+    g = nx.Graph((x["a"], x["b"]) for x in lab["links"])
+    for e in multi:
+        assert len({(x["a"], x["b"]) for x in e["links"]}) == 3
+        h = g.copy()
+        h.remove_edges_from((x["a"], x["b"]) for x in e["links"])
+        assert nx.is_connected(h) and M.event_ends(e)[1] == []
+    assert [e["links"] for e in M.pick_events(lab, 2, "link", 3)] == [[x] for x in M.pick_links(lab, 2, 3)]
+    with pytest.raises(ValueError):
+        M.pick_events(lab, 1, "multi", 1, fail=1)
+    with pytest.raises(ValueError):
+        M.pick_events(lab, 1, "storm", 1)
+
+
+def test_outcome_leaves_out_the_failed_router():
+    before = {"r0.00-00": 3, "r1.00-00": 3, "r2.00-00": 3}
+    after = {"r0.00-00": 3, "r1.00-00": 4, "r2.00-00": 4}
+    dbs = {"r0": dict(before), "r1": dict(after), "r2": dict(after)}
+    assert M.outcome(dbs, before, ("r1", "r2"), exclude=("r0",))[0] == "satisfied"
+    assert M.outcome(dbs, before, ("r1", "r2"))[0] == "violated"
+
+
+def test_apply_sets_the_ports_of_each_router_at_once():
+    lab = object.__new__(M.Lab)
+    calls = []
+
+    class Pool:
+        def map(self, fn, items):
+            return [fn(i) for i in items]
+
+    def fake_exec(router, script):
+        calls.append((router, script))
+        return 0, f"{len(calls)}.5\n"
+    lab.pool, lab.exec = Pool(), fake_exec
+    links = [{"a": "r0", "a_port": "eth1", "b": "r1", "b_port": "eth3"},
+             {"a": "r2", "a_port": "eth2", "b": "r0", "b_port": "eth4"}]
+    assert lab.apply({"kind": "node", "router": "r0", "links": links}, "down") == 1.5
+    assert calls == [("r0", "ip link set eth1 down; ip link set eth4 down; date +%s.%N")]
+    calls.clear()
+    lab.apply({"kind": "multi", "links": links}, "up")
+    assert sorted(calls) == [("r0", "ip link set eth1 up; date +%s.%N"), ("r2", "ip link set eth2 up; date +%s.%N")]

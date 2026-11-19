@@ -121,3 +121,18 @@ def test_cpu_set(tmp_path):
     assert "cpu_set" not in json.loads((tmp_path / "free" / "lab.json").read_text())["settings"]
     with pytest.raises(ValueError):
         C.write_lab(src, tmp_path / "bad", name="p", cpu_set="12-23; rm -rf /")
+
+
+def test_timing_logs(tmp_path):
+    src = topology(tmp_path, F.random_regular(8, 3, 1))
+    m = C.write_lab(src, tmp_path / "off", name="t", timing_logs=True)
+    C.write_lab(src, tmp_path / "on", name="t", flood_reduction=True, timing_logs=True)
+    off = (tmp_path / "off" / "r0" / "frr.conf").read_text().splitlines()
+    on = (tmp_path / "on" / "r0" / "frr.conf").read_text().splitlines()
+    for x in ("log file /tmp/frr.log debugging", "log timestamp precision 6", "debug isis update-packets"):
+        assert x in off
+    assert [x for x in on if x != " flood-reduction"] == off and m["settings"]["timing_logs"] is True
+    C.write_lab(src, tmp_path / "plain", name="t")
+    plain = (tmp_path / "plain" / "r0" / "frr.conf").read_text()
+    assert "debug isis update-packets" not in plain and "timing_logs" not in json.loads(
+        (tmp_path / "plain" / "lab.json").read_text())["settings"]

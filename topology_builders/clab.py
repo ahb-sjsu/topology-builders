@@ -11,6 +11,9 @@ containerlab version; `frr` is containerlab's own FRR kind, which needs containe
 (containerlab's `cpu-set`, e.g. "12-23") confines every router of the lab to those CPUs, so a dense lab cannot take
 the whole host.
 
+Timing logs (`timing_logs`) make every router log each LSP it builds or receives, with microsecond timestamps, to
+/tmp/frr.log, for `measure --timing`. They cost CPU, so labs with them are for timing, not for CPU figures.
+
 Addresses: router i has loopback 10.255.0.0 + i + 1 and system ID i + 1 in hexadecimal; link j has
 10.0.0.0 + 2j and + 2j + 1.  Ports are numbered eth1, eth2, ... on each router in the order of its links in the
 sorted link list."""
@@ -91,6 +94,8 @@ def frr_conf(router, interfaces, settings):
     lines = ["frr defaults traditional", f"hostname {router['name']}", "log stdout informational", "!"]
     if s["debug_flooding"]:
         lines += ["debug isis flooding", "!"]
+    if s.get("timing_logs"):
+        lines += ["log file /tmp/frr.log debugging", "log timestamp precision 6", "debug isis update-packets", "!"]
     lines += ["interface lo", f" ip address {router['loopback']}", " ip router isis 1", " isis passive", "exit",
               "!"]
     for port, address, metric in interfaces:
@@ -139,7 +144,8 @@ def topology_yaml(name, routers, links, kind, image, cpu_set=None):
 
 
 def write_lab(source, out, name=None, flood_reduction=False, kind="linux", image=None, hello_interval=1,
-              hello_multiplier=3, lsp_gen_interval=2, area="49.0001", debug_flooding=False, cpu_set=None):
+              hello_multiplier=3, lsp_gen_interval=2, area="49.0001", debug_flooding=False, cpu_set=None,
+              timing_logs=False):
     """Write one lab into directory `out`; return its manifest."""
     if kind not in IMAGES:
         raise ValueError(f"kind must be one of {sorted(IMAGES)}, got {kind}")
@@ -154,6 +160,8 @@ def write_lab(source, out, name=None, flood_reduction=False, kind="linux", image
                 "lsp_gen_interval": lsp_gen_interval, "area": area, "debug_flooding": bool(debug_flooding)}
     if cpu_set:
         settings["cpu_set"] = cpu_set
+    if timing_logs:
+        settings["timing_logs"] = True
     routers, links = plan(g, area)
     interfaces = {r["name"]: [] for r in routers}
     for x in links:
