@@ -103,9 +103,42 @@ Measured on an HP Z840 (Xeon E5-2690 v3; Python 3.12.3, networkx 3.6.1), 2026-11
   each router used about 20 MiB. In the 8-router lab, router r0 had IS-IS routes to all 7 other loopbacks and
   reached a loopback two hops away.
 
+## An FRR image from any commit
+
+The `on` labs need FRR built with the flood-reduction change. `tools/frr-image/build.sh` builds an image from any FRR
+commit with FRR's own Alpine packaging (`docker/alpine` in the FRR tree), so it has the layout of the official
+images and the labs run on it unchanged:
+
+```
+CPUSET=36-47 THERMAL=1 tools/frr-image/build.sh work https://github.com/riw777/frr \
+    e263c441160c7cf25749a9695978ffe5649678f9 frr-distoptflood:e263c441
+python -m topology_builders clab topology.json --out lab --image frr-distoptflood:e263c441
+```
+
+- It uses Docker's classic builder, so buildx is not needed. FRR's Dockerfile needs BuildKit for two lines, so
+  `make_dockerfile.py` writes a version without them: it drops the `# syntax=` line and replaces `COPY --exclude`
+  with an extra stage that deletes the same packages. Every other line is FRR's.
+- `CPUSET` caps the build's CPUs. FRR's packaging runs `make -j $(nproc)`, and `nproc` follows the cap.
+- `THERMAL=1` holds the build under [batch-probe](https://github.com/ahb-sjsu/batch-probe)'s ThermalController.
+  `thermal_pause.py` pauses the build's containers while the controller recommends fewer than half the build's
+  CPUs.
+- FRR's packaging runs FRR's unit tests, and the build fails if they do.
+
+Built on the HP Z840 above, 2026-11-19, from FRR pull request 24128 at e263c441 (FRR 10.9.0-dev):
+
+- 12 minutes on 12 CPUs; the CPU temperature peaked at 75.6 C, and the build was never paused;
+- FRR's unit tests: 570 passed, 1 skipped, including the pull request's flood-reduction tests;
+- image size 131 MB;
+- on the 8-router flattened butterfly, the `off` and `on` labs each reached one adjacency Up per link and an LSP
+  from every router within 8 s;
+- in the `on` lab, `flood-reduction` was in the running configuration, and `show isis summary` listed the
+  flooding-reduction counters;
+- that image was built with a first version of these scripts. Rebuilt with `build.sh` itself (9 minutes, peak
+  75.4 C), it gave the same FRR and libyang packages and the same test result. The image ID differs: the classic
+  builder took steps 1 to 17 from its cache and ran the rest again, from `ARG PKGVER` on, for a reason not found.
+
 ## Not here yet
 
-- Runs with flood reduction on, which need an FRR image built from FRR pull request 24128.
 - Measuring a run: CPU, and the flooding counters that `show isis summary` reports with flood reduction on.
 - An exporter to netlab, as a second, independent path to FRR IS-IS.
 - Fat-tree (three-tier Clos) by radix.
