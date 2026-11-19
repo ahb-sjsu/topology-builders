@@ -101,7 +101,7 @@ flowchart TB
     subgraph host["Host: its uplink and network manager never see a lab interface"]
         subgraph lxd["LXD container: own network namespace, limited to a CPU set"]
             D["Docker and containerlab"] --> R1["FRR router"] & R2["FRR router"] & R3["... one container per router"]
-            R1 <-. "veth pairs" .-> R2
+            R1 -.-|veth pairs| R2
         end
     end
 ```
@@ -191,9 +191,9 @@ One run of one lab:
 ```mermaid
 flowchart LR
     D[deploy] --> S["settle<br/>30 s"] --> K{"converged?"}
-    K -- "no: check<br/>every 5 s" --> K
-    K -- yes --> B["bring-up<br/>snapshot"] --> Q["quiet<br/>window"] --> E["event down:<br/>window, check"] --> U["event up:<br/>window, check"]
-    U -- "next event" --> E
+    K -->|"no: check<br/>every 5 s"| K
+    K -->|yes| B["bring-up<br/>snapshot"] --> Q["quiet<br/>window"] --> E["event down:<br/>window, check"] --> U["event up:<br/>window, check"]
+    U -->|next event| E
     U --> X[destroy]
 ```
 
