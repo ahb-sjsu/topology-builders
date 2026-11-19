@@ -72,6 +72,14 @@ topotest:
 - each link point-to-point, with its own /31 (10.0.0.0/9);
 - hello interval 1 s, hello multiplier 3, lsp-gen-interval 2 (each can be changed on the command line).
 
+`--cpu-set 12-23,36-43` confines every router of the lab to those CPUs (containerlab's `cpu-set`), so that a dense
+lab cannot take the whole host and its runs see the same CPUs every time.
+
+Run large labs inside a container or VM with its own network namespace, not directly on a host whose own network
+matters. A 64-router lab creates over a thousand interfaces in the namespace containerlab runs in. On one host,
+deploying a 512-link lab made systemd-networkd time out and give up on the host's uplink, whose DHCP lease then
+lapsed. We now run containerlab and its own Docker inside a privileged LXD container with nesting enabled.
+
 Each lab directory holds the containerlab file, one directory per router, `lab.json` (every router's loopback,
 NET and port count, and every link's ports and addresses) and `manifest.json` (SHA-256 of each file). Node kind
 `linux` (the default) mounts `frr.conf`, `daemons` and `vtysh.conf` into any FRR image and works with every
@@ -95,7 +103,7 @@ totals.
 
 Measured on an HP Z840 (Xeon E5-2690 v3; Python 3.12.3, networkx 3.6.1), 2026-11-18:
 
-- all 17 tests pass (24 now, with `measure`);
+- all 17 tests pass (29 now, with `measure` and `report`);
 - the 64-router sweep with seeds 1, 2 and 3: 50 topologies, all connected, in 1.0 s in all (0.03 s or less each),
   and a second run gives byte-identical files (50 of 50 SHA-256 equal);
 - random-regular at 256 routers, d = 3 to 255: 14 topologies in 3.1 s in all, the largest with 32,640 links;
@@ -195,9 +203,18 @@ are summed over all routers:
   for link up also counted the check that ends the link-down window; each window now starts from its own snapshot.
 - Two topologies of different families and sizes, and one link each, say nothing yet about the effect of density.
 
+`topology-builders report measurements.jsonl` prints one row per topology, flood reduction off against on: link
+windows pooled and paired (same link, same direction), and bring-up. `--json` gives the same rows as JSON.
+
+**Density.** [results/random-regular-n64](results/random-regular-n64/README.md): 64-router random regular graphs of
+degree 3 to 48. LSPs sent for a link change fall by 7% at degree 3 and by 94% at degree 32; isisd CPU for a link
+change is a median 14% to 23% lower from degree 8 and not measurably lower below it (a rerun of degree 16 in a
+different setup gave 10% instead of 19%); at degree 48, without flood
+reduction, the 64 routers did not converge on the host's CPUs, and with it they did.
+
 ## Not here yet
 
-- A density sweep at a fixed number of routers, with several links and more repeats.
+- The density sweep for the flattened-butterfly and leaf-spine families, and more than one graph per degree.
 - An exporter to netlab, as a second, independent path to FRR IS-IS.
 - Fat-tree (three-tier Clos) by radix.
 

@@ -7,7 +7,9 @@ tests/topotests/isis_flood_reduction_topo1): level-2-only; every link point-to-p
 loads on FRR builds that lack the change.
 
 Node kinds: `linux` (the default) mounts frr.conf, daemons and vtysh.conf into any FRR image and works with every
-containerlab version; `frr` is containerlab's own FRR kind, which needs containerlab 0.80.0 or later.
+containerlab version; `frr` is containerlab's own FRR kind, which needs containerlab 0.80.0 or later.  A CPU set
+(containerlab's `cpu-set`, e.g. "12-23") confines every router of the lab to those CPUs, so a dense lab cannot take
+the whole host.
 
 Addresses: router i has loopback 10.255.0.0 + i + 1 and system ID i + 1 in hexadecimal; link j has
 10.0.0.0 + 2j and + 2j + 1.  Ports are numbered eth1, eth2, ... on each router in the order of its links in the
@@ -115,8 +117,10 @@ def daemons_file():
     return "\n".join(lines) + "\n"
 
 
-def topology_yaml(name, routers, links, kind, image):
+def topology_yaml(name, routers, links, kind, image, cpu_set=None):
     lines = [f"name: {name}", "", "topology:", "  kinds:", f"    {kind}:", f"      image: {image}"]
+    if cpu_set:
+        lines.append(f'      cpu-set: "{cpu_set}"')
     if kind == "frr":
         lines += ["      daemons:", "        - isisd"]
     lines.append("  nodes:")
@@ -135,10 +139,12 @@ def topology_yaml(name, routers, links, kind, image):
 
 
 def write_lab(source, out, name=None, flood_reduction=False, kind="linux", image=None, hello_interval=1,
-              hello_multiplier=3, lsp_gen_interval=2, area="49.0001", debug_flooding=False):
+              hello_multiplier=3, lsp_gen_interval=2, area="49.0001", debug_flooding=False, cpu_set=None):
     """Write one lab into directory `out`; return its manifest."""
     if kind not in IMAGES:
         raise ValueError(f"kind must be one of {sorted(IMAGES)}, got {kind}")
+    if cpu_set is not None and not re.fullmatch(r"\d+(-\d+)?(,\d+(-\d+)?)*", cpu_set):
+        raise ValueError(f"a CPU set is a list like 12-23,36-43, got {cpu_set!r}")
     with open(source, "rb") as fh:
         source_sha = hashlib.sha256(fh.read()).hexdigest()
     g = O.read(source)
@@ -146,6 +152,8 @@ def write_lab(source, out, name=None, flood_reduction=False, kind="linux", image
     settings = {"flood_reduction": bool(flood_reduction), "kind": kind, "image": image or IMAGES[kind],
                 "hello_interval": hello_interval, "hello_multiplier": hello_multiplier,
                 "lsp_gen_interval": lsp_gen_interval, "area": area, "debug_flooding": bool(debug_flooding)}
+    if cpu_set:
+        settings["cpu_set"] = cpu_set
     routers, links = plan(g, area)
     interfaces = {r["name"]: [] for r in routers}
     for x in links:
@@ -162,7 +170,7 @@ def write_lab(source, out, name=None, flood_reduction=False, kind="linux", image
             fh.write(data)
         files.append({"file": rel, "sha256": hashlib.sha256(data).hexdigest()})
 
-    put(f"{name}.clab.yml", topology_yaml(name, routers, links, kind, settings["image"]))
+    put(f"{name}.clab.yml", topology_yaml(name, routers, links, kind, settings["image"], cpu_set))
     for r in routers:
         ports = sorted(interfaces[r["name"]], key=lambda p: int(p[0][3:]))
         put(f"{r['name']}/frr.conf", frr_conf(r, ports, settings))

@@ -108,3 +108,16 @@ def test_command_writes_both_labs(tmp_path):
 def test_rejects_unknown_kind(tmp_path):
     with pytest.raises(ValueError):
         C.write_lab(topology(tmp_path, F.leaf_spine(2, 2)), tmp_path / "x", kind="docker")
+
+
+def test_cpu_set(tmp_path):
+    src = topology(tmp_path, F.leaf_spine(4, 2))
+    m = C.write_lab(src, tmp_path / "pinned", name="p", cpu_set="12-23,36-43")
+    topo = yaml.safe_load((tmp_path / "pinned" / "p.clab.yml").read_text())
+    assert topo["topology"]["kinds"]["linux"]["cpu-set"] == "12-23,36-43" and m["settings"]["cpu_set"] == "12-23,36-43"
+    C.write_lab(src, tmp_path / "free", name="p")
+    topo = yaml.safe_load((tmp_path / "free" / "p.clab.yml").read_text())
+    assert "cpu-set" not in topo["topology"]["kinds"]["linux"]
+    assert "cpu_set" not in json.loads((tmp_path / "free" / "lab.json").read_text())["settings"]
+    with pytest.raises(ValueError):
+        C.write_lab(src, tmp_path / "bad", name="p", cpu_set="12-23; rm -rf /")

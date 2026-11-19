@@ -1,5 +1,7 @@
-"""Command line: python -m topology_builders {sweep, zoo, build} ...  Run with -h for the options."""
+"""Command line: python -m topology_builders {sweep, zoo, build, clab, measure, report} ...  Run with -h for the
+options."""
 import argparse
+import json
 import os
 import sys
 import time
@@ -88,6 +90,7 @@ def main(argv=None):
     c.add_argument("--area", default="49.0001", help="IS-IS area (default 49.0001)")
     c.add_argument("--debug-flooding", action="store_true",
                    help="add 'debug isis flooding' (verbose: it changes CPU measurements)")
+    c.add_argument("--cpu-set", help="run every router on these CPUs only, e.g. 12-23,36-43 (containerlab cpu-set)")
 
     m = sub.add_parser("measure", help="deploy labs written by clab and measure flooding and CPU around a link flap")
     m.add_argument("labs", nargs="+", help="lab directories of one topology, e.g. <out>/off <out>/on")
@@ -101,6 +104,10 @@ def main(argv=None):
     m.add_argument("--max-wait", type=int, default=120,
                    help="seconds to keep checking for convergence after the settle time (default 120)")
     m.add_argument("--out", default="measurements.jsonl", help="JSON lines, appended (default measurements.jsonl)")
+
+    r = sub.add_parser("report", help="per topology, flood reduction off against on, from measure's JSON lines")
+    r.add_argument("files", nargs="+", help="JSON-lines files written by measure (.jsonl or .jsonl.gz)")
+    r.add_argument("--json", action="store_true", help="print the rows as JSON instead of tables")
 
     a = p.parse_args(argv)
     if a.command == "sweep":
@@ -128,6 +135,10 @@ def main(argv=None):
             print(f"{r['lab']:<28} {'on' if r['flood_reduction'] else 'off':<9} {r['phase']:<9} {r['runs']:>4} "
                   f"{r['lsps_sent']:>9} {r['suppressed_sends']:>10} {r['isisd_ms']:>8} {net:>12}  {r['outcomes']}")
         print(f"{len(records)} runs appended to {a.out}")
+    elif a.command == "report":
+        from . import report as R
+        table = R.rows(R.read(a.files))
+        sys.stdout.write(json.dumps(table, indent=1) + "\n" if a.json else R.text(table))
     elif a.command == "clab":
         base = C.lab_name(a.name or os.path.splitext(os.path.basename(a.topology))[0])
         for on in {"on": [True], "off": [False], "both": [False, True]}[a.flood_reduction]:
@@ -135,7 +146,8 @@ def main(argv=None):
             out = os.path.join(a.out, tag) if a.flood_reduction == "both" else a.out
             m = C.write_lab(a.topology, out, name=f"{base}-{tag}", flood_reduction=on, kind=a.kind,
                             image=a.image, hello_interval=a.hello_interval, hello_multiplier=a.hello_multiplier,
-                            lsp_gen_interval=a.lsp_gen_interval, area=a.area, debug_flooding=a.debug_flooding)
+                            lsp_gen_interval=a.lsp_gen_interval, area=a.area, debug_flooding=a.debug_flooding,
+                            cpu_set=a.cpu_set)
             print(f"{out}: lab {m['name']}, {m['routers']} routers, {m['links']} links, flood-reduction {tag}. "
                   f"Deploy: containerlab deploy -t {os.path.join(out, m['name'] + '.clab.yml')}")
     else:
