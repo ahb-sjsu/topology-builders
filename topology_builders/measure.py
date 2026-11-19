@@ -9,8 +9,8 @@ One run of one lab:
    of isisd and zebra from /proc. This is the bring-up phase.
 4. A quiet window: snapshot, wait the window length with no event and no queries, snapshot, then check that no
    router's LSPs changed. It measures the background work (hellos, timers) that every window contains.
-5. Take one link down: snapshot, take it down, wait the window, snapshot, then check that every router holds the
-   same LSPs, including a newer LSP from each end of the link. Bring the link back up and do the same again.
+5. For each chosen link in turn: snapshot, take it down, wait the window, snapshot, then check that every router
+   holds the same LSPs, including a newer LSP from each end of the link. Bring the link back up and do the same.
 6. Destroy the lab.
 
 Every window is the difference between a snapshot taken just before it and one at its end, so the checks between
@@ -21,7 +21,8 @@ and unknown when a router could not be read; the quiet window's is satisfied whe
 JSON line.
 
 Labs given together (the off and on labs of one topology) take turns, and the order alternates between repeats.
-They must have the same topology file; the same link is used for all of them."""
+They must have the same topology file; the same links are used for all of them. Before each run the harness waits
+while the hottest CPU sensor is above a limit."""
 import json
 import os
 import random
@@ -32,7 +33,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from . import output as O
 
-FORMAT = "topology-builders measure 0.2"
+FORMAT = "topology-builders measure 0.3"
 SECTIONS = {"TX counters per PDU type:": "tx", "RX counters per PDU type:": "rx",
             "Drop counters per PDU type:": "drop", "Flooding reduction:": "fr"}
 COUNTER = re.compile(r"^\s*([A-Za-z0-9 ]+?)\s*:\s*(\d+)\s*$")
@@ -107,10 +108,37 @@ def net(total, quiet):
             "cpu_ms": {k: round(v, 1) for k, v in diff(total["cpu_ms"], quiet["cpu_ms"]).items()}}
 
 
+def pick_links(lab, seed, k=1):
+    """k different links to take down, one after another: chosen by the seed and the topology file, so every variant
+    gets the same ones. The first is the one pick_link gives."""
+    n = len(lab["links"])
+    if not 1 <= k <= n:
+        raise ValueError(f"cannot pick {k} of {n} links")
+    rng = random.Random(f"flap/{lab['source_sha256']}/{seed}")
+    picked = []
+    while len(picked) < k:
+        i = rng.randrange(n)
+        if i not in picked:
+            picked.append(i)
+    return [lab["links"][i] for i in picked]
+
+
 def pick_link(lab, seed):
     """The link to take down: chosen by the seed and the topology file, so every variant gets the same one."""
-    rng = random.Random(f"flap/{lab['source_sha256']}/{seed}")
-    return lab["links"][rng.randrange(len(lab["links"]))]
+    return pick_links(lab, seed, 1)[0]
+
+
+def wait_cool(max_temp, read=None, sleep=time.sleep, poll=30, limit=3600):
+    """Wait while the hottest CPU sensor is above max_temp (deg C); return the seconds waited. No sensor: no wait."""
+    read = read or (lambda: host_state().get("cpu_temp_max_c"))
+    waited = 0
+    while waited < limit:
+        t = read()
+        if t is None or t <= max_temp:
+            break
+        sleep(poll)
+        waited += poll
+    return waited
 
 
 def order(labs, repeat):
@@ -244,11 +272,11 @@ def totals(snap_after, snap_before=None):
     return {"counters": total, "cpu_ms": cpu, "unreadable": sorted(r for r, v in per.items() if v is None)}, per
 
 
-def run_one(lab, link, settle, window, max_wait, repeat, position):
+def run_one(lab, links, settle, window, max_wait, repeat, position):
     rec = {"format": FORMAT, "builder": O.builder_info(), "lab": lab.name, "settings": lab.lab["settings"],
            "source": lab.lab["source"], "source_sha256": lab.lab["source_sha256"], "topology": lab.lab["topology"],
            "repeat": repeat, "position": position, "settle_s": settle, "window_s": window,
-           "link": {k: link[k] for k in ("a", "a_port", "b", "b_port")},
+           "links": [{k: x[k] for k in ("a", "a_port", "b", "b_port")} for x in links],
            "started": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "host_start": host_state(), "phases": []}
     try:
         rec["deploy_s"] = lab.containerlab("deploy")
@@ -282,14 +310,16 @@ def run_one(lab, link, settle, window, max_wait, repeat, position):
                               "detail": detail})
         if result != "unknown":
             before_db = next(iter(dbs.values()))
-        for phase, state in (("link-down", "down"), ("link-up", "up")):
-            total, per = measured_window(lambda s=state: lab.link(link["a"], link["a_port"], s))
-            dbs = lab.databases()
-            result, detail = outcome(dbs, before_db, (link["a"], link["b"]))
-            rec["phases"].append({"phase": phase, "seconds": window, **total, "net_of_quiet": net(total, quiet),
-                                  "per_router": per, "outcome": result, "detail": detail})
-            if result != "unknown":
-                before_db = next(iter(dbs.values()))
+        for j, link in enumerate(links):
+            for phase, state in (("link-down", "down"), ("link-up", "up")):
+                total, per = measured_window(lambda s=state, x=link: lab.link(x["a"], x["a_port"], s))
+                dbs = lab.databases()
+                result, detail = outcome(dbs, before_db, (link["a"], link["b"]))
+                rec["phases"].append({"phase": phase, "link": j, "seconds": window, **total,
+                                      "net_of_quiet": net(total, quiet), "per_router": per, "outcome": result,
+                                      "detail": detail})
+                if result != "unknown":
+                    before_db = next(iter(dbs.values()))
     finally:
         rec["host_end"] = host_state()
         rec["destroy_s"] = lab.containerlab("destroy")
@@ -297,16 +327,19 @@ def run_one(lab, link, settle, window, max_wait, repeat, position):
     return rec
 
 
-def run(directories, repeat=1, settle=30, window=30, seed=1, out="measurements.jsonl", max_wait=120):
+def run(directories, repeat=1, settle=30, window=30, seed=1, out="measurements.jsonl", max_wait=120, links=1,
+        max_temp=80.0):
     labs = [Lab(d) for d in directories]
     sources = {lab.lab["source_sha256"] for lab in labs}
     if len(sources) != 1:
         raise ValueError("the labs were written from different topology files")
-    link = pick_link(labs[0].lab, seed)
+    chosen = pick_links(labs[0].lab, seed, links)
     records = []
     for i in range(repeat):
         for position, lab in enumerate(order(labs, i)):
-            rec = run_one(lab, link, settle, window, max_wait, i, position)
+            cooled = wait_cool(max_temp)
+            rec = run_one(lab, chosen, settle, window, max_wait, i, position)
+            rec["cool_wait_s"] = cooled
             with open(out, "a", encoding="utf-8") as fh:
                 fh.write(json.dumps(rec, sort_keys=True) + "\n")
             records.append(rec)

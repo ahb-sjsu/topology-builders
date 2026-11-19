@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from topology_builders import measure as M
 
 FIX = Path(__file__).resolve().parent / "fixtures"
@@ -64,6 +66,19 @@ def test_pick_link_and_order():
     assert M.pick_link(lab, 1) == M.pick_link(dict(lab), 1) and M.pick_link(lab, 1) in links
     assert len({M.pick_link(lab, s)["a"] for s in range(10)}) > 1
     assert M.order(["off", "on"], 0) == ["off", "on"] and M.order(["off", "on"], 1) == ["on", "off"]
+
+
+def test_pick_links_and_wait_cool():
+    links = [{"a": f"r{i}", "a_port": "eth1", "b": f"r{i + 1}", "b_port": "eth1"} for i in range(20)]
+    lab = {"source_sha256": "cd" * 32, "links": links}
+    five = M.pick_links(lab, 3, 5)
+    assert len(five) == 5 and len({x["a"] for x in five}) == 5 and five[0] == M.pick_link(lab, 3)
+    assert M.pick_links(lab, 3, 5) == five and M.pick_links(lab, 3, 20) != links
+    with pytest.raises(ValueError):
+        M.pick_links(lab, 3, 21)
+    temps, slept = iter([85.0, 81.0, 79.5]), []
+    assert M.wait_cool(80.0, read=lambda: next(temps), sleep=slept.append, poll=30) == 60 and slept == [30, 30]
+    assert M.wait_cool(80.0, read=lambda: None, sleep=slept.append) == 0
 
 
 def test_totals_and_summarize():

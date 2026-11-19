@@ -158,8 +158,9 @@ One run of one lab:
 4. A quiet window: snapshot, wait 30 s (`--window`) with no event and no queries, snapshot, then check that no
    router's LSPs changed. It measures the background work (hellos every second on every link, timers) that every
    window contains.
-5. Take one link down: snapshot, take it down, wait the same 30 s, snapshot, then check that every router holds the
-   same LSPs, including a newer LSP from each end of the link. Bring the link back up and do the same.
+5. For each of `--links` links in turn (default 1): snapshot, take it down, wait the same 30 s, snapshot, then
+   check that every router holds the same LSPs, including a newer LSP from each end of the link. Bring the link
+   back up and do the same.
 6. Destroy the lab.
 
 - Every window is the difference between a snapshot taken just before it and one at its end, so the checks between
@@ -167,8 +168,10 @@ One run of one lab:
 - The link windows are also reported net of the quiet window, which has the same length: the work the event caused.
 - Each link window has an outcome: satisfied when every router holds the same LSPs and the new ones, violated when
   not, and unknown when a router could not be read. The quiet window is satisfied when nothing changed in it.
-- The link is chosen from the topology file and `--seed`, so the off and on labs use the same one. The labs take
-  turns, and the order alternates between repeats.
+- The links are chosen from the topology file and `--seed`, so the off and on labs use the same ones; the first is
+  the same whatever `--links` is. The labs take turns, and the order alternates between repeats.
+- Before each run, the harness waits while the hottest CPU sensor is above `--max-temp` (default 80 C), and records
+  how long it waited.
 - Each run is one JSON line, with per-router figures and the host's load average and CPU temperature at start and
   end. A table of means per lab and phase is printed at the end.
 

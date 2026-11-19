@@ -94,7 +94,10 @@ def main(argv=None):
     m.add_argument("--repeat", type=int, default=1, help="runs of each lab; the order alternates (default 1)")
     m.add_argument("--settle", type=int, default=30, help="seconds after deploy before the first check (default 30)")
     m.add_argument("--window", type=int, default=30, help="seconds after the link goes down, and up (default 30)")
-    m.add_argument("--seed", type=int, default=1, help="chooses the link (default 1)")
+    m.add_argument("--seed", type=int, default=1, help="chooses the links (default 1)")
+    m.add_argument("--links", type=int, default=1, help="links taken down and up, one after another (default 1)")
+    m.add_argument("--max-temp", type=float, default=80.0,
+                   help="before each run, wait while the hottest CPU sensor is above this, deg C (default 80)")
     m.add_argument("--max-wait", type=int, default=120,
                    help="seconds to keep checking for convergence after the settle time (default 120)")
     m.add_argument("--out", default="measurements.jsonl", help="JSON lines, appended (default measurements.jsonl)")
@@ -117,7 +120,7 @@ def main(argv=None):
     elif a.command == "measure":
         from . import measure as M
         records = M.run(a.labs, repeat=a.repeat, settle=a.settle, window=a.window, seed=a.seed, out=a.out,
-                        max_wait=a.max_wait)
+                        max_wait=a.max_wait, links=a.links, max_temp=a.max_temp)
         print(f"{'lab':<28} {'reduction':<9} {'phase':<9} {'runs':>4} {'LSPs sent':>9} {'suppressed':>10} "
               f"{'isisd ms':>8} {'net of quiet':>12}  outcomes")
         for r in M.summarize(records):
