@@ -20,6 +20,43 @@ flowchart LR
     J --> R["<b>report</b><br/>off against on,<br/>per topology"]
 ```
 
+## Ways to run a test
+
+A topology can be tested two ways: by the model of the draft's algorithm, which needs only Python, or as a lab of
+real FRR routers, which can run in three places.
+
+```mermaid
+flowchart LR
+    T["<b>topology file</b><br/>sweep · zoo · build"] --> MOD["<b>flood_model</b><br/>the draft's algorithm in Python:<br/>LSPs per change, any size"]
+    T --> C["<b>clab</b><br/>FRR IS-IS lab,<br/>off/ and on/"]
+    subgraph RUN["where a lab of real FRR routers runs"]
+        direction TB
+        D["<b>a Docker host</b><br/>containerlab, a container per router<br/>Linux · root"]
+        N["<b>network namespaces</b><br/>measure --backend netns, no Docker<br/>root, or unshare -Urnm"]
+        O["<b>an emulated guest</b><br/>tools/overlay: Docker inside QEMU<br/>no root · no KVM · about 10× slower"]
+    end
+    C --> D & N & O
+    N -.-> COL["Google Colab<br/>tools/colab"]
+    O -.-> POD["cluster pods<br/>without privileges"]
+    D & N & O --> EV["<b>measure</b><br/>events: link · node · multi<br/>options: --timing · --profile"]
+    EV --> REP["<b>report</b><br/>off against on"]
+    MOD -.->|"same link changes:<br/>LSP counts"| REP
+    MOD -.->|"tools/model:<br/>decision by decision"| N
+```
+
+| Option | What runs | Needs | Speed | Status, 2026-11-20 |
+|---|---|---|---|---|
+| Model: `flood_model` | the draft's reflood decision, no FRR | Python | milliseconds per change, any size | with flood reduction on, within 20% of FRR's LSP counts on 26 of 28 measured 64-router topologies |
+| Docker labs: `measure` | real FRR, a container per router | Linux, root, Docker, containerlab | real time | every result in `results/` |
+| Namespace labs: `measure --backend netns` | real FRR, a network namespace per router | Linux, root or `unshare -Urnm` | real time | unit tests pass; not yet run end to end |
+| Colab: `tools/colab` | namespace labs on a Colab runtime | a Google account | real time, on the runtime's CPUs | not yet run end to end |
+| Emulated guest: `tools/overlay` | Docker labs inside QEMU, software emulation | QEMU; no root, no KVM | about 10 times slower | a 16-router lab runs on the host and in a cluster pod; link-down LSP counts within 17% of the host's; link-up, router and multi-link windows 1.2 to 1.7 times, bring-up 1.5 to 2.6 times; scaling timers by 10 is not a fix; CPU and times not comparable |
+| Decision check: `tools/model` | FRR's logged decisions against the model's | as namespace labs | real time | not yet run |
+
+Kaggle's notebooks refuse user namespaces, so of the lab options only the emulated guest could run there (untested).
+Details: [the model](#a-model-of-flooding), [namespaces and Colab](#without-docker-and-on-colab),
+[the emulated guest](tools/overlay/README.md), [measure](#measuring-flooding-and-cpu).
+
 ## Families
 
 | Family | What it is | Density knob at N routers |
