@@ -1,0 +1,17 @@
+Link changes: every link-down and link-up window; diameter and two-hop multiplicity of the topology; mean LSPs sent and isisd ms net of the quiet window, off -> on; pairs with the on figure lower; windows satisfied
+topology                          degree diam 2-hop  LSPs off      on saving pairs net ms off      on saving pairs median satisfied
+flattened butterfly 4 x 4 x 4        9.0    -     -       922     274    70%  6/6       1,675   1,591     5%  3/6      5%     24/24
+leaf-spine, 48 leaves x 16 spines   24.0    -     -     2,686     178    93%  6/6       4,037   2,717    33%  6/6     31%     24/24
+random regular, degree 4             4.0    -     -       366     320    13% 18/18        857     898    -5%  9/18    -4%   108/108
+random regular, degree 8             8.0    -     -       789     512    35% 18/18      1,516   1,422     5% 11/18    10%   108/108
+random regular, degree 16           16.0    -     -     1,696     428    75% 18/18      2,987   2,687    10% 16/18    10%   108/108
+random regular, degree 32           32.0    -     - 1,347,186     238   100% 18/18     12,077   4,799    37% 14/18    67%    54/108
+
+Bring-up: mean LSPs sent and isisd ms from the routers' start, off -> on; runs converged, and quiet windows satisfied, off and on
+topology                          degree    LSPs off        on saving      ms off        on saving converged     quiet
+flattened butterfly 4 x 4 x 4        9.0      90,346    62,496    31%      37,575    32,810    13%   2/2 2/2   2/2 2/2
+leaf-spine, 48 leaves x 16 spines   24.0     448,622   171,922    62%     181,770   112,260    38%   2/2 2/2   2/2 2/2
+random regular, degree 4             4.0      22,102    21,370     3%      11,953    12,163    -2%   9/9 9/9   9/9 9/9
+random regular, degree 8             8.0      73,403    59,780    19%      31,409    29,007     8%   9/9 9/9   9/9 9/9
+random regular, degree 16           16.0     246,783   131,774    47%      95,453    70,977    26%   9/9 9/9   9/9 9/9
+random regular, degree 32           32.0  12,689,497   262,921    98%   3,208,218   196,306    94%   0/9 9/9   0/9 9/9

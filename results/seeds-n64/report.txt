@@ -1,0 +1,161 @@
+Link changes: every link-down and link-up window; diameter and two-hop multiplicity of the topology; mean LSPs sent and isisd ms net of the quiet window, off -> on; pairs with the on figure lower; windows satisfied
+topology                          degree diam 2-hop  LSPs off      on saving pairs net ms off      on saving pairs median satisfied
+flattened butterfly 4 x 4 x 4        9.0    -     -       922     274    70%  6/6       1,675   1,591     5%  3/6      5%     24/24
+leaf-spine, 48 leaves x 16 spines   24.0    -     -     2,686     178    93%  6/6       4,037   2,717    33%  6/6     31%     24/24
+random regular, degree 4, seed 1     4.0    -     -       363     329     9%  6/6         862     817     5%  5/6      5%     36/36
+random regular, degree 4, seed 2     4.0    -     -       367     313    15%  6/6         827     961   -16%  1/6    -15%     36/36
+random regular, degree 4, seed 3     4.0    -     -       367     316    14%  6/6         881     917    -4%  3/6     -4%     36/36
+random regular, degree 8, seed 1     8.0    -     -       791     503    36%  6/6       1,598   1,334    16%  5/6     17%     36/36
+random regular, degree 8, seed 2     8.0    -     -       789     513    35%  6/6       1,588   1,386    13%  5/6     10%     36/36
+random regular, degree 8, seed 3     8.0    -     -       787     522    34%  6/6       1,363   1,546   -13%  1/6     -6%     36/36
+random regular, degree 16, seed 1   16.0    -     -     1,690     422    75%  6/6       3,046   2,730    10%  6/6     10%     36/36
+random regular, degree 16, seed 2   16.0    -     -     1,708     427    75%  6/6       3,045   2,661    13%  6/6     10%     36/36
+random regular, degree 16, seed 3   16.0    -     -     1,690     434    74%  6/6       2,871   2,671     7%  4/6      7%     36/36
+random regular, degree 32, seed 1   32.0    -     - 1,136,714     237   100%  6/6      16,864   4,517    73%  6/6     74%     18/36
+random regular, degree 32, seed 2   32.0    -     - 1,453,699     238   100%  6/6       3,816   4,956   -30%  2/6     18%     18/36
+random regular, degree 32, seed 3   32.0    -     - 1,451,145     241   100%  6/6      15,551   4,924    68%  6/6     67%     18/36
+
+Bring-up: mean LSPs sent and isisd ms from the routers' start, off -> on; runs converged, and quiet windows satisfied, off and on
+topology                          degree    LSPs off        on saving      ms off        on saving converged     quiet
+flattened butterfly 4 x 4 x 4        9.0      90,346    62,496    31%      37,575    32,810    13%   2/2 2/2   2/2 2/2
+leaf-spine, 48 leaves x 16 spines   24.0     448,622   171,922    62%     181,770   112,260    38%   2/2 2/2   2/2 2/2
+random regular, degree 4, seed 1     4.0      22,158    21,172     4%      12,080    12,043     0%   3/3 3/3   3/3 3/3
+random regular, degree 4, seed 2     4.0      22,292    21,724     3%      11,913    12,113    -2%   3/3 3/3   3/3 3/3
+random regular, degree 4, seed 3     4.0      21,855    21,212     3%      11,867    12,333    -4%   3/3 3/3   3/3 3/3
+random regular, degree 8, seed 1     8.0      73,325    58,817    20%      31,847    28,963     9%   3/3 3/3   3/3 3/3
+random regular, degree 8, seed 2     8.0      74,656    60,629    19%      31,503    29,077     8%   3/3 3/3   3/3 3/3
+random regular, degree 8, seed 3     8.0      72,227    59,893    17%      30,877    28,980     6%   3/3 3/3   3/3 3/3
+random regular, degree 16, seed 1   16.0     241,841   130,640    46%      94,367    70,680    25%   3/3 3/3   3/3 3/3
+random regular, degree 16, seed 2   16.0     243,323   132,168    46%      94,897    71,010    25%   3/3 3/3   3/3 3/3
+random regular, degree 16, seed 3   16.0     255,183   132,513    48%      97,097    71,240    27%   3/3 3/3   3/3 3/3
+random regular, degree 32, seed 1   32.0  11,071,877   275,267    98%   2,901,257   206,080    93%   0/3 3/3   0/3 3/3
+random regular, degree 32, seed 2   32.0  13,466,762   254,498    98%   3,344,273   188,683    94%   0/3 3/3   0/3 3/3
+random regular, degree 32, seed 3   32.0  13,529,851   258,999    98%   3,379,123   194,153    94%   0/3 3/3   0/3 3/3
+
+isisd CPU per event handler, mean ms per link window net of the quiet window, off -> on
+flattened butterfly 4 x 4 x 4 (12 and 12 windows)
+  isis_run_spf_cb                             1,586.3    1,356.0
+  isis_receive                                  124.9      157.7
+  tx_queue_send_event                            14.4        5.7
+  send_l2_psnp                                    8.4        2.4
+  send_hello_cb                                  -8.6        3.7
+  zclient_read                                    0.8        0.8
+  lsp_refresh                                     0.4        0.4
+  dyn_cache_cleanup                               0.2        0.3
+leaf-spine, 48 leaves x 16 spines (12 and 12 windows)
+  isis_run_spf_cb                             3,296.1    2,854.0
+  isis_receive                                  876.6      117.4
+  tx_queue_send_event                            38.3        3.1
+  lsp_refresh                                     1.1        0.9
+  zclient_read                                    0.8        0.9
+  vtysh_accept                                   -0.2        0.3
+  dyn_cache_cleanup                               0.3        0.3
+  vtysh_read                                     -1.5       -0.5
+random regular, degree 4, seed 1 (18 and 18 windows)
+  isis_run_spf_cb                               727.0      717.8
+  isis_receive                                  106.2       88.1
+  send_l2_psnp                                    7.1        3.7
+  tx_queue_send_event                             6.8        6.7
+  zclient_read                                    0.7        0.7
+  lsp_refresh                                     0.3        0.3
+  dyn_cache_cleanup                               0.2        0.2
+  lsp_tick                                       -0.5       -0.3
+random regular, degree 4, seed 2 (18 and 18 windows)
+  isis_run_spf_cb                               737.4      748.9
+  isis_receive                                   58.8      114.1
+  tx_queue_send_event                             6.9        6.4
+  send_l2_psnp                                    2.9        5.7
+  zclient_read                                    0.7        0.8
+  lsp_refresh                                     0.3        0.3
+  vtysh_accept                                   -0.1        0.2
+  dyn_cache_cleanup                               0.2        0.2
+random regular, degree 4, seed 3 (18 and 18 windows)
+  isis_run_spf_cb                               746.9      742.1
+  isis_receive                                   87.5      121.0
+  send_l2_psnp                                    8.7        4.0
+  tx_queue_send_event                             7.0        6.4
+  send_hello_cb                                   4.8       -9.3
+  lsp_tick                                        1.1       -0.5
+  zclient_read                                    0.8        0.8
+  lsp_refresh                                     0.3        0.3
+random regular, degree 8, seed 1 (18 and 18 windows)
+  isis_run_spf_cb                             1,333.3    1,328.1
+  isis_receive                                  226.3       78.8
+  tx_queue_send_event                            11.6        8.7
+  send_l2_psnp                                    4.3       -0.4
+  zclient_read                                    0.9        0.8
+  lsp_refresh                                     0.3        0.4
+  send_hello_cb                                   0.3      -15.7
+  dyn_cache_cleanup                               0.2        0.2
+random regular, degree 8, seed 2 (18 and 18 windows)
+  isis_run_spf_cb                             1,331.1    1,310.3
+  isis_receive                                  195.4       46.1
+  tx_queue_send_event                            11.9        8.6
+  send_l2_psnp                                   11.8        6.5
+  zclient_read                                    0.9        0.8
+  lsp_refresh                                     0.4        0.3
+  vtysh_accept                                    0.0        0.3
+  dyn_cache_cleanup                               0.2        0.2
+random regular, degree 8, seed 3 (18 and 18 windows)
+  isis_run_spf_cb                             1,295.3    1,280.2
+  isis_receive                                   98.9      247.2
+  tx_queue_send_event                            11.8        8.8
+  send_l2_psnp                                    7.6        8.3
+  zclient_read                                    0.8        0.8
+  vtysh_read                                     -0.6        0.5
+  lsp_refresh                                     0.3        0.4
+  dyn_cache_cleanup                               0.2        0.2
+random regular, degree 16, seed 1 (18 and 18 windows)
+  isis_run_spf_cb                             2,643.8    2,574.6
+  isis_receive                                  403.0      270.8
+  tx_queue_send_event                            23.3        7.4
+  send_l2_psnp                                    2.9      -21.2
+  zclient_read                                    1.0        1.0
+  lsp_refresh                                     0.5        0.6
+  dyn_cache_cleanup                               0.2        0.2
+  vtysh_accept                                   -0.2       -0.3
+random regular, degree 16, seed 2 (18 and 18 windows)
+  isis_run_spf_cb                             2,764.2    2,614.2
+  isis_receive                                  337.7      203.4
+  tx_queue_send_event                            23.4        7.4
+  send_hello_cb                                 -14.6        1.9
+  zclient_read                                    1.0        1.0
+  lsp_refresh                                     0.4        0.7
+  dyn_cache_cleanup                               0.2        0.2
+  vtysh_accept                                    0.1       -0.1
+random regular, degree 16, seed 3 (18 and 18 windows)
+  isis_run_spf_cb                             2,698.3    2,614.1
+  isis_receive                                  306.0      216.2
+  tx_queue_send_event                            23.4        7.4
+  zclient_read                                    1.0        1.0
+  lsp_refresh                                     0.5        0.7
+  dyn_cache_cleanup                               0.2        0.2
+  vtysh_accept                                   -0.0       -0.1
+  lsp_tick                                       -1.2       -0.6
+random regular, degree 32, seed 1 (18 and 18 windows)
+  isis_receive                               13,342.0      -64.7
+  isis_run_spf_cb                             2,118.0    5,160.8
+  tx_queue_send_event                           899.5        4.3
+  isis_adj_expire                               119.2        0.0
+  send_hello_cb                                  91.5      -67.7
+  zclient_flush_data                             76.1        0.0
+  send_l2_psnp                                   30.4      -75.9
+  lsp_refresh                                     3.5        0.8
+random regular, degree 32, seed 2 (18 and 18 windows)
+  isis_run_spf_cb                             2,039.1    5,280.5
+  isis_receive                                1,158.6      135.3
+  tx_queue_send_event                           285.9        4.4
+  isis_adj_expire                                90.9        0.0
+  send_hello_cb                                  70.4      -16.2
+  send_l2_psnp                                   18.1      -95.0
+  lsp_refresh                                     8.6        0.7
+  zclient_flush_data                              4.3        0.0
+random regular, degree 32, seed 3 (18 and 18 windows)
+  isis_receive                               11,675.3       32.2
+  isis_run_spf_cb                             2,766.9    5,252.7
+  tx_queue_send_event                           825.7        4.5
+  isis_adj_expire                               103.9        0.0
+  send_hello_cb                                  61.8      -24.0
+  send_l2_psnp                                   20.2      -54.7
+  lsp_refresh                                    10.5        0.8
+  zclient_read                                    1.2        1.3

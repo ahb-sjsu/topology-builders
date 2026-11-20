@@ -47,12 +47,12 @@ flowchart LR
 
 | Option | What runs | Needs | Speed | Status, 2026-11-20 |
 |---|---|---|---|---|
-| Model: `flood_model` | the draft's reflood decision, no FRR | Python | milliseconds per change, any size | with flood reduction on, within 20% of FRR's LSP counts on 26 of 28 measured 64-router topologies |
+| Model: `flood_model` | the draft's reflood decision, no FRR | Python | milliseconds per change, any size | with flood reduction on, within 20% of FRR's LSP counts on 26 of 28 64-router topologies, and within 15% on all 14 graphs of the latest runs (64 and 128 routers), where its lockstep saving is within 5 points of FRR's |
 | Docker labs: `measure` | real FRR, a container per router | Linux, root, Docker, containerlab | real time | every result in `results/` |
 | Namespace labs: `measure --backend netns` | real FRR, a network namespace per router | Linux, root or `unshare -Urnm` | real time | ran end to end in a container with Colab's permissions: every run converged; link-change LSP counts within 12% of the Docker labs' on the same graph |
 | Colab: `tools/colab` | namespace labs on a Colab runtime | a Google account | real time, on the runtime's CPUs | passed `test_in_docker.sh` (Colab's permissions, 2 CPUs); not yet run on Colab itself |
 | Emulated guest: `tools/overlay` | Docker labs inside QEMU, software emulation | QEMU; no root, no KVM | about 10 times slower | a 16-router lab runs on the host and in a cluster pod; link-down LSP counts within 17% of the host's; link-up, router and multi-link windows 1.2 to 1.7 times, bring-up 1.5 to 2.6 times; scaling timers by 10 is not a fix; CPU and times not comparable |
-| Decision check: `tools/model` | FRR's logged decisions against the model's | as namespace labs | real time | all 1,186 decisions logged on five topologies match the model, given the snapshot each router used |
+| Decision check: `tools/model` | FRR's logged decisions against the model's | as namespace labs | real time | all 1,186 decisions logged on five topologies match the model, given the snapshot each router used; after router and multi-link failures, it shows which relays decided with the topology from before the failure |
 
 Kaggle's notebooks refuse user namespaces, so of the lab options only the emulated guest could run there (untested).
 Details: [the model](#a-model-of-flooding), [namespaces and Colab](#without-docker-and-on-colab),
@@ -344,6 +344,25 @@ logs, for single links, router failures and three links failing at once. Single 
 of milliseconds either way; when a router fails or several links fail together, flooding with flood reduction on was
 often seconds slower (up to 8 s), though every router still ended with the same LSPs.
 
+**Why flooding was slow after failures.** [results/mechanism](results/mechanism/README.md): the same failures again,
+with flooding, CSNP and PSNP logs. The routers that got a new LSP more than a second late got it through the periodic
+CSNP exchange (241 of 249), because a neighbor that held it decided with the topology from before the failure and
+left them to a router that had just lost its links (shown for 172 of the 249, by the model reproducing the
+neighbor's logged decision only with that topology). Without flood reduction, on the same butterfly and failures,
+every router had every new LSP within 236 ms.
+
+**Three graphs per degree, and where the CPU goes.** [results/seeds-n64](results/seeds-n64/README.md): three random
+graphs at each of degree 4, 8, 16 and 32, with isisd's CPU per event handler. The LSP saving barely depends on the
+graph (36%, 35% and 34% at degree 8; 75%, 75% and 74% at 16). Route computation is 82% to 95% of isisd's CPU for a
+link change and costs the same with flood reduction on, which is why CPU falls so much less than LSPs. CPU savings
+also repeat less well than LSP savings: the 4x4x4 butterfly's median 22% in the families sweep was 5% in this run. At
+degree 32, without flood reduction none of the 9 runs converged on 20 CPUs.
+
+**128 routers.** [results/random-regular-n128](results/random-regular-n128/README.md): degree 4, 8 and 16 at 128
+routers. LSPs fall by 8%, 19% and 53%, less than at 64 routers of the same degree; matched by two-hop paths instead of
+degree, the two sizes agree. isisd CPU falls by 1% to 8%: route computation is nearly all of it, and each costs twice
+as much as at 64 routers. 256-router labs could not be deployed with containerlab on this host.
+
 **Multistage butterflies, model only.** [results/model-nfly](results/model-nfly/README.md): the flooding model on
 k-ary n-flies from 16 to 2,304 switches, each beside a random graph of the same size and degree; no FRR yet. At the
 same size and degree an n-fly saves far more (49% against 18% at 48 switches, 31% against 1% at 1,280), and the
@@ -390,7 +409,9 @@ for reduction in (False, True):
 
 Against every link change measured on 64 routers, with flood reduction on, the model is within 20% of the LSPs FRR
 sent on 26 of 28 topologies (the exceptions: the flattened butterfly 16×2×2, 29% over, and the random graph of degree
-48, 26% under). Without flood reduction the count depends on timing, which decides how many copies a router receives
+48, 26% under), and within 15% on all 14 graphs of 64 and 128 routers measured since; there its lockstep saving is
+within 5 points of FRR's ([seeds-n64](results/seeds-n64/README.md), [random-regular-n128](results/random-regular-n128/README.md);
+`tools/model/validate.py` makes the comparison). Without flood reduction the count depends on timing, which decides how many copies a router receives
 before it sends; the model brackets it rather than predicts it. It leaves out CPU, timers, retransmissions, recovery
 by CSNP and PSNP, and the database exchange over a new adjacency. Checked decision by decision against isisd's own
 debug log ([results/model-decisions](results/model-decisions/README.md)), every one of 1,186 decisions matches,
@@ -399,8 +420,9 @@ new link, while `flood_link_change` assumes the snapshot without it.
 
 ## Not here yet
 
-- Results of runs with several graphs per degree, CPU per event handler for single link changes, and 128 and 256
-  routers (running), and FRR runs of fat-trees and k-ary n-flies (queued).
+- FRR runs of fat-trees and k-ary n-flies (so far model only: [model-fat-tree](results/model-fat-tree/README.md),
+  [model-nfly](results/model-nfly/README.md)).
+- 256 routers and more, which need a setup other than one containerlab host, for example the namespace backend.
 - An exporter to netlab, as a second, independent path to FRR IS-IS.
 
 [SURVEY.md](https://github.com/ahb-sjsu/topology-builders/blob/main/SURVEY.md) lists the existing builders and lab tools, with licences and status, so that this repository

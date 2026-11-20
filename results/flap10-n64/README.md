@@ -48,7 +48,10 @@ implementation:
 - **Event:** ten links down at once, then up at once, with 30 s windows, and the graph kept connected; how the flaps
   were timed there is not known to us.
 - **Setup:** all 64 routers share 20 CPUs here (an LXD container on one host, every router pinned to CPUs 12-23 and
-  36-43); CPU figures depend on the setup, as the [families results](../families-n64/README.md) show.
+  36-43); CPU figures depend on the setup, as the [families results](../families-n64/README.md) show. During all of
+  these runs, a QEMU guest of ours ran pinned to CPUs 44-47, which share physical cores with CPUs 20-23, four of the
+  routers' 20. That slows the routers on those four CPUs and can raise their CPU times, in both variants alike: the
+  off and on labs took turns under the same load. It does not change which LSPs are sent.
 
 So this measures FRR's behaviour under this protocol; it does not contradict the other implementation's figure.
 

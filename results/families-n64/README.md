@@ -118,6 +118,10 @@ topology-builders measure labs/<name>/off labs/<name>/on --repeat 2 --links 3 --
   CPUs online); every router was also pinned to those CPUs. containerlab 0.78.2, topology-builders 0.1.0.
 - A watcher on the host checked every minute that its own uplink was configured and could reach the router, and
   would have stopped the sweep before the next topology if not. It never did.
+- Other load: from 19:18 to 19:29 UTC, during the 8x8 butterfly's runs, a small lab of ours ran in a container
+  limited to CPUs 44-47, which share physical cores with CPUs 20-23, four of the routers' 20; that container's
+  one-minute setup at 19:07 fell during the 8x4x2 butterfly's runs. They can have raised CPU times in the windows
+  they overlapped; LSP counts do not depend on them. No other topology overlapped such a job.
 - The links are chosen from the topology file and seed 1, the same for off and on; the labs take turns and the
   order alternates between the two runs. Before each run the harness waited until the hottest CPU sensor was below
   80 C.

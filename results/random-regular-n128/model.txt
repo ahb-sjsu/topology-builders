@@ -1,0 +1,13 @@
+topology                                     red win    n  measured         lockstep          jitter1  jitter1-proc0.5   measured-minus-model (jitter1)
+random-regular degree=16,seed=1              off down   6    2793.8           3241.3           3838.0           3604.5    -1044.2
+random-regular degree=16,seed=1              off up     6    3986.3           3278.7           3842.0           3612.9      144.3
+random-regular degree=16,seed=1              on  down   6    1283.7           1382.7           1380.1           1378.5      -96.5
+random-regular degree=16,seed=1              on  up     6    1914.8           1391.0           1397.5           1395.4      517.3
+random-regular degree=4,seed=1               off down   6     565.7            646.0            766.0            708.2     -200.3
+random-regular degree=4,seed=1               off up     6     850.2            636.7            770.0            709.5       80.2
+random-regular degree=4,seed=1               on  down   6     528.3            627.0            617.8            616.5      -89.4
+random-regular degree=4,seed=1               on  up     6     772.7            593.0            599.4            595.1      173.3
+random-regular degree=8,seed=1               off down   6    1296.5           1481.3           1790.0           1650.6     -493.5
+random-regular degree=8,seed=1               off up     6    1774.5           1464.7           1794.0           1645.9      -19.5
+random-regular degree=8,seed=1               on  down   6    1000.5           1223.7           1216.5           1213.6     -216.0
+random-regular degree=8,seed=1               on  up     6    1472.0           1198.0           1213.1           1196.2      258.9

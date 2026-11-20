@@ -41,9 +41,10 @@ the four topologies. Convergence after a link went down, from 0.4 to 1 s, is set
 - Without flood reduction there was no such tail: every window in which links went down flooded in at most 0.43 s,
   except router failures on leaf-spine, which took 1.5 to 1.9 s with flood reduction on or off.
 - Every window still ended with every router holding the same LSPs. This is about speed, not correctness.
-- We have not yet found the mechanism. The delays of one to eight seconds are longer than flooding itself takes, as
-  if the new LSPs reached the last routers only through some slower path, such as a retransmission or database
-  synchronization, after a router they relied on to relay had lost links. That is a guess, not a finding.
+- The mechanism, from a lab that replays these failures with flooding, CSNP and PSNP logs
+  ([mechanism](../mechanism/README.md)): the last routers got the new LSPs through the periodic CSNP exchange, not
+  through flooding, because a neighbor that held the LSP decided with the topology from before the failure and left
+  them to a router that had just lost its links.
 
 ## Recoveries were not slower
 
@@ -91,6 +92,10 @@ interval 1 s), so it is longer.
   on; CPU figures from these runs are not used anywhere.
 - Degree 32 is missing: with the logging, the routers without flood reduction never converged on the 20 CPUs they
   shared, and the run was stopped. No records were written.
+- Other load on the host's CPUs: while leaf-spine ran (03:19 to 03:53 UTC), other jobs of ours ran pinned to CPUs
+  44-47 (building and then running a QEMU guest), which share physical cores with CPUs 20-23, four of the routers'
+  20. That slows the routers on those four CPUs, in both variants alike since they took turns; the other three
+  topologies ran without it.
 - One run is set aside, in `excluded.jsonl.gz`: the butterfly's first run without flood reduction, which started
   while the stopped degree-32 lab was still being taken down and shared the CPUs with it. The butterfly therefore
   has two windows of each kind without flood reduction.

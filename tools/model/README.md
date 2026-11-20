@@ -1,7 +1,8 @@
 # Checking the flooding model against FRR, decision by decision
 
-`topology_builders.flood_model` reproduces the reflood decision of draft-ietf-lsr-distoptflood-14. These two scripts
-check it against the decisions FRR's isisd actually makes.
+`topology_builders.flood_model` reproduces the reflood decision of draft-ietf-lsr-distoptflood-14. These scripts
+check it against the decisions FRR's isisd actually makes, use it to explain FRR's logs, and compare its LSP counts
+with measured ones.
 
 1. `collect_decisions.py` (root, or inside `unshare -Urnm`): for each topology file, writes a lab with flood
    reduction on, `debug isis flooding` and timing logs, deploys it with the netns backend, waits for convergence,
@@ -21,3 +22,33 @@ python tools/model/compare_decisions.py decisions/*/
 **Status (2026-11-20):** run on five topologies of 16 to 20 routers: all 1,186 decisions match the model, given
 the snapshot each router decided with ([results/model-decisions](../../results/model-decisions/README.md)).
 `compare_decisions.py` also prints, per window, how many decisions used a snapshot with or without the changed link.
+
+## After router and multi-link failures
+
+3. `collect_events.py`: replays measured failures (`node` and `multi` events, as `measure` stores them) in a
+   namespace lab, flood reduction off and/or on, with `debug isis flooding`, timing logs, `debug isis snp-packets`
+   and `debug isis spf-events`, and saves every router's log, the lab and the events' times.
+4. `analyze_events.py`: for each failure, when each router first held each new LSP and how it got it (flooding, or
+   CSNP exchange: asked for with a PSNP, or sent by a neighbor that saw an older copy in its CSNP); for late
+   arrivals, which topology snapshot reproduces each relaying neighbor's logged decision, and whether the decision on
+   the topology without the failed links would have sent the LSP to the late router.
+
+```
+unshare -Urnm python3 tools/model/collect_events.py --out mech --topology t.json --events events.json --reduction both
+python tools/model/analyze_events.py --verbose mech/*/
+```
+
+**Status (2026-11-20):** on the 4x4x4 butterfly and leaf-spine with 16 spines, 241 of the 249 router-LSP pairs that
+arrived more than 1 s late got the LSP by CSNP, and for 172 a relay decided with the topology from before the
+failure ([results/mechanism](../../results/mechanism/README.md)).
+
+## The model against measured LSP counts
+
+5. `validate.py`: for every run in a measurements file, finds the topology file the lab was written from (by sha256,
+   under the folders in `TOPOLOGY_DIRS`) and prints, per topology, variant and window kind, the LSPs FRR sent against
+   the model's count for the same links, in lockstep and with jittered link delays.
+
+```
+mkdir topos && tar -xzf results/seeds-n64/topologies.tar.gz -C topos
+TOPOLOGY_DIRS=topos python tools/model/validate.py results/seeds-n64/measurements.jsonl.gz
+```
