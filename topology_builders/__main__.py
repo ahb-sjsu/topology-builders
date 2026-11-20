@@ -63,14 +63,15 @@ def main(argv=None):
     z.add_argument("--out", required=True, help="output directory")
 
     b = sub.add_parser("build", help="one topology")
-    b.add_argument("family", choices=("random-regular", "leaf-spine", "flattened-butterfly", "k-ary-n-fly"))
+    b.add_argument("family", choices=("random-regular", "leaf-spine", "flattened-butterfly", "k-ary-n-fly",
+                                      "fat-tree"))
     b.add_argument("--routers", type=int, help="random-regular")
     b.add_argument("--degree", type=int, help="random-regular")
     b.add_argument("--seed", type=int, default=1, help="random-regular (default 1)")
     b.add_argument("--leaves", type=int, help="leaf-spine")
     b.add_argument("--spines", type=int, help="leaf-spine")
     b.add_argument("--radices", help="flattened-butterfly, comma-separated, e.g. 8,8")
-    b.add_argument("--k", type=int, help="k-ary-n-fly")
+    b.add_argument("--k", type=int, help="k-ary-n-fly; fat-tree (even)")
     b.add_argument("--stages", type=int, help="k-ary-n-fly")
     b.add_argument("--out", required=True, help="output file")
 
@@ -178,6 +179,8 @@ def main(argv=None):
             g = F.leaf_spine(a.leaves, a.spines)
         elif a.family == "flattened-butterfly":
             g = F.flattened_butterfly(_ints(a.radices))
+        elif a.family == "fat-tree":
+            g = F.fat_tree(a.k)
         else:
             g = F.kary_nfly(a.k, a.stages)
         e = O.write(g, a.out)

@@ -74,6 +74,32 @@ def flattened_butterfly(radices):
     return _named(g, "flattened-butterfly", {"routers": len(coords), "radices": list(radices)}, order=coords)
 
 
+def fat_tree(k):
+    """The k-ary fat-tree, a three-tier Clos (Al-Fares, Loukissas and Vahdat, SIGCOMM 2008): k pods of k/2 edge and
+    k/2 aggregation switches, every edge switch of a pod linked to every aggregation switch of the pod; (k/2)^2 core
+    switches in k/2 groups, aggregation switch j of every pod linked to the k/2 core switches of group j. Every
+    switch has k ports; the edge switches' k/2 host ports are left out, so edge switches have degree k/2 and the
+    others k. 5k^2/4 switches and k^3/2 links. Routers are named core first, then pod by pod, aggregation before
+    edge."""
+    if k < 2 or k % 2:
+        raise ValueError(f"k must be an even number of at least 2, got {k}")
+    h = k // 2
+    order = [("core", j, i) for j in range(h) for i in range(h)]
+    order += [(role, p, i) for p in range(k) for role in ("aggregation", "edge") for i in range(h)]
+    g = nx.Graph()
+    for role, a, b in order:
+        if role == "core":
+            g.add_node((role, a, b), role=role, group=a, index=b)
+        else:
+            g.add_node((role, a, b), role=role, pod=a, index=b)
+    for p in range(k):
+        for j in range(h):
+            for i in range(h):
+                g.add_edge(("edge", p, i), ("aggregation", p, j))
+                g.add_edge(("aggregation", p, j), ("core", j, i))
+    return _named(g, "fat-tree", {"routers": len(order), "k": k}, order=order)
+
+
 def kary_nfly(k, stages):
     """The butterfly (k-ary n-fly): `stages` stages of k^(stages - 1) switches.  Switch w of stage s is linked to the
     k switches of stage s + 1 whose positions differ from w only in base-k digit s, so between any switch of the

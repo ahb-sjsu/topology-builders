@@ -157,3 +157,29 @@ def test_size_limits_leave_figures_out(monkeypatch):
     s = O.summary(F.random_regular(16, 4, 1))
     assert s["connected"] and s["diameter"] is None and s["mean_distance"] is None
     assert s["two_hop_multiplicity"] is None
+
+
+def test_fat_tree():
+    for k in (2, 4, 6, 8):
+        g = F.fat_tree(k)
+        h = k // 2
+        role = nx.get_node_attributes(g, "role")
+        assert g.number_of_nodes() == 5 * k * k // 4 and g.number_of_edges() == k ** 3 // 2
+        assert nx.is_connected(g) and nx.is_bipartite(g)
+        assert {g.degree(v) for v in g if role[v] == "edge"} == {h}
+        assert {g.degree(v) for v in g if role[v] != "edge"} == {k}
+        pod = nx.get_node_attributes(g, "pod")
+        for c in (v for v in g if role[v] == "core"):
+            assert sorted(pod[a] for a in g[c]) == list(range(k)), "one aggregation switch in every pod"
+        if k >= 4:
+            edges = [v for v in g if role[v] == "edge"]
+            same = next(v for v in edges if pod[v] == pod[edges[0]] and v != edges[0])
+            other = next(v for v in edges if pod[v] != pod[edges[0]])
+            assert len(list(nx.all_shortest_paths(g, edges[0], same))) == h
+            assert len(list(nx.all_shortest_paths(g, edges[0], other))) == h * h
+            assert nx.diameter(g) == 4
+    assert F.fat_tree(4).graph == {"family": "fat-tree", "parameters": {"routers": 20, "k": 4}}
+    with pytest.raises(ValueError):
+        F.fat_tree(5)
+    with pytest.raises(ValueError):
+        F.fat_tree(0)

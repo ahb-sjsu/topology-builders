@@ -29,6 +29,7 @@ flowchart LR
 | `flattened-butterfly` | Routers on a grid of radices k1 x k2 x ...; each is linked to every router that differs from it in one coordinate (Kim, Dally and Abts, ISCA 2007). One radix N is the full mesh; all radices 2 is the hypercube. | every factorization of N (a prime N has only the full mesh) |
 | `zoo` | A Topology Zoo graph, in TopoHub's packaging, made denser by adding links: at random, or shortest great-circle distance first | target average degree, up to N - 1 |
 | `k-ary-n-fly` | The butterfly: n stages of k^(n-1) switches, each linked to the k switches of the next stage whose position differs from its own in one base-k digit. Switches only, no hosts. | none: the size grows with k and n, so it is not in the sweep |
+| `fat-tree` | The k-ary fat-tree, a three-tier Clos (Al-Fares, Loukissas and Vahdat, SIGCOMM 2008): k pods of k/2 edge and k/2 aggregation switches, fully linked within the pod, and (k/2)^2 core switches, each linked to one aggregation switch in every pod. 5k^2/4 switches, k^3/2 links. Switches only, no hosts. | none: the size grows with the radix k (k = 8: 80 switches, 256 links), so it is not in the sweep |
 
 Random-regular and flattened-butterfly both end at the full mesh. Leaf-spine is densest at N/2 spines, where the
 average degree is N/2.
@@ -71,6 +72,7 @@ python -m topology_builders sweep --routers 64 --seeds 1,2,3 --out out/n64
 python -m topology_builders zoo <topohub>/data/topozoo/TataNld.json --method nearest --degrees 4,8,16 --out out/tata
 python -m topology_builders build flattened-butterfly --radices 8,8 --out ff-8x8.json
 python -m topology_builders build k-ary-n-fly --k 4 --stages 3 --out fly-4x3.json
+python -m topology_builders build fat-tree --k 8 --out fat-tree-k8.json
 ```
 
 Without `--degrees`, `zoo` steps from just above the graph's own average degree to the full mesh. The Zoo data is
@@ -306,10 +308,9 @@ often seconds slower (up to 8 s), though every router still ended with the same 
 
 ## Not here yet
 
-- Results of runs with several graphs per degree, convergence timing, router and multi-link failures, CPU per
-  event handler, and 128 and 256 routers (running).
+- Results of runs with several graphs per degree, CPU per event handler for single link changes, and 128 and 256
+  routers (running), and of fat-trees.
 - An exporter to netlab, as a second, independent path to FRR IS-IS.
-- Fat-tree (three-tier Clos) by radix.
 
 [SURVEY.md](https://github.com/ahb-sjsu/topology-builders/blob/main/SURVEY.md) lists the existing builders and lab tools, with licences and status, so that this repository
 can link to and wrap them rather than rewrite them.
