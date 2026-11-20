@@ -26,30 +26,31 @@ A topology can be tested two ways: by the model of the draft's algorithm, which 
 real FRR routers, which can run in three places.
 
 ```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart LR
-    T["<b>topology file</b><br/>sweep · zoo · build"] --> MOD["<b>flood_model</b><br/>the draft's algorithm in Python:<br/>LSPs per change, any size"]
-    T --> C["<b>clab</b><br/>FRR IS-IS lab,<br/>off/ and on/"]
+    T["<b>topology file</b><br/>sweep, zoo or build"] --> MOD["<b>flood_model</b><br/>the draft's algorithm<br/>in Python<br/>LSPs per change"]
+    T --> C["<b>clab</b><br/>FRR IS-IS lab<br/>off/ and on/"]
     subgraph RUN["where a lab of real FRR routers runs"]
         direction TB
-        D["<b>a Docker host</b><br/>containerlab, a container per router<br/>Linux · root"]
-        N["<b>network namespaces</b><br/>measure --backend netns, no Docker<br/>root, or unshare -Urnm"]
-        O["<b>an emulated guest</b><br/>tools/overlay: Docker inside QEMU<br/>no root · no KVM · about 10× slower"]
+        D["<b>a Docker host</b><br/>containerlab<br/>a container per router<br/>Linux, root"]
+        N["<b>network namespaces</b><br/>netns backend<br/>no Docker<br/>root or user namespace"]
+        O["<b>an emulated guest</b><br/>tools/overlay<br/>Docker inside QEMU<br/>no root, no KVM<br/>about 10× slower"]
     end
     C --> D & N & O
-    N -.-> COL["Google Colab<br/>tools/colab"]
-    O -.-> POD["cluster pods<br/>without privileges"]
-    D & N & O --> EV["<b>measure</b><br/>events: link · node · multi<br/>options: --timing · --profile"]
+    N -.-> COL["<b>Google Colab</b><br/>tools/colab"]
+    O -.-> POD["<b>cluster pods</b><br/>no privileges"]
+    D & N & O --> EV["<b>measure</b><br/>link, node, multi<br/>timing, CPU profile"]
     EV --> REP["<b>report</b><br/>off against on"]
-    MOD -.->|"same link changes:<br/>LSP counts"| REP
-    MOD -.->|"tools/model:<br/>decision by decision"| N
+    MOD -.->|"LSP counts"| REP
+    MOD -.->|"decision by decision<br/>tools/model"| N
 ```
 
 | Option | What runs | Needs | Speed | Status, 2026-11-20 |
 |---|---|---|---|---|
 | Model: `flood_model` | the draft's reflood decision, no FRR | Python | milliseconds per change, any size | with flood reduction on, within 20% of FRR's LSP counts on 26 of 28 measured 64-router topologies |
 | Docker labs: `measure` | real FRR, a container per router | Linux, root, Docker, containerlab | real time | every result in `results/` |
-| Namespace labs: `measure --backend netns` | real FRR, a network namespace per router | Linux, root or `unshare -Urnm` | real time | unit tests pass; not yet run end to end |
-| Colab: `tools/colab` | namespace labs on a Colab runtime | a Google account | real time, on the runtime's CPUs | not yet run end to end |
+| Namespace labs: `measure --backend netns` | real FRR, a network namespace per router | Linux, root or `unshare -Urnm` | real time | ran end to end in a container with Colab's permissions: every run converged; link-change LSP counts within 12% of the Docker labs' on the same graph |
+| Colab: `tools/colab` | namespace labs on a Colab runtime | a Google account | real time, on the runtime's CPUs | passed `test_in_docker.sh` (Colab's permissions, 2 CPUs); not yet run on Colab itself |
 | Emulated guest: `tools/overlay` | Docker labs inside QEMU, software emulation | QEMU; no root, no KVM | about 10 times slower | a 16-router lab runs on the host and in a cluster pod; link-down LSP counts within 17% of the host's; link-up, router and multi-link windows 1.2 to 1.7 times, bring-up 1.5 to 2.6 times; scaling timers by 10 is not a fix; CPU and times not comparable |
 | Decision check: `tools/model` | FRR's logged decisions against the model's | as namespace labs | real time | not yet run |
 
@@ -343,6 +344,15 @@ logs, for single links, router failures and three links failing at once. Single 
 of milliseconds either way; when a router fails or several links fail together, flooding with flood reduction on was
 often seconds slower (up to 8 s), though every router still ended with the same LSPs.
 
+**Multistage butterflies, model only.** [results/model-nfly](results/model-nfly/README.md): the flooding model on
+k-ary n-flies from 16 to 2,304 switches, each beside a random graph of the same size and degree; no FRR yet. At the
+same size and degree an n-fly saves far more (49% against 18% at 48 switches, 31% against 1% at 1,280), and the
+saving follows the number of two-hop paths.
+
+**Fat-trees, model only.** [results/model-fat-tree](results/model-fat-tree/README.md): the same on k-ary fat-trees
+from k = 4 (20 switches) to k = 24 (720). The saving rises with the radix towards two-thirds (27% at k = 4, 60% at
+12, 67% at 24), while random graphs of the same size and degree stay near 20%.
+
 ## Without Docker, and on Colab
 
 `measure --backend netns` runs every router in a network namespace of one machine instead of a container: no Docker
@@ -356,8 +366,10 @@ unshare -Urnm topology-builders measure labs/rr16/off labs/rr16/on --backend net
 [tools/colab](tools/colab/README.md) uses it to run the labs on Google Colab: `setup.sh` builds FRR from the flood
 reduction pull request with only the daemons the labs use, and a notebook builds a topology, measures it with flood
 reduction off and on, and reports. A Colab CPU runtime allows user namespaces with network devices (checked on
-2026-11-20); Kaggle's does not. **Status:** the backend's unit tests pass; the recipe has not yet run end to end, on
-Colab or in `test_in_docker.sh`, the container shaped like Colab's runtime.
+2026-11-20); Kaggle's does not. **Status:** the recipe passed end to end in `test_in_docker.sh`, a container with
+Colab's permissions and 2 CPUs: a 16-router random graph and a k = 4 fat-tree, flood reduction off and on, every run
+converged and every window consistent, link-change LSP counts within 12% of the Docker labs' on the same graph
+([results/colab-shaped](results/colab-shaped/README.md)). It has not yet run on Colab itself.
 
 ## A model of flooding
 
@@ -386,7 +398,7 @@ against FRR decision by decision, from FRR's own debug log.
 ## Not here yet
 
 - Results of runs with several graphs per degree, CPU per event handler for single link changes, and 128 and 256
-  routers (running), and of fat-trees.
+  routers (running), and FRR runs of fat-trees and k-ary n-flies (queued).
 - The model's decision-by-decision check against FRR (queued).
 - An exporter to netlab, as a second, independent path to FRR IS-IS.
 

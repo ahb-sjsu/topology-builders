@@ -451,9 +451,10 @@ class NetnsLab(Lab):
     DAEMONS = ("mgmtd", "zebra", "staticd", "isisd")
     NETNS_DIR = "/run/netns"
 
-    def __init__(self, directory, workers=16, etc_base="/etc/frr", run_base="/var/run/frr", frr_lib=None):
+    def __init__(self, directory, workers=16, etc_base="/etc/frr", run_base="/var/run/frr", lib_base="/var/lib/frr",
+                 frr_lib=None):
         super().__init__(directory, workers)
-        self.etc_base, self.run_base = etc_base, run_base
+        self.etc_base, self.run_base, self.lib_base = etc_base, run_base, lib_base
         self.frr_lib = frr_lib or os.environ.get("TB_FRR_LIB", "/usr/lib/frr")
 
     def run_dir(self, router):
@@ -473,10 +474,37 @@ class NetnsLab(Lab):
                            timeout=timeout, check=False)
         return p.returncode, p.stdout
 
-    def _run(self, args, timeout=120):
-        p = subprocess.run(args, capture_output=True, text=True, timeout=timeout, check=False)
+    def _run(self, args, timeout=120, log=None):
+        """Run a command; raise RuntimeError with the end of its output if it fails. With `log`, its output goes to
+        that file instead of a pipe: a daemon that forks keeps its parent's output open, and a pipe would then
+        never reach end of file."""
+        if log is None:
+            p = subprocess.run(args, capture_output=True, text=True, timeout=timeout, check=False)
+            out = p.stdout + p.stderr
+        else:
+            with open(log, "ab") as fh:
+                p = subprocess.run(args, stdin=subprocess.DEVNULL, stdout=fh, stderr=subprocess.STDOUT,
+                                   timeout=timeout, check=False)
+            with open(log, encoding="utf-8", errors="replace") as fh:
+                out = fh.read()
         if p.returncode:
-            raise RuntimeError(f"{' '.join(args)} failed: {(p.stdout + p.stderr)[-300:]}")
+            raise RuntimeError(f"{' '.join(args)} failed: {out[-300:]}")
+
+    def daemon_log(self, cmd):
+        """Where a daemon's start-up output goes: <run dir>/<daemon>.start.log; None for other commands."""
+        daemon = next((x for x in cmd if x.startswith(f"{self.frr_lib}/")), None)
+        if daemon is None or "-N" not in cmd:
+            return None
+        return f"{self.run_dir(cmd[cmd.index('-N') + 1])}/{os.path.basename(daemon)}.start.log"
+
+    def daemon_command(self, router, daemon):
+        """Start one FRR daemon of `router`: in the router's network namespace and in a UTS namespace of its own whose
+        host name is the router's, as in a container. isisd advertises the host name as the router's dynamic
+        hostname, and `show isis database` lists LSPs by it; sharing one host name, every LSP would look alike."""
+        rd = self.run_dir(router)
+        args = [f"{self.frr_lib}/{daemon}", "-N", router, "-d", "-u", "root", "-g", "root", "-A", "127.0.0.1", "-i",
+                f"{rd}/{daemon}.pid"] + (["-s", "90000000"] if daemon == "zebra" else [])
+        return self.enter(router) + ["unshare", "--uts", "sh", "-c", f'hostname {router} && exec "$@"', "sh"] + args
 
     def commands_deploy(self):
         """The commands deploy runs, in order (argument lists), after the configuration files are written."""
@@ -489,11 +517,7 @@ class NetnsLab(Lab):
                      self.enter(x["a"]) + ["ip", "link", "set", ta, "name", x["a_port"], "up"],
                      self.enter(x["b"]) + ["ip", "link", "set", tb, "name", x["b_port"], "up"]]
         for d in self.DAEMONS:
-            for r in self.routers:
-                rd = self.run_dir(r)
-                cmds.append(self.enter(r) + [f"{self.frr_lib}/{d}", "-N", r, "-d", "-u", "root", "-g", "root", "-A",
-                                             "127.0.0.1", "-i", f"{rd}/{d}.pid", "-z", f"{rd}/zserv.api"]
-                            + (["-s", "90000000"] if d == "zebra" else []))
+            cmds += [self.daemon_command(r, d) for r in self.routers]
         return cmds
 
     def _write_configs(self):
@@ -501,6 +525,7 @@ class NetnsLab(Lab):
             etc, rd = f"{self.etc_base}/{r}", self.run_dir(r)
             os.makedirs(etc, exist_ok=True)
             os.makedirs(rd, exist_ok=True)
+            os.makedirs(f"{self.lib_base}/{r}", exist_ok=True)  # mgmtd keeps its state here
             with open(os.path.join(self.dir, r, "frr.conf"), encoding="utf-8") as fh:
                 conf = fh.read().replace(f"log file {TIMING_LOG} ", f"log file {self.log_path(r)} ")
             with open(f"{etc}/frr.conf", "w", encoding="utf-8") as fh:
@@ -508,18 +533,29 @@ class NetnsLab(Lab):
             with open(f"{etc}/vtysh.conf", "w", encoding="utf-8") as fh:
                 fh.write("service integrated-vtysh-config\n")
 
+    def _deploy(self):
+        # A namespace file left by a run that crashed (its mount gone with that run's mount namespace) would make
+        # `ip netns add` fail; `ip netns del` removes it.
+        for r in self.routers:
+            if os.path.exists(f"{self.NETNS_DIR}/{r}"):
+                subprocess.run(["ip", "netns", "del", r], capture_output=True, check=False)
+        self._write_configs()
+        first_zebra = self.daemon_command(self.routers[0], "zebra")
+        for cmd in self.commands_deploy():
+            if cmd == first_zebra:
+                time.sleep(1)  # mgmtd of every router up before the daemons that connect to it
+            self._run(cmd, log=self.daemon_log(cmd))
+        time.sleep(1)
+        for r in self.routers:
+            self._run(self.enter(r) + ["vtysh", "-N", r, "-b"])
+
     def containerlab(self, action):
         t0 = time.time()
         if action == "deploy":
-            self._write_configs()
-            first_zebra = self.enter(self.routers[0]) + [f"{self.frr_lib}/zebra"]
-            for cmd in self.commands_deploy():
-                if cmd[:len(first_zebra)] == first_zebra:
-                    time.sleep(1)  # mgmtd of every router up before the daemons that connect to it
-                self._run(cmd)
-            time.sleep(1)
-            for r in self.routers:
-                self._run(self.enter(r) + ["vtysh", "-N", r, "-b"])
+            try:
+                self._deploy()
+            except (OSError, subprocess.TimeoutExpired) as e:  # RuntimeError, so that the caller destroys the lab
+                raise RuntimeError(f"deploying {self.name} failed: {e}") from e
         else:
             pids = []
             for r in self.routers:
