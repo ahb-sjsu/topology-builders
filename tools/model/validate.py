@@ -20,8 +20,8 @@ from topology_builders import clab as C
 from topology_builders import flood_model as M
 from topology_builders import output as O
 
-TIMINGS = {"lockstep": dict(jitter=0.0, proc=0.0), "jitter1": dict(jitter=1.0, proc=0.0),
-           "jitter1-proc0.5": dict(jitter=1.0, proc=0.5)}
+TIMINGS = {"lockstep": {"jitter": 0.0, "proc": 0.0}, "jitter1": {"jitter": 1.0, "proc": 0.0},
+           "jitter1-proc0.5": {"jitter": 1.0, "proc": 0.5}}
 SEEDS = 10
 
 
@@ -54,7 +54,9 @@ def main(files):
     cache, rows = {}, defaultdict(lambda: defaultdict(list))
     index(os.environ.get("TOPOLOGY_DIRS", "").split(":"))
     for path in files:
-        for line in gzip.open(path, "rt"):
+        with gzip.open(path, "rt") as fh:
+            lines = list(fh)
+        for line in lines:
             r = json.loads(line)
             if [e.get("kind", "link") for e in r.get("events", [])] not in ([], ["link"] * len(r.get("events", []))):
                 continue
