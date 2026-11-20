@@ -284,10 +284,17 @@ change is a median 14% to 23% lower from degree 8 and not measurably lower below
 different setup gave 10% instead of 19%); at degree 48, without flood
 reduction, the 64 routers did not converge on the host's CPUs, and with it they did.
 
+**Structure.** [results/families-n64](results/families-n64/README.md): flattened butterflies and leaf-spine fabrics
+of 64 routers. Butterflies send 60% to 75% fewer LSPs for a link change from degree 6, where random graphs of the
+same degree save 23%; on leaf-spine, with flood reduction on, a link change costs about 170 to 190 LSPs at any number
+of spines, and isisd CPU per link change is lower in every pair, by a median of 22% to 40%. At 960 and 1,024 links, without flood
+reduction the routers never converged on 20 CPUs; with it they did. The two-hop multiplicity lines up with the
+saving better than the degree does.
+
 ## Not here yet
 
-- Results of the flattened-butterfly and leaf-spine sweep, and of runs with several graphs per degree, timing,
-  failures and CPU per handler (running).
+- Results of runs with several graphs per degree, convergence timing, router and multi-link failures, CPU per
+  event handler, and 128 and 256 routers (running).
 - An exporter to netlab, as a second, independent path to FRR IS-IS.
 - Fat-tree (three-tier Clos) by radix.
 
