@@ -52,7 +52,7 @@ flowchart LR
 | Namespace labs: `measure --backend netns` | real FRR, a network namespace per router | Linux, root or `unshare -Urnm` | real time | ran end to end in a container with Colab's permissions: every run converged; link-change LSP counts within 12% of the Docker labs' on the same graph |
 | Colab: `tools/colab` | namespace labs on a Colab runtime | a Google account | real time, on the runtime's CPUs | passed `test_in_docker.sh` (Colab's permissions, 2 CPUs); not yet run on Colab itself |
 | Emulated guest: `tools/overlay` | Docker labs inside QEMU, software emulation | QEMU; no root, no KVM | about 10 times slower | a 16-router lab runs on the host and in a cluster pod; link-down LSP counts within 17% of the host's; link-up, router and multi-link windows 1.2 to 1.7 times, bring-up 1.5 to 2.6 times; scaling timers by 10 is not a fix; CPU and times not comparable |
-| Decision check: `tools/model` | FRR's logged decisions against the model's | as namespace labs | real time | not yet run |
+| Decision check: `tools/model` | FRR's logged decisions against the model's | as namespace labs | real time | all 1,186 decisions logged on five topologies match the model, given the snapshot each router used |
 
 Kaggle's notebooks refuse user namespaces, so of the lab options only the emulated guest could run there (untested).
 Details: [the model](#a-model-of-flooding), [namespaces and Colab](#without-docker-and-on-colab),
@@ -392,14 +392,15 @@ Against every link change measured on 64 routers, with flood reduction on, the m
 sent on 26 of 28 topologies (the exceptions: the flattened butterfly 16×2×2, 29% over, and the random graph of degree
 48, 26% under). Without flood reduction the count depends on timing, which decides how many copies a router receives
 before it sends; the model brackets it rather than predicts it. It leaves out CPU, timers, retransmissions, recovery
-by CSNP and PSNP, and the database exchange over a new adjacency. [tools/model](tools/model/README.md) checks it
-against FRR decision by decision, from FRR's own debug log.
+by CSNP and PSNP, and the database exchange over a new adjacency. Checked decision by decision against isisd's own
+debug log ([results/model-decisions](results/model-decisions/README.md)), every one of 1,186 decisions matches,
+given the topology snapshot the router decided with; after a link comes up, most routers already decided with the
+new link, while `flood_link_change` assumes the snapshot without it.
 
 ## Not here yet
 
 - Results of runs with several graphs per degree, CPU per event handler for single link changes, and 128 and 256
   routers (running), and FRR runs of fat-trees and k-ary n-flies (queued).
-- The model's decision-by-decision check against FRR (queued).
 - An exporter to netlab, as a second, independent path to FRR IS-IS.
 
 [SURVEY.md](https://github.com/ahb-sjsu/topology-builders/blob/main/SURVEY.md) lists the existing builders and lab tools, with licences and status, so that this repository

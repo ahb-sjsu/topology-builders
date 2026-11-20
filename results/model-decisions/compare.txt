@@ -1,0 +1,40 @@
+fat-tree-k4: 285 decisions after the first change, skipped 3
+  snapshot without-link    226/282 match (80.1%)
+  snapshot with-link       195/282 match (69.1%)
+  snapshot actual          252/282 match (89.4%)
+  any, link down           114/114 match (100.0%)
+  any, link up             168/168 match (100.0%)
+  link down decisions whose snapshot was: without the link 57, with it 0, either (same decision) 57, neither 0
+  link up   decisions whose snapshot was: without the link 30, with it 56, either (same decision) 82, neither 0
+fb-4x4: 225 decisions after the first change, skipped 3
+  snapshot without-link    151/222 match (68.0%)
+  snapshot with-link       116/222 match (52.3%)
+  snapshot actual          187/222 match (84.2%)
+  any, link down            90/90 match (100.0%)
+  any, link up             132/132 match (100.0%)
+  link down decisions whose snapshot was: without the link 71, with it 0, either (same decision) 19, neither 0
+  link up   decisions whose snapshot was: without the link 35, with it 71, either (same decision) 26, neither 0
+fb-8x2: 240 decisions after the first change, skipped 3
+  snapshot without-link    173/237 match (73.0%)
+  snapshot with-link       105/237 match (44.3%)
+  snapshot actual          178/237 match (75.1%)
+  any, link down            90/90 match (100.0%)
+  any, link up             147/147 match (100.0%)
+  link down decisions whose snapshot was: without the link 73, with it 0, either (same decision) 17, neither 0
+  link up   decisions whose snapshot was: without the link 57, with it 64, either (same decision) 26, neither 0
+ls-12x4: 225 decisions after the first change, skipped 3
+  snapshot without-link    132/222 match (59.5%)
+  snapshot with-link        96/222 match (43.2%)
+  snapshot actual          180/222 match (81.1%)
+  any, link down            90/90 match (100.0%)
+  any, link up             132/132 match (100.0%)
+  link down decisions whose snapshot was: without the link 84, with it 0, either (same decision) 6, neither 0
+  link up   decisions whose snapshot was: without the link 42, with it 90, either (same decision) 0, neither 0
+rr16-d4: 225 decisions after the first change, skipped 2
+  snapshot without-link    178/223 match (79.8%)
+  snapshot with-link       145/223 match (65.0%)
+  snapshot actual          199/223 match (89.2%)
+  any, link down            90/90 match (100.0%)
+  any, link up             133/133 match (100.0%)
+  link down decisions whose snapshot was: without the link 52, with it 0, either (same decision) 38, neither 0
+  link up   decisions whose snapshot was: without the link 24, with it 45, either (same decision) 64, neither 0

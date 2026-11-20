@@ -100,20 +100,36 @@ def compare(d):
         snaps = {"without-link": without, "with-link": topo, "actual": M.Topology(actual, topo.sysid)}
         for name, snap in snaps.items():
             got = model_decision(snap, actual, x["router"], x["tn"], x["origin"])
-            ok = got == logged
-            tally[name]["match" if ok else "differ"] += 1
-            if not ok and name == "without-link" and len(misses) < 8:
-                misses.append((x["router"], x["lsp"], x["tn"], state, f"{a}-{b}", "FRR", logged, "model", got))
+            tally[name]["match" if got == logged else "differ"] += 1
+        # Any combination of snapshot (with or without the changed link) and neighbor list (with or without it: at
+        # the link's ends the adjacency may not be up yet when the router decides).
+        combos = {(s, n): model_decision(sv, nv, x["router"], x["tn"], x["origin"])
+                  for s, sv in (("without", without), ("with", topo))
+                  for n, nv in (("without", without.adj), ("with", topo.adj))}
+        hit = [k for k, v in combos.items() if v == logged]
+        tally[f"any-{state}"]["match" if hit else "differ"] += 1
+        snaps_hit = {s for s, _ in hit}
+        which = "either" if snaps_hit == {"without", "with"} else next(iter(snaps_hit), "none")
+        tally[f"snapshot-{state}"][which] += 1
+        if not hit and len(misses) < 12:
+            misses.append((x["router"], x["lsp"], f"TN {x['tn']}", state, f"{a}-{b}", "FRR", logged,
+                           "model (snapshot without, with)", combos[("without", "without")], combos[("with", "with")]))
     print(f"{os.path.basename(os.path.normpath(d))}: {len(recs)} decisions after the first change, "
           f"skipped {tally['all']['skipped']}")
-    for name in ("without-link", "with-link", "actual"):
+    for name in ("without-link", "with-link", "actual", "any-down", "any-up"):
         t = tally[name]
         n = t["match"] + t["differ"]
-        print(f"  snapshot {name:<13} {t['match']:>5}/{n} match" + (f" ({100 * t['match'] / n:.1f}%)" if n else ""))
+        label = {"any-down": "any, link down", "any-up": "any, link up"}.get(name, f"snapshot {name}")
+        print(f"  {label:<22} {t['match']:>5}/{n} match" + (f" ({100 * t['match'] / n:.1f}%)" if n else ""))
+    for state in ("down", "up"):
+        t = tally[f"snapshot-{state}"]
+        print(f"  link {state:<4} decisions whose snapshot was: without the link {t['without']}, with it {t['with']}, "
+              f"either (same decision) {t['either']}, neither {t['none']}")
     for m in misses:
-        print("   differs:", *m)
+        print("   matches no combination:", *m)
 
 
 if __name__ == "__main__":
     for d in sys.argv[1:]:
-        compare(d)
+        if os.path.exists(os.path.join(d, "lab", "lab.json")):  # skip folders that hold no lab, such as topos/
+            compare(d)
