@@ -299,6 +299,11 @@ saving better than the degree does.
 64-router random graphs of degree 16 and 24. Flood reduction sends 78% and 89% fewer LSPs and uses 48% and 59% less
 isisd CPU, lower in every pair; the saving is in receiving LSPs, while route computation costs the same.
 
+**Timing.** [results/timing-n64](results/timing-n64/README.md): flooding and convergence times from the routers' own
+logs, for single links, router failures and three links failing at once. Single link changes flood in the same tens
+of milliseconds either way; when a router fails or several links fail together, flooding with flood reduction on was
+often seconds slower (up to 8 s), though every router still ended with the same LSPs.
+
 ## Not here yet
 
 - Results of runs with several graphs per degree, convergence timing, router and multi-link failures, CPU per
