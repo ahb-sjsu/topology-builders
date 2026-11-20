@@ -295,6 +295,10 @@ of spines, and isisd CPU per link change is lower in every pair, by a median of 
 reduction the routers never converged on 20 CPUs; with it they did. The two-hop multiplicity lines up with the
 saving better than the degree does.
 
+**Ten links at once.** [results/flap10-n64](results/flap10-n64/README.md): ten links down at once and back up, on the
+64-router random graphs of degree 16 and 24. Flood reduction sends 78% and 89% fewer LSPs and uses 48% and 59% less
+isisd CPU, lower in every pair; the saving is in receiving LSPs, while route computation costs the same.
+
 ## Not here yet
 
 - Results of runs with several graphs per degree, convergence timing, router and multi-link failures, CPU per
