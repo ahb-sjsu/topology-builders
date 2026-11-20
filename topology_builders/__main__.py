@@ -111,6 +111,9 @@ def main(argv=None):
     m.add_argument("--timing", action="store_true",
                    help="convergence time per window from the routers' logs (labs written with clab --timing-logs)")
     m.add_argument("--profile", action="store_true", help="isisd CPU per event handler (show event cpu) per window")
+    m.add_argument("--backend", choices=("docker", "netns"), default="docker",
+                   help="docker: containerlab (default); netns: every router in a network namespace of this machine, "
+                        "no Docker (needs root, or unshare -Urnm, as on Colab)")
     m.add_argument("--max-temp", type=float, default=80.0,
                    help="before each run, wait while the hottest CPU sensor is above this, deg C (default 80)")
     m.add_argument("--max-wait", type=int, default=120,
@@ -145,7 +148,7 @@ def main(argv=None):
         from . import measure as M
         records = M.run(a.labs, repeat=a.repeat, settle=a.settle, window=a.window, seed=a.seed, out=a.out,
                         max_wait=a.max_wait, links=a.links, max_temp=a.max_temp, kind=a.event, fail=a.fail,
-                        timing=a.timing, profile=a.profile)
+                        timing=a.timing, profile=a.profile, backend=a.backend)
         print(f"{'lab':<28} {'reduction':<9} {'phase':<9} {'runs':>4} {'LSPs sent':>9} {'suppressed':>10} "
               f"{'isisd ms':>8} {'net of quiet':>12}  outcomes")
         for r in M.summarize(records):

@@ -207,3 +207,36 @@ def test_apply_sets_the_ports_of_each_router_at_once():
     calls.clear()
     lab.apply({"kind": "multi", "links": links}, "up")
     assert sorted(calls) == [("r0", "ip link set eth1 up; date +%s.%N"), ("r2", "ip link set eth2 up; date +%s.%N")]
+
+
+def test_netns_backend_commands_and_configs(tmp_path):
+    from topology_builders import clab as C
+    from topology_builders import families as F
+    from topology_builders import output as O
+
+    src = tmp_path / "t.json"
+    O.write(F.leaf_spine(2, 1), str(src))
+    C.write_lab(str(src), str(tmp_path / "lab"), name="x", timing_logs=True)
+    lab = M.NetnsLab(str(tmp_path / "lab"), etc_base=str(tmp_path / "etc"), run_base=str(tmp_path / "run"),
+                     frr_lib="/frr")
+    cmds = lab.commands_deploy()
+    r0 = lab.routers[0]
+    assert cmds[:2] == [["ip", "netns", "add", r0],
+                        ["nsenter", f"--net=/run/netns/{r0}", "--", "ip", "link", "set", "lo", "up"]]
+    assert not any(c[:2] == ["ip", "-n"] or c[:3] == ["ip", "netns", "exec"] for c in cmds)  # both remount /sys
+    veths = [c for c in cmds if c[:3] == ["ip", "link", "add"]]
+    assert len(veths) == len(lab.lab["links"]) == 2
+    x = lab.lab["links"][0]
+    assert lab.enter(x["a"]) + ["ip", "link", "set", "tbv0a", "name", x["a_port"], "up"] in cmds
+    starts = [c for c in cmds if c[0] == "nsenter" and c[3].startswith("/frr/")]
+    assert [c[3] for c in starts] == [f"/frr/{d}" for d in lab.DAEMONS for _ in lab.routers]
+    zebra = next(c for c in starts if c[3] == "/frr/zebra")
+    assert zebra[4:6] == ["-N", zebra[1].rsplit("/", 1)[1]] and zebra[-2:] == ["-s", "90000000"]
+    assert all(c[c.index("-z") + 1] == f"{lab.run_dir(c[5])}/zserv.api" for c in starts)
+    lab._write_configs()
+    r = lab.routers[0]
+    conf = (tmp_path / "etc" / r / "frr.conf").read_text(encoding="utf-8")
+    assert f"log file {lab.log_path(r)} debugging" in conf and "/tmp/frr.log" not in conf
+    assert lab.log_path(r) == f"{tmp_path / 'run'}/{r}/frr.log"
+    assert (tmp_path / "etc" / r / "vtysh.conf").read_text(encoding="utf-8") == "service integrated-vtysh-config\n"
+    assert M.BACKENDS == {"docker": M.Lab, "netns": M.NetnsLab}

@@ -306,10 +306,51 @@ logs, for single links, router failures and three links failing at once. Single 
 of milliseconds either way; when a router fails or several links fail together, flooding with flood reduction on was
 often seconds slower (up to 8 s), though every router still ended with the same LSPs.
 
+## Without Docker, and on Colab
+
+`measure --backend netns` runs every router in a network namespace of one machine instead of a container: no Docker
+or containerlab, links as veth pairs, FRR's daemons started per router with `-N`. It needs root, or a user namespace
+in which the process is root:
+
+```
+unshare -Urnm topology-builders measure labs/rr16/off labs/rr16/on --backend netns
+```
+
+[tools/colab](tools/colab/README.md) uses it to run the labs on Google Colab: `setup.sh` builds FRR from the flood
+reduction pull request with only the daemons the labs use, and a notebook builds a topology, measures it with flood
+reduction off and on, and reports. A Colab CPU runtime allows user namespaces with network devices (checked on
+2026-11-20); Kaggle's does not. **Status:** the backend's unit tests pass; the recipe has not yet run end to end, on
+Colab or in `test_in_docker.sh`, the container shaped like Colab's runtime.
+
+## A model of flooding
+
+`flood_model` counts the LSPs a change floods, with and without flood reduction, as draft-ietf-lsr-distoptflood-14
+specifies it (the reflood decision of section 1.2.3, the reverse optimization of section 1.2.2), in milliseconds and
+at any size. It is written from the draft's text; its Figure 2 checksums are tests, and the module says where the
+draft leaves a choice open and which reading it takes.
+
+```python
+from topology_builders import clab, families, flood_model as fm
+
+routers, links = clab.plan(families.random_regular(64, 16, 1))
+topo = fm.Topology.from_lab(routers, links)
+link = (links[0]["a"], links[0]["b"])
+for reduction in (False, True):
+    print(reduction, fm.flood_link_change(topo, link, "down", reduction)["sent"])
+```
+
+Against every link change measured on 64 routers, with flood reduction on, the model is within 20% of the LSPs FRR
+sent on 26 of 28 topologies (the exceptions: the flattened butterfly 16×2×2, 29% over, and the random graph of degree
+48, 26% under). Without flood reduction the count depends on timing, which decides how many copies a router receives
+before it sends; the model brackets it rather than predicts it. It leaves out CPU, timers, retransmissions, recovery
+by CSNP and PSNP, and the database exchange over a new adjacency. [tools/model](tools/model/README.md) checks it
+against FRR decision by decision, from FRR's own debug log.
+
 ## Not here yet
 
 - Results of runs with several graphs per degree, CPU per event handler for single link changes, and 128 and 256
   routers (running), and of fat-trees.
+- The model's decision-by-decision check against FRR (queued).
 - An exporter to netlab, as a second, independent path to FRR IS-IS.
 
 [SURVEY.md](https://github.com/ahb-sjsu/topology-builders/blob/main/SURVEY.md) lists the existing builders and lab tools, with licences and status, so that this repository

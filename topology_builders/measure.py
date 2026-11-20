@@ -424,17 +424,123 @@ class Lab:
             return float(out.split()[-1])
         return min(self.pool.map(one, list(ports)))
 
+    def log_path(self, router):
+        return TIMING_LOG
+
     def clear_logs(self):
-        self.each(lambda r: self.exec(r, f": > {TIMING_LOG}"))
+        self.each(lambda r: self.exec(r, f": > {self.log_path(r)}"))
 
     def read_logs(self):
         def one(r):
             try:
-                rc, out = self.exec(r, f"grep -E 'ISIS-Upd .*: (Rcvd|Building|Refreshed our) L' {TIMING_LOG}")
+                rc, out = self.exec(r, f"grep -E 'ISIS-Upd .*: (Rcvd|Building|Refreshed our) L' {self.log_path(r)}")
                 return parse_log_lsps(out) if rc in (0, 1) else None
             except subprocess.TimeoutExpired:
                 return None
         return self.each(one)
+
+
+class NetnsLab(Lab):
+    """The same lab with every router in a network namespace of this machine instead of a container: no Docker or
+    containerlab. Each router's FRR daemons run as root with `-N <router>`, so each has its own configuration and
+    sockets under /etc/frr/<router> and /var/run/frr/<router>; links are veth pairs. It needs root, or a user and
+    mount namespace in which this process is root (`unshare -Urnm`), which is how it runs on Colab. Commands enter a
+    router with `nsenter --net=`, not `ip netns exec` or `ip -n`: those remount /sys, which a user namespace inside a
+    container is usually not allowed to do. The FRR binaries are taken from TB_FRR_LIB (default /usr/lib/frr)."""
+
+    DAEMONS = ("mgmtd", "zebra", "staticd", "isisd")
+    NETNS_DIR = "/run/netns"
+
+    def __init__(self, directory, workers=16, etc_base="/etc/frr", run_base="/var/run/frr", frr_lib=None):
+        super().__init__(directory, workers)
+        self.etc_base, self.run_base = etc_base, run_base
+        self.frr_lib = frr_lib or os.environ.get("TB_FRR_LIB", "/usr/lib/frr")
+
+    def run_dir(self, router):
+        return f"{self.run_base}/{router}"
+
+    def enter(self, router):
+        return ["nsenter", f"--net={self.NETNS_DIR}/{router}", "--"]
+
+    def log_path(self, router):
+        return f"{self.run_dir(router)}/frr.log"
+
+    def exec(self, router, script, timeout=60):
+        # vtysh and pidof are redefined so the scripts written for containers address this router's daemons.
+        pre = (f'vtysh() {{ command vtysh -N {router} "$@"; }}; '
+               f"pidof() {{ cat {self.run_dir(router)}/$1.pid; }}; ")
+        p = subprocess.run(self.enter(router) + ["sh", "-c", pre + script], capture_output=True, text=True,
+                           timeout=timeout, check=False)
+        return p.returncode, p.stdout
+
+    def _run(self, args, timeout=120):
+        p = subprocess.run(args, capture_output=True, text=True, timeout=timeout, check=False)
+        if p.returncode:
+            raise RuntimeError(f"{' '.join(args)} failed: {(p.stdout + p.stderr)[-300:]}")
+
+    def commands_deploy(self):
+        """The commands deploy runs, in order (argument lists), after the configuration files are written."""
+        cmds = []
+        for r in self.routers:
+            cmds += [["ip", "netns", "add", r], self.enter(r) + ["ip", "link", "set", "lo", "up"]]
+        for j, x in enumerate(self.lab["links"]):
+            ta, tb = f"tbv{j}a", f"tbv{j}b"
+            cmds += [["ip", "link", "add", ta, "netns", x["a"], "type", "veth", "peer", "name", tb, "netns", x["b"]],
+                     self.enter(x["a"]) + ["ip", "link", "set", ta, "name", x["a_port"], "up"],
+                     self.enter(x["b"]) + ["ip", "link", "set", tb, "name", x["b_port"], "up"]]
+        for d in self.DAEMONS:
+            for r in self.routers:
+                rd = self.run_dir(r)
+                cmds.append(self.enter(r) + [f"{self.frr_lib}/{d}", "-N", r, "-d", "-u", "root", "-g", "root", "-A",
+                                             "127.0.0.1", "-i", f"{rd}/{d}.pid", "-z", f"{rd}/zserv.api"]
+                            + (["-s", "90000000"] if d == "zebra" else []))
+        return cmds
+
+    def _write_configs(self):
+        for r in self.routers:
+            etc, rd = f"{self.etc_base}/{r}", self.run_dir(r)
+            os.makedirs(etc, exist_ok=True)
+            os.makedirs(rd, exist_ok=True)
+            with open(os.path.join(self.dir, r, "frr.conf"), encoding="utf-8") as fh:
+                conf = fh.read().replace(f"log file {TIMING_LOG} ", f"log file {self.log_path(r)} ")
+            with open(f"{etc}/frr.conf", "w", encoding="utf-8") as fh:
+                fh.write(conf)
+            with open(f"{etc}/vtysh.conf", "w", encoding="utf-8") as fh:
+                fh.write("service integrated-vtysh-config\n")
+
+    def containerlab(self, action):
+        t0 = time.time()
+        if action == "deploy":
+            self._write_configs()
+            first_zebra = self.enter(self.routers[0]) + [f"{self.frr_lib}/zebra"]
+            for cmd in self.commands_deploy():
+                if cmd[:len(first_zebra)] == first_zebra:
+                    time.sleep(1)  # mgmtd of every router up before the daemons that connect to it
+                self._run(cmd)
+            time.sleep(1)
+            for r in self.routers:
+                self._run(self.enter(r) + ["vtysh", "-N", r, "-b"])
+        else:
+            pids = []
+            for r in self.routers:
+                for d in reversed(self.DAEMONS):
+                    try:
+                        with open(f"{self.run_dir(r)}/{d}.pid", encoding="utf-8") as fh:
+                            pid = int(fh.read().strip())
+                        os.kill(pid, 15)
+                        pids.append(pid)
+                    except (OSError, ValueError):
+                        pass
+            deadline = time.time() + 30
+            while pids and time.time() < deadline:  # gone before the next lab reuses their directories
+                pids = [p for p in pids if os.path.exists(f"/proc/{p}")]
+                time.sleep(0.2)
+            for r in self.routers:
+                subprocess.run(["ip", "netns", "del", r], capture_output=True, check=False)
+        return round(time.time() - t0, 2)
+
+
+BACKENDS = {"docker": Lab, "netns": NetnsLab}
 
 
 def totals(snap_after, snap_before=None):
@@ -545,10 +651,10 @@ def run_one(lab, events, settle, window, max_wait, repeat, position, timing=Fals
 
 
 def run(directories, repeat=1, settle=30, window=30, seed=1, out="measurements.jsonl", max_wait=120, links=1,
-        max_temp=80.0, kind="link", fail=2, timing=False, profile=False):
+        max_temp=80.0, kind="link", fail=2, timing=False, profile=False, backend="docker"):
     """`links` is the number of events per run of each kind; `kind` is one kind or several, comma-separated, run in
     that order (link,node,multi: the links first, then the routers, then the sets of links)."""
-    labs = [Lab(d) for d in directories]
+    labs = [BACKENDS[backend](d) for d in directories]
     sources = {lab.lab["source_sha256"] for lab in labs}
     if len(sources) != 1:
         raise ValueError("the labs were written from different topology files")
