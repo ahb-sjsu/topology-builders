@@ -1,0 +1,12 @@
+[Unit]
+Description=Docker inside the topology-builders overlay guest
+After=network-online.target
+[Service]
+ExecStart=/usr/bin/dockerd
+Delegate=yes
+KillMode=process
+LimitNOFILE=infinity
+TasksMax=infinity
+Restart=on-failure
+[Install]
+WantedBy=multi-user.target

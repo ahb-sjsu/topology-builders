@@ -182,6 +182,10 @@ Built on the HP Z840 above, 2026-11-19, from FRR pull request 24128 at e263c441 
   75.4 C), it gave the same FRR and libyang packages and the same test result. The image ID differs: the classic
   builder took steps 1 to 17 from its cache and ran the rest again, from `ARG PKGVER` on, for a reason not found.
 
+Without root, or on a cluster whose pods get no added capabilities, run the labs inside a guest kernel under
+software emulation: [tools/overlay](tools/overlay/README.md). Docker, containerlab, the FRR image and
+topology-builders run inside the guest, and the QEMU process needs no capabilities and no `/dev/kvm`.
+
 ## Measuring flooding and CPU
 
 `measure` deploys labs written by `clab` and measures them around events: a link going down and coming back up,

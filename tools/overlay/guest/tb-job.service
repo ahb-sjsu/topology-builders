@@ -1,0 +1,12 @@
+[Unit]
+Description=topology-builders overlay job (runs share/job.sh from the host, then powers off)
+After=docker.service network-online.target
+Wants=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/tb-job.sh
+TimeoutStartSec=infinity
+
+[Install]
+WantedBy=multi-user.target
