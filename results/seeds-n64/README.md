@@ -127,6 +127,11 @@ more LSPs than the model counts (`model.txt`).
   both variants ran under the same conditions in a run. At degree 16 the graph that ran without it (10%) falls
   between the two that ran with it (13% and 7%); at degree 8 the graph without it gave -13% against 16% and 13% with
   it. We cannot tell that apart from the spread between graphs, and cannot rule out an effect on CPU.
+- **Background load throughout.** A console demo engine of ours (running since 2026-09-28) used about 60% of one CPU
+  on average, and the host's own Docker daemons, outside the lab container, three to five CPUs. The engine may run on
+  any of CPUs 12-23 and 36-47, the routers' among them, so it slows whichever routers share a CPU with it at the
+  time; that affects both variants alike, since they took turns, and does not change which LSPs are sent. An earlier
+  version of this README did not mention it.
 - Single link changes only; the [timing results](../timing-n64/README.md) cover router and multi-link failures.
 
 ## How it was run

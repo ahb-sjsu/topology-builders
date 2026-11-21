@@ -122,6 +122,11 @@ topology-builders measure labs/<name>/off labs/<name>/on --repeat 2 --links 3 --
   limited to CPUs 44-47, which share physical cores with CPUs 20-23, four of the routers' 20; that container's
   one-minute setup at 19:07 fell during the 8x4x2 butterfly's runs. They can have raised CPU times in the windows
   they overlapped; LSP counts do not depend on them. No other topology overlapped such a job.
+- Background load throughout: a console demo engine of ours (running since 2026-09-28) used about 60% of one CPU on
+  average, and the host's own Docker daemons, outside the lab container, three to five CPUs. The engine may run on
+  any of CPUs 12-23 and 36-47, the routers' among them, so it slows whichever routers share a CPU with it at the
+  time; that affects both variants alike, since they took turns, and does not change which LSPs are sent. An earlier
+  version of this README did not mention it.
 - The links are chosen from the topology file and seed 1, the same for off and on; the labs take turns and the
   order alternates between the two runs. Before each run the harness waited until the hottest CPU sensor was below
   80 C.

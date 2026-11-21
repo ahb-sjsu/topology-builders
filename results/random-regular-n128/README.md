@@ -86,7 +86,11 @@ netns`), which creates no containers, or more than one host.
 ## Limits of these runs
 
 - One graph per degree, two runs per variant, 3 links per run.
-- No other job of ours shared these routers' CPUs during these runs.
+- No job of ours ran pinned to CPUs 44-47, which share physical cores with four of the routers' CPUs, during these
+  runs. Throughout, though, a console demo engine of ours (running since 2026-09-28) used about 60% of one CPU on
+  average, allowed to run on any of CPUs 12-23 and 36-47, the routers' among them, and the host's own Docker daemons,
+  outside the lab container, three to five CPUs. Both variants ran under it alike, and it does not change which LSPs
+  are sent. An earlier version of this README said no other job of ours shared these routers' CPUs; that was wrong.
 
 ## How it was run
 

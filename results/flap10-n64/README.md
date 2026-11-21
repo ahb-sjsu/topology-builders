@@ -51,7 +51,10 @@ implementation:
   36-43); CPU figures depend on the setup, as the [families results](../families-n64/README.md) show. During all of
   these runs, a QEMU guest of ours ran pinned to CPUs 44-47, which share physical cores with CPUs 20-23, four of the
   routers' 20. That slows the routers on those four CPUs and can raise their CPU times, in both variants alike: the
-  off and on labs took turns under the same load. It does not change which LSPs are sent.
+  off and on labs took turns under the same load. It does not change which LSPs are sent. Throughout, a console demo
+  engine of ours (running since 2026-09-28) also used about 60% of one CPU on average, allowed to run on any of CPUs
+  12-23 and 36-47, the routers' among them, and the host's own Docker daemons, outside the lab container, three to
+  five CPUs; the same applies to them. An earlier version of this README did not mention the engine.
 
 So this measures FRR's behaviour under this protocol; it does not contradict the other implementation's figure.
 

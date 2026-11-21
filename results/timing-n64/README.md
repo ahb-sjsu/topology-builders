@@ -97,6 +97,10 @@ interval 1 s), so it is longer.
   44-47 (building and then running a QEMU guest), which share physical cores with CPUs 20-23, four of the routers'
   20. That slows the routers on those four CPUs, in both variants alike since they took turns; the other three
   topologies ran without it.
+- Background load throughout: a console demo engine of ours (running since 2026-09-28) used about 60% of one CPU on
+  average, allowed to run on any of CPUs 12-23 and 36-47, the routers' among them, and the host's own Docker
+  daemons, outside the lab container, three to five CPUs. Both variants ran under it alike. An earlier version of
+  this README did not mention it.
 - One run is set aside, in `excluded.jsonl.gz`: the butterfly's first run without flood reduction, which started
   while the stopped degree-32 lab was still being taken down and shared the CPUs with it. That run was made again on
   2026-11-21, 04:08 to 04:14 UTC, with the same lab directory, events, options and place in the order (first run,

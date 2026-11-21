@@ -7,9 +7,17 @@
 [![Code: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE)
 [![Text and data: CC BY 4.0](https://img.shields.io/badge/text%20%26%20data-CC%20BY%204.0-lightgrey.svg)](LICENSE-TEXT)
 
-Generators for network topologies whose density can be stepped while the number of routers stays fixed, so that
-an experiment can tell the effect of density from the effect of size. The first use is testing an IS-IS flooding
-reduction on denser and denser topologies.
+This repository is first an evaluation of IS-IS distributed flooding reduction, draft-ietf-lsr-distoptflood as FRR
+implements it in pull request 24128, and second a topology library. The measurements, their data and the scripts
+that reproduce their tables are in [`results/`](results/): what flood reduction saves in LSPs and in isisd's CPU on
+random graphs, flattened and multistage butterflies, leaf-spine fabrics and fat-trees, how that depends on density
+and structure, and why flooding can be seconds slower with it after a router or several links fail.
+
+The library is what the evaluation is built from: generators for network topologies whose density can be stepped
+while the number of routers stays fixed, so that an experiment can tell the effect of density from the effect of
+size; an exporter to FRR IS-IS labs; a harness that measures them with the change off and on; and a model of the
+draft's algorithm. They work for other link-state experiments, but they were written for this one, and it is the
+part that has been tested most.
 
 ```mermaid
 flowchart LR
@@ -50,7 +58,7 @@ flowchart LR
 | Model: `flood_model` | the draft's reflood decision, no FRR | Python | milliseconds per change, any size | with flood reduction on, within 20% of FRR's LSP counts on 26 of 28 64-router topologies, and within 15% on all 14 graphs of the latest runs (64 and 128 routers), where its lockstep saving is within 5 points of FRR's; on fat-trees and n-flies (20 to 180 switches) within 5% when a link goes down, with FRR saving 7 to 14 points more than the lockstep figure |
 | Docker labs: `measure` | real FRR, a container per router | Linux, root, Docker, containerlab | real time | every result in `results/` |
 | Namespace labs: `measure --backend netns` | real FRR, a network namespace per router | Linux, root or `unshare -Urnm` | real time | ran end to end in a container with Colab's permissions: every run converged; link-change LSP counts within 12% of the Docker labs' on the same graph |
-| Colab: `tools/colab` | namespace labs on a Colab runtime | a Google account | real time, on the runtime's CPUs | passed `test_in_docker.sh` (Colab's permissions, 2 CPUs); not yet run on Colab itself |
+| Colab: `tools/colab` | namespace labs on a Colab runtime | a Google account | real time, on the runtime's CPUs | passed `test_in_docker.sh` (Colab's permissions, 2 CPUs); on Colab itself, 16-router labs converged on free CPU and TPU runtimes and a Pro CPU runtime, 32-router labs on two of them (2026-11-21) |
 | Emulated guest: `tools/overlay` | Docker labs inside QEMU, software emulation | QEMU; no root, no KVM | about 10 times slower | a 16-router lab runs on the host and in a cluster pod; link-down LSP counts within 17% of the host's; link-up, router and multi-link windows 1.2 to 1.7 times, bring-up 1.5 to 2.6 times; scaling timers by 10 is not a fix; CPU and times not comparable |
 | Decision check: `tools/model` | FRR's logged decisions against the model's | as namespace labs | real time | all 1,186 decisions logged on five topologies match the model, given the snapshot each router used; after router and multi-link failures, it shows which relays decided with the topology from before the failure |
 
@@ -393,7 +401,9 @@ reduction off and on, and reports. A Colab CPU runtime allows user namespaces wi
 2026-11-20); Kaggle's does not. **Status:** the recipe passed end to end in `test_in_docker.sh`, a container with
 Colab's permissions and 2 CPUs: a 16-router random graph and a k = 4 fat-tree, flood reduction off and on, every run
 converged and every window consistent, link-change LSP counts within 12% of the Docker labs' on the same graph
-([results/colab-shaped](results/colab-shaped/README.md)). It has not yet run on Colab itself.
+([results/colab-shaped](results/colab-shaped/README.md)). On Colab itself, `topology_builders_sessions.ipynb` ran in
+several sessions at once on 2026-11-21: 16-router labs converged in every run on the free CPU and TPU runtimes and on
+a Pro CPU runtime; [tools/colab](tools/colab/README.md) lists what each runtime type offers.
 
 ## A model of flooding
 
