@@ -67,6 +67,50 @@ ATLAS RUNS OF THE SAME GRAPHS (same family, parameters and routers; other links)
   seeds-n64: random regular, degree 8, seed 1, 64 routers, runs {'off': 3, 'on': 3}: LSPs 791 -> 503 (36% fewer); net ms 1598 -> 1334; CPU lower in 5 of 6 pairs, median 17%; bring-up LSPs 20% fewer, CPU 9% lower; quiet isisd ms off [7620.0, 7040.0, 7050.0], on [7720.0, 7140.0, 7770.0]; deploy 23 s; bring-up LSPs 73325 -> 58817
   seeds-n64: random regular, degree 16, seed 1, 64 routers, runs {'off': 3, 'on': 3}: LSPs 1690 -> 422 (75% fewer); net ms 3046 -> 2730; CPU lower in 6 of 6 pairs, median 10%; bring-up LSPs 46% fewer, CPU 25% lower; quiet isisd ms off [14450.0, 14390.0, 14060.0], on [14120.0, 13880.0, 14270.0]; deploy 38 s; bring-up LSPs 241841 -> 130640
 
+ATLAS WITH THE COLAB LINKS (the Colab topology files, so the same links; Docker labs as in seeds-n64)
+  flattened butterfly 4 x 4 x 4, 64 routers, runs {'off': 2, 'on': 2}: LSPs 922 -> 343 (63% fewer); net ms 1897 -> 1733; CPU lower in 5 of 6 pairs, median 9%; bring-up LSPs 32% fewer, CPU 13% lower; quiet isisd ms off [9820.0, 9820.0], on [9770.0, 9760.0]; deploy 24 s; bring-up LSPs 95560 -> 65030; links as on Colab: True
+    LSP saving: Colab sessions 60%, 60%, 60%; Atlas, Colab links 63%; Atlas, own links families-n64 68%, seeds-n64 70%
+    median pair CPU saving: Colab sessions 12%, 12%, -4%; Atlas, Colab links 9%; Atlas, own links families-n64 22%, seeds-n64 5%
+    bring-up LSP saving: Colab sessions 15%, 25%, 25%; Atlas, Colab links 32%; Atlas, own links families-n64 33%, seeds-n64 31%
+  leaf-spine, 48 leaves x 16 spines, 64 routers, runs {'off': 2, 'on': 2}: LSPs 2730 -> 192 (93% fewer); net ms 4492 -> 3232; CPU lower in 6 of 6 pairs, median 27%; bring-up LSPs 59% fewer, CPU 36% lower; quiet isisd ms off [21860.0, 21780.0], on [21580.0, 21960.0]; deploy 54 s; bring-up LSPs 439883 -> 180953; links as on Colab: True
+    LSP saving: Colab sessions 93%, 93%, 92%, 92%; Atlas, Colab links 93%; Atlas, own links families-n64 93%, seeds-n64 93%
+    median pair CPU saving: Colab sessions 17%, 2%, 35%, 32%; Atlas, Colab links 27%; Atlas, own links families-n64 40%, seeds-n64 31%
+    bring-up LSP saving: Colab sessions 22%, 28%, 25%, 27%; Atlas, Colab links 59%; Atlas, own links families-n64 66%, seeds-n64 62%
+  random regular, degree 16, seed 1, 64 routers, runs {'off': 2, 'on': 2}: LSPs 1728 -> 440 (75% fewer); net ms 3427 -> 2828; CPU lower in 5 of 6 pairs, median 16%; bring-up LSPs 48% fewer, CPU 26% lower; quiet isisd ms off [16340.0, 15380.0], on [16000.0, 15380.0]; deploy 39 s; bring-up LSPs 255478 -> 131769; links as on Colab: True
+    LSP saving: Colab sessions 71%, 72%, 72%, 71%; Atlas, Colab links 75%; Atlas, own links families-n64 74%, random-regular-n64 75%, seeds-n64 75%
+    median pair CPU saving: Colab sessions 11%, -56%, 13%, 15%; Atlas, Colab links 16%; Atlas, own links families-n64 10%, random-regular-n64 19%, seeds-n64 10%
+    bring-up LSP saving: Colab sessions 27%, 32%, 30%, 28%; Atlas, Colab links 48%; Atlas, own links families-n64 48%, random-regular-n64 47%, seeds-n64 46%
+
+isisd CPU per event handler, mean ms per link window net of the quiet window, off -> on
+flattened butterfly 4 x 4 x 4 (12 and 12 windows)
+  isis_run_spf_cb                             1,743.3    1,598.4
+  isis_receive                                  140.2      113.2
+  send_l2_psnp                                   16.1       -1.4
+  tx_queue_send_event                            14.7        7.0
+  zclient_read                                    0.9        0.9
+  lsp_tick                                        0.7       -0.4
+  lsp_refresh                                     0.5        0.5
+  dyn_cache_cleanup                               0.3        0.3
+leaf-spine, 48 leaves x 16 spines (12 and 12 windows)
+  isis_run_spf_cb                             3,631.6    3,070.6
+  isis_receive                                  979.0      322.0
+  tx_queue_send_event                            39.5        3.7
+  lsp_refresh                                     1.0        1.5
+  zclient_read                                    0.9        0.9
+  dyn_cache_cleanup                               0.3        0.2
+  vtysh_accept                                    0.1        0.2
+  vtysh_read                                     -1.0       -0.7
+random regular, degree 16, seed 1 (12 and 12 windows)
+  isis_run_spf_cb                             3,043.0    2,708.8
+  isis_receive                                  441.4      236.6
+  tx_queue_send_event                            25.5        8.6
+  zclient_read                                    1.1        1.0
+  lsp_refresh                                     0.5        0.9
+  dyn_cache_cleanup                               0.3        0.3
+  vtysh_accept                                    0.2       -0.2
+  vtysh_read                                      0.0       -1.6
+
+
 THE MODEL FOR EACH SETUP'S LINKS: LSPs per window, lockstep, off -> on (saving)
   flattened butterfly 4 x 4 x 4, 64 routers Colab (r2-r50, r6-r38, r49-r57): 867.0 -> 304.0 (65%)
   flattened butterfly 4 x 4 x 4, 64 routers families-n64 (r36-r52, r40-r56, r37-r38): 867.0 -> 261.5 (70%)

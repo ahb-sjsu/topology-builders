@@ -27,9 +27,11 @@ Data:
   and steal time.
 - `report.txt`: the output of `topology-builders report` on all the records.
 - `report-<session>.txt`: the same output, on one session's records.
+- `atlas-colab-links.jsonl.gz`: the same three graphs and the same links, run on Atlas afterwards
+  ([below](#the-colab-links-on-atlas)); `report-atlas-colab-links.txt` is `topology-builders report` on it.
 - `tables.txt`: the output of `session_tables.py`. It has, per session, the spread across sessions, the pairs pooled
-  over sessions, the quiet windows, the Atlas runs of the same graphs, and the flooding model's count for each
-  setup's links.
+  over sessions, the quiet windows, the Atlas runs of the same graphs, the Atlas run with the Colab links, and the
+  flooding model's count for each setup's links.
 
 | Session | CPU | Started (UTC) | Setup | Labs |
 |---|---|---|---:|---|
@@ -64,9 +66,45 @@ LSPs are the Level-2 LSPs sent, summed over the 64 routers, as a mean per link w
 - **The link choice accounts for about half of the butterfly's gap.** The flooding model (lockstep) gives a 65%
   saving for the Colab links and 70% for the Atlas links, because with flood reduction on the Colab links flood more
   (304 against 261.5 LSPs per window). On the degree-16 graph the model gives 77% for the Colab links and 76% to 78%
-  for the Atlas ones, so link choice does not explain that 3-point gap. Neither does it explain the rest of the
-  butterfly's. The backend differs too (namespaces against containers), and we have not separated the two causes.
-  Running these links on Atlas would.
+  for the Atlas ones, so link choice does not explain that 3-point gap. The rest is the setup, as the Atlas run with
+  the Colab links shows ([below](#the-colab-links-on-atlas)).
+
+## The Colab links on Atlas
+
+The same three topology files and so the same links, run on Atlas on 2026-11-21 from 16:59 to 18:01 UTC, in the
+setup of [seeds-n64](../seeds-n64/README.md). They were Docker labs in the LXD container, with every router pinned to
+the same 20 CPUs, image `frr-distoptflood:e263c441`, and the same protocol: 2 runs of each variant, 3 links,
+`--profile`. The files were rebuilt on Atlas with the builder's Python version set to Colab's, and their sha256
+equals the one in the Colab records. In all 72 windows every router ended with the same LSPs.
+
+LSPs sent per link window, off -> on, and the saving:
+
+| Topology | Colab, Colab links | Atlas, Colab links | Atlas, Atlas links |
+|---|---|---|---|
+| Flattened butterfly 4x4x4 | 827-842 -> 328-337 (60%) | 922 -> 343 (63%) | 881-922 -> 274-280 (68%, 70%) |
+| Random regular, degree 16 | 1,508-1,574 -> 436-443 (71-72%) | 1,728 -> 440 (75%) | 1,684-1,749 -> 422-436 (74-75%) |
+| Leaf-spine, 48 x 16 | 2,378-2,611 -> 180-191 (92-93%) | 2,730 -> 192 (93%) | 2,686-2,795 -> 178-183 (93%) |
+
+- **With flood reduction on, the links set the count.** The same links sent nearly the same number of LSPs in both
+  setups: 343 against 328 to 337 on the butterfly, 440 against 436 to 443 at degree 16, 192 against 180 to 191 on
+  leaf-spine. As the model predicted, the Colab links flood more on the butterfly than the Atlas links (343 against
+  274 to 280).
+- **Without flood reduction, the setup sets the count.** Atlas's container labs sent 5% to 15% more LSPs than
+  Colab's namespace labs: 922 against 827 to 842 on the butterfly, and 1,728 against 1,508 to 1,574 at degree 16.
+  Without flood reduction, how many copies a router sends depends on timing.
+- **So the butterfly's 8 to 10 points split into 5 to 7 from the links and 3 from the setup.** Degree 16's 3 points
+  are all setup.
+- **CPU per link change, median over pairs:** 9% on the butterfly (5 of 6 pairs lower), 16% at degree 16 (5 of 6) and
+  27% on leaf-spine (6 of 6). Those are close to the medians pooled over the Colab sessions (11%, 10%, 28%) and to
+  the earlier Atlas runs (5% and 22%, 10% and 19%, 31% and 40%). isisd's CPU per link change on Atlas was 1.7
+  to 2 times Colab's (net 1,897 against 937 ms on the butterfly, without flood reduction).
+- **Bring-up saved as much as in the earlier Atlas runs:** 32%, 48% and 59% fewer LSPs, against 31% to 33%, 46% to
+  48% and 62% to 66% with Atlas's links and 15% to 32% on Colab. The smaller bring-up saving on Colab comes from the
+  setup, not the links.
+- During the run, the host's own Docker daemons (containerd about 2.4 CPUs, dockerd about 1.9) and libvirtd (about
+  1 CPU, serving a virtual machine) ran on CPUs among the routers'. So did postgres, netdata and other Python jobs of
+  ours: the console demo engine, and for part of the run a job of another project. The 1-minute load average was
+  6 to 46, the labs included, and the CPU packages reached 74 °C. Both variants ran under the same load, taking turns.
 
 ## CPU per link change: about the Atlas median, with a wide spread
 
@@ -89,9 +127,9 @@ pairs, with the number of pairs lower with flood reduction on. Pooled: every ses
   2c3f, off: 8.2 and 10.4 s), as much as a link change costs.
 - **The outlier is a057's degree-16 lab.** Its quiet windows were 10.4 and 9.6 s off and 9.3 s twice on. Net of
   them, a link change cost more with flood reduction on (2,108 against 1,426 ms), and no pair was lower.
-- On Atlas, the quiet windows of one lab and variant differed by at most 5% on these three graphs (for example
-  14.1 to 14.5 s at degree 16 in seeds-n64), and by up to 9% on the degree-8 graph. On Colab they differed by up to
-  27%.
+- On Atlas, the quiet windows of one lab and variant differed by at most 6% on these three graphs (for example
+  14.1 to 14.5 s at degree 16 in seeds-n64, and 15.4 to 16.3 s in the run with the Colab links), and by up to 9% on
+  the degree-8 graph. On Colab they differed by up to 27%.
 - On the AMD session, isisd cost a quarter to a third less than on the Intel ones. On the butterfly, its quiet
   windows took 3.6 to 3.8 s against 5.2 to 5.7 s, and route computation 714 against 959 to 982 ms per link
   window.
@@ -125,9 +163,8 @@ From the routers' start to the check that finds every router with all its adjace
 - On Atlas, without flood reduction, bring-up sent 1.4 to 3.7 times as many LSPs as on Colab. On leaf-spine it was
   449,000 to 515,000 against 138,000 to 156,000. With flood reduction on, the difference is smaller.
 - The deploy step took about as long in both setups: 23 to 69 s on Atlas and 28 to 66 s on Colab for the 64-router
-  labs. We have not looked
-  into why bring-up differs this much. Bring-up depends on how the routers come up, and that differs between the
-  backends.
+  labs. With the Colab links on Atlas, bring-up saved as much as in the other Atlas runs, so the difference comes
+  from the setup (backend and machine), not the links. We have not looked further into why.
 
 ## The probe ladder (ff2f)
 
@@ -150,7 +187,10 @@ Two links per run, two runs of each variant:
 ## Limits of these runs
 
 - Four sessions, three of them at the same time. Two runs per variant per session, 3 links per run (2 in the ladder).
-- The links differ from Atlas's, and so does the backend (see above).
+- The Colab links differ from those of the earlier Atlas runs; the Atlas run with the Colab links separates the two
+  (above). It is one more run of two repeats, under the load described there.
+- The Atlas run used topology-builders 0.2.0.dev0 in the lab container, which does not record the diameter and
+  two-hop multiplicity, so `report-atlas-colab-links.txt` shows them as `-`.
 - Colab does not say what else ran on the physical machines. Low steal time means the hypervisor gave the vCPUs
   their time. It does not mean the caches and memory bandwidth were not shared.
 - The records' `image` field is containerlab's default; the namespace backend does not use it. It runs the FRR in
@@ -184,10 +224,24 @@ unshare -Urnm topology-builders measure labs/<name>/off labs/<name>/on --backend
 ```
 
 The FRR configuration is the same topotest configuration as on Atlas: level-2-only, point-to-point, hello 1 s x 3,
-lsp-gen-interval 2. The tables come from:
+lsp-gen-interval 2.
+
+On Atlas, for the Colab links, each of the three topology files was rebuilt with the same `build` command and its
+builder field `"python": "3.12.3"` replaced by `"3.13.18"`. That gives the sha256 of the Colab records, and so the
+same links. Then, in the lab container:
+
+```
+topology-builders clab <name>.json --out labs/c-<name> --name c-<name> --image frr-distoptflood:e263c441 \
+    --cpu-set 12-23,36-43
+topology-builders measure labs/c-<name>/off labs/c-<name>/on --profile --links 3 --repeat 2 --max-wait 300 \
+    --out colab-links.jsonl
+```
+
+The tables come from:
 
 ```
 topology-builders report results/colab-sessions/measurements.jsonl.gz
+topology-builders report results/colab-sessions/atlas-colab-links.jsonl.gz
 python results/colab-sessions/session_tables.py results/colab-sessions/measurements.jsonl.gz \
     results/colab-sessions/sessions.json results
 ```

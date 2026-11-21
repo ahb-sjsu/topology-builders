@@ -1,6 +1,7 @@
 """Tables for the Colab sessions: per session, the rows of `topology-builders report`; the spread across sessions;
 the pairs pooled over sessions; the quiet windows; the Atlas runs of the same graphs in the other results folders;
-and the flooding model's count for the links each setup took down.
+the Atlas runs with the Colab links (`atlas-colab-links.jsonl.gz` beside the measurements, when present); and the
+flooding model's count for the links each setup took down.
 
     python results/colab-sessions/session_tables.py results/colab-sessions/measurements.jsonl.gz \
         results/colab-sessions/sessions.json results
@@ -48,6 +49,19 @@ def quiet(records, row):
                 if report.label(r["topology"]) == row["topology"] and r["topology"]["routers"] == row["routers"]
                 and bool(r["settings"]["flood_reduction"]) == (s == "on")
                 for p in r["phases"] if p["phase"] == "quiet"] for s in ("off", "on")}
+
+
+def atlas_line(row, rs):
+    pr, q = row["pairs"], quiet(rs, row)
+    deploy = mean(r["deploy_s"] for r in rs if rname(r) == name(row))
+    return (f"{name(row)}, runs {row['runs']}: LSPs {row['windows']['off']['lsps']['mean']:.0f} -> "
+            f"{row['windows']['on']['lsps']['mean']:.0f} ({pct(row['lsp_saving'])} fewer); net ms "
+            f"{row['windows']['off']['net_ms']['mean']:.0f} -> {row['windows']['on']['net_ms']['mean']:.0f}; "
+            f"CPU lower in {pr['net_lower_on']} of {pr['n']} pairs, median {pct(pr['median_net_saving'])}; "
+            f"bring-up LSPs {pct(row['bring_up_lsp_saving'])} fewer, CPU {pct(row['bring_up_ms_saving'])} lower; "
+            f"quiet isisd ms off {q['off']}, on {q['on']}; deploy {deploy:.0f} s; "
+            f"bring-up LSPs {row['bring_up']['off']['lsps']['mean']:.0f} -> "
+            f"{row['bring_up']['on']['lsps']['mean']:.0f}")
 
 
 def graph(topology):
@@ -118,7 +132,7 @@ def main(measurements, sessions_file, results):
 
     print("\nATLAS RUNS OF THE SAME GRAPHS (same family, parameters and routers; other links)")
     names = {name(row) for d in by_sha.values() for row in d.values()}
-    atlas_links = {}
+    atlas_links, atlas_rows = {}, {}
     for f in sorted(glob.glob(os.path.join(results, "*", "measurements.jsonl.gz"))):
         folder = os.path.basename(os.path.dirname(f))
         if os.path.samefile(f, measurements):
@@ -126,16 +140,30 @@ def main(measurements, sessions_file, results):
         rs = [r for r in report.read([f]) if not r.get("timing")]
         for row in report.rows(rs):
             if name(row) in names and row["pairs"]["n"]:
-                pr, q = row["pairs"], quiet(rs, row)
-                print(f"  {folder}: {name(row)}, runs {row['runs']}: LSPs {row['windows']['off']['lsps']['mean']:.0f} "
-                      f"-> {row['windows']['on']['lsps']['mean']:.0f} ({pct(row['lsp_saving'])} fewer); net ms "
-                      f"{row['windows']['off']['net_ms']['mean']:.0f} -> {row['windows']['on']['net_ms']['mean']:.0f};"
-                      f" CPU lower in {pr['net_lower_on']} of {pr['n']} pairs, median {pct(pr['median_net_saving'])};"
-                      f" bring-up LSPs {pct(row['bring_up_lsp_saving'])} fewer, CPU {pct(row['bring_up_ms_saving'])}"
-                      f" lower; quiet isisd ms off {q['off']}, on {q['on']}; deploy "
-                      f"{mean(r['deploy_s'] for r in rs if rname(r) == name(row)):.0f} s; bring-up LSPs "
-                      f"{row['bring_up']['off']['lsps']['mean']:.0f} -> {row['bring_up']['on']['lsps']['mean']:.0f}")
+                print(f"  {folder}: {atlas_line(row, rs)}")
                 atlas_links.setdefault(name(row), {})[folder] = next(r for r in rs if rname(r) == name(row))
+                atlas_rows.setdefault(name(row), {})[folder] = row
+
+    extra = os.path.join(os.path.dirname(measurements), "atlas-colab-links.jsonl.gz")
+    if os.path.exists(extra):
+        rs = [r for r in report.read([extra]) if not r.get("timing")]
+        print("\nATLAS WITH THE COLAB LINKS (the Colab topology files, so the same links; Docker labs as in seeds-n64)")
+        for row in report.rows(rs):
+            sha = next(r["source_sha256"] for r in rs if rname(r) == name(row))
+            # the probe session took 2 links per run, the first 2 of the same 3: compare the links, not the lists
+            here = {json.dumps(x, sort_keys=True) for r in rs if r["source_sha256"] == sha for x in r["links"]}
+            there = {json.dumps(x, sort_keys=True) for s in recs for r in recs[s] if r["source_sha256"] == sha
+                     for x in r["links"]}
+            print(f"  {atlas_line(row, rs)}; links as on Colab: {here == there}")
+            colab, own = by_sha.get(sha, {}), atlas_rows.get(name(row), {})
+            for key, what in (("lsp_saving", "LSP saving"), ("median", "median pair CPU saving"),
+                              ("bring_up_lsp_saving", "bring-up LSP saving")):
+                def val(x, key=key):
+                    return x["pairs"]["median_net_saving"] if key == "median" else x[key]
+                print(f"    {what}: Colab sessions " + ", ".join(pct(val(colab[s])) for s in colab)
+                      + f"; Atlas, Colab links {pct(val(row))}; Atlas, own links "
+                      + ", ".join(f"{f} {pct(val(own[f]))}" for f in sorted(own)))
+        print(report.profile_text(rs))
 
     print("\nTHE MODEL FOR EACH SETUP'S LINKS: LSPs per window, lockstep, off -> on (saving)")
     for nm, folders in sorted(atlas_links.items()):

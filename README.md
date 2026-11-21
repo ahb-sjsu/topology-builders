@@ -409,7 +409,9 @@ a Pro CPU runtime; [tools/colab](tools/colab/README.md) lists what each runtime 
 three at once) ran the 64-router butterfly, the random graph of degree 16 and leaf-spine of the Atlas runs, with other
 links. Every run converged and every window was consistent. The LSP saving was the same on every machine within 1
 point (60%, 71% to 72%, 92% to 93%). Against Atlas it was the same on leaf-spine and 3 and 8 to 10 points lower on
-the other two; on the butterfly, the flooding model puts about half of that gap down to the links chosen. The CPU
+the other two. Running the Colab links on Atlas split that gap. With flood reduction on, the same links sent the same
+LSPs in both setups. Without it, Atlas's container labs sent 5% to 15% more than Colab's namespace labs. So the
+butterfly's gap is 5 to 7 points from the links and 3 from the setup, and degree 16's is all setup. The CPU
 saving per link change, pooled over the sessions, was close to Atlas's (11%, 10%, 28%). Single sessions, though, gave
 -56% to 15% on the same graph: the quiet window it is net of varied by up to 27% there, against at most 9% on Atlas.
 
