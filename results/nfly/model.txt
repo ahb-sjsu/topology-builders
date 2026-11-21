@@ -1,0 +1,17 @@
+topology                                     red win    n  measured         lockstep          jitter1  jitter1-proc0.5   measured-minus-model (jitter1)
+k-ary-n-fly k=2,stages=4                     off down   6     109.2             94.0            126.0            111.5      -16.8
+k-ary-n-fly k=2,stages=4                     off up     6     172.8             96.0            130.0            113.0       42.8
+k-ary-n-fly k=2,stages=4                     on  down   6      75.3             75.3             75.3             75.3        0.0
+k-ary-n-fly k=2,stages=4                     on  up     6     116.5             77.3             78.4             77.7       38.1
+k-ary-n-fly k=2,stages=5                     off down   6     278.3            254.0            350.0            305.8      -71.7
+k-ary-n-fly k=2,stages=5                     off up     6     435.7            256.0            354.0            307.7       81.7
+k-ary-n-fly k=2,stages=5                     on  down   6     212.7            212.0            212.0            212.0        0.7
+k-ary-n-fly k=2,stages=5                     on  up     6     326.2            214.0            215.0            214.6      111.2
+k-ary-n-fly k=3,stages=3                     off down   6     129.7            106.0            160.0            136.1      -30.3
+k-ary-n-fly k=3,stages=3                     off up     6     206.2            108.0            164.0            138.5       42.2
+k-ary-n-fly k=3,stages=3                     on  down   6      64.0             64.0             64.0             64.0        0.0
+k-ary-n-fly k=3,stages=3                     on  up     6      99.0             68.0             69.0             68.4       30.0
+k-ary-n-fly k=4,stages=3                     off down   6     315.7            254.0            414.0            352.1      -98.3
+k-ary-n-fly k=4,stages=3                     off up     6     487.7            256.0            418.0            351.4       69.7
+k-ary-n-fly k=4,stages=3                     on  down   6     130.0            130.0            130.0            130.0        0.0
+k-ary-n-fly k=4,stages=3                     on  up     6     212.7            136.0            137.0            136.3       75.7

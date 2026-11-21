@@ -2,8 +2,8 @@
 
 The flooding model's LSP counts for one link going down, flood reduction off and on, on k-ary n-flies from 16 to
 2,304 switches, each beside a random regular graph of the same number of routers and (rounded) average degree.
-**These are model results, not measurements:** no FRR ran. FRR runs of four of these topologies (27 to 80 switches)
-are queued.
+**These are model results, not measurements.** Four of these topologies (27 to 80 switches) were since measured with
+FRR: [results/nfly](../nfly/README.md).
 
 `topology_builders.flood_model` implements the reflood decision of draft-ietf-lsr-distoptflood-14 (sections 1.2.2
 and 1.2.3); see [the README](../../README.md#a-model-of-flooding). Twenty links per topology, chosen by seed. With
@@ -13,7 +13,9 @@ with link delays drawn from 1 to 2 units. The saving column runs from the lockst
 
 **Which end to believe.** On the 24 topologies of 64 routers measured with FRR both ways (random graphs, flattened
 butterflies, leaf-spine), FRR's saving fell inside this range on 17 and at most 5 points below its lockstep end on
-the other 7. Read the lockstep figure as the estimate and the jittered one as an upper bound.
+the other 7. On the four n-flies measured since, and on fat-trees, FRR's saving fell inside the range but 7 to 14
+points above its lockstep end ([nfly](../nfly/README.md), [fat-tree](../fat-tree/README.md)). Read the lockstep
+figure as a lower estimate for these families, about 10 points under FRR, and the jittered one as an upper bound.
 
 Two-hop paths: the mean number of common neighbors of two routers two hops apart.
 

@@ -1,0 +1,18 @@
+Link changes: every link-down and link-up window; diameter and two-hop multiplicity of the topology; mean LSPs sent and isisd ms net of the quiet window, off -> on; pairs with the on figure lower; windows satisfied
+topology                                         degree diam 2-hop  LSPs off      on saving pairs net ms off      on saving pairs median satisfied
+k-ary-n-fly {"k": 3, "routers": 27, "stages": 3}    4.0    4  1.62       172      82    52%  6/6         239     178    25%  6/6     30%     24/24
+
+Bring-up: mean LSPs sent and isisd ms from the routers' start, off -> on; runs converged, and quiet windows satisfied, off and on
+topology                                         degree    LSPs off        on saving      ms off        on saving converged     quiet
+k-ary-n-fly {"k": 3, "routers": 27, "stages": 3}    4.0       3,887     3,625     7%       3,445     3,510    -2%   2/2 2/2   2/2 2/2
+
+isisd CPU per event handler, mean ms per link window net of the quiet window, off -> on
+k-ary-n-fly {"k": 3, "routers": 27, "stages": 3} (12 and 12 windows)
+  isis_run_spf_cb                               174.6      159.9
+  isis_receive                                   39.7        8.7
+  tx_queue_send_event                             3.3        1.8
+  send_l2_psnp                                    2.4        1.8
+  zclient_read                                    0.6        0.7
+  vtysh_read                                     -0.1        0.4
+  lsp_refresh                                     0.4        0.3
+  vtysh_accept                                   -0.1        0.1

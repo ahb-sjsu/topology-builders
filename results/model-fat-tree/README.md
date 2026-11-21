@@ -2,15 +2,17 @@
 
 The flooding model's LSP counts for one link going down, flood reduction off and on, on k-ary fat-trees from k = 4
 (20 switches) to k = 24 (720 switches), each beside a random regular graph of the same number of routers and
-(rounded) average degree. **These are model results, not measurements:** no FRR ran. FRR runs of the fat-trees from
-k = 4 to k = 12 (20 to 180 switches) are queued.
+(rounded) average degree. **These are model results, not measurements.** The fat-trees from k = 4 to k = 12 (20 to
+180 switches) were since measured with FRR: [results/fat-tree](../fat-tree/README.md).
 
 The method is that of [the n-fly tables](../model-nfly/README.md), whose script this one uses: twenty links per
 topology chosen by seed, flood reduction on counted in lockstep, and flood reduction off counted both in lockstep and
 with link delays drawn from 1 to 2 units. The saving column runs from the lockstep figure to the jittered one. On the
 24 topologies of 64 routers measured with FRR both ways, FRR's saving fell inside this range on 17 and at most 5
-points below its lockstep end on the other 7: read the lockstep figure as the estimate and the jittered one as an
-upper bound.
+points below its lockstep end on the other 7. On the five fat-trees measured since, FRR's saving fell inside the
+range but 7 to 14 points above its lockstep end (41% against 27% at k = 4, 59% against 52% at k = 8, 67% against
+60% at k = 12, link-down windows; [fat-tree](../fat-tree/README.md)): for fat-trees read the lockstep figure as a
+lower estimate and the jittered one as an upper bound.
 
 The fat-tree is `families.fat_tree(k)`: k pods of k/2 edge and k/2 aggregation switches and (k/2)² core switches,
 switches only, so edge switches have degree k/2 and the others k. Two-hop paths: the mean number of common neighbors

@@ -5,7 +5,8 @@ four 64-router topologies: random regular graphs of degree 8 and 16, the flatten
 leaf-spine fabric of 48 leaves and 16 spines. Each run takes, one after another: two single links down and up
 (`link`), two routers down and up, each with all its links at once, as when a router fails (`node`), and two sets of
 three links down and up at once, chosen so that the graph stays connected (`multi`). Every window is 20 s. Two runs
-of each variant, flood reduction off and on. Runs of 2026-11-20 00:38 to 03:53 UTC.
+of each variant, flood reduction off and on. Runs of 2026-11-20 00:38 to 03:53 UTC, and one run again on 2026-11-21
+(see Limits).
 
 Times come from the routers' own logs: every router logs each LSP it builds or receives (`debug isis
 update-packets`, `log timestamp precision 6`), and all routers share the host's clock. For each window:
@@ -27,10 +28,10 @@ the four topologies. Convergence after a link went down, from 0.4 to 1 s, is set
 
 | Down windows | Flooding, off (ms) | Flooding, on (ms) |
 |---|---|---|
-| Butterfly 4x4x4, a router fails | 70, 90 | 1,143, 3,107, 3,437, 6,281 |
+| Butterfly 4x4x4, a router fails | 70, 73, 76, 90 | 1,143, 3,107, 3,437, 6,281 |
 | Random regular, degree 8, a router fails | 61, 71, 72, 80 | 59, 1,299, 1,755, 2,978 |
 | Leaf-spine 48 x 16, three links fail | 275, 284, 329, 427 | 1,606, 1,855, 7,566, 8,082 |
-| Butterfly 4x4x4, three links fail | 75, 97 | 53, 335, 3,037, 3,305 |
+| Butterfly 4x4x4, three links fail | 58, 71, 75, 97 | 53, 335, 3,037, 3,305 |
 | Random regular, degree 8, three links fail | 62, 69, 70, 83 | 66, 74, 406, 446 |
 | Random regular, degree 16, a router fails | 231, 242, 254, 315 | 103, 115, 295, 527 |
 | Random regular, degree 16, three links fail | 122, 130, 133, 161 | 94, 100, 553, 812 |
@@ -56,12 +57,12 @@ router recovery each on the butterfly (5.2 s) and on the random graph of degree 
 
 | Topology | Window | Flooding, off (ms) | Flooding, on (ms) | Convergence, off -> on (median, s) | Consistent, off / on |
 |---|---|---|---|---|---|
-| flattened butterfly 4x4x4 | link-down | 58, 76 | 45, 46, 51, 58 | 0.43 -> 0.92 | 2 of 2 / 4 of 4 |
-| flattened butterfly 4x4x4 | link-up | 29, 32 | 23, 24, 29, 35 | 2.79 -> 2.70 | 2 of 2 / 4 of 4 |
-| flattened butterfly 4x4x4 | node-down | 70, 90 | 1,143, 3,107, 3,437, 6,281 | 0.56 -> 3.67 | 2 of 2 / 4 of 4 |
-| flattened butterfly 4x4x4 | node-up | 33, 99 | 25, 36, 130, 5,237 | 2.92 -> 3.22 | 2 of 2 / 4 of 4 |
-| flattened butterfly 4x4x4 | multi-down | 75, 97 | 53, 335, 3,037, 3,305 | 1.01 -> 2.19 | 2 of 2 / 4 of 4 |
-| flattened butterfly 4x4x4 | multi-up | 29, 92 | 17, 38, 46, 60 | 2.77 -> 2.86 | 2 of 2 / 4 of 4 |
+| flattened butterfly 4x4x4 | link-down | 56, 58, 62, 76 | 45, 46, 51, 58 | 0.59 -> 0.92 | 4 of 4 / 4 of 4 |
+| flattened butterfly 4x4x4 | link-up | 22, 29, 32, 32 | 23, 24, 29, 35 | 2.61 -> 2.70 | 4 of 4 / 4 of 4 |
+| flattened butterfly 4x4x4 | node-down | 70, 73, 76, 90 | 1,143, 3,107, 3,437, 6,281 | 0.56 -> 3.67 | 4 of 4 / 4 of 4 |
+| flattened butterfly 4x4x4 | node-up | 24, 33, 39, 99 | 25, 36, 130, 5,237 | 2.92 -> 3.22 | 4 of 4 / 4 of 4 |
+| flattened butterfly 4x4x4 | multi-down | 58, 71, 75, 97 | 53, 335, 3,037, 3,305 | 0.66 -> 2.19 | 4 of 4 / 4 of 4 |
+| flattened butterfly 4x4x4 | multi-up | 29, 45, 84, 92 | 17, 38, 46, 60 | 2.92 -> 2.86 | 4 of 4 / 4 of 4 |
 | leaf-spine, 48 x 16 | link-down | 158, 163, 178 (+1 missing) | 154, 165, 173, 183 | 0.96 -> 0.70 | 4 of 4 / 4 of 4 |
 | leaf-spine, 48 x 16 | link-up | 53, 92, 131, 206 | 40, 80, 80, 101 | 3.25 -> 2.67 | 4 of 4 / 4 of 4 |
 | leaf-spine, 48 x 16 | node-down | 1,490, 1,527, 1,806, 1,929 | 1,491, 1,842, 1,879, 2,571 | 2.01 -> 2.44 | 4 of 4 / 4 of 4 |
@@ -97,8 +98,14 @@ interval 1 s), so it is longer.
   20. That slows the routers on those four CPUs, in both variants alike since they took turns; the other three
   topologies ran without it.
 - One run is set aside, in `excluded.jsonl.gz`: the butterfly's first run without flood reduction, which started
-  while the stopped degree-32 lab was still being taken down and shared the CPUs with it. The butterfly therefore
-  has two windows of each kind without flood reduction.
+  while the stopped degree-32 lab was still being taken down and shared the CPUs with it. That run was made again on
+  2026-11-21, 04:08 to 04:14 UTC, with the same lab directory, events, options and place in the order (first run,
+  first lab), after the other sweeps had ended; it is in `measurements.jsonl.gz` and in the tables above. It began 47
+  s after a 180-router lab had been taken down, while the host's one-minute load average was still falling from that
+  (118 at the start, under 13 one to two minutes later); a database backup used about one CPU on the host at the
+  time. Its flooding
+  times are in line with the other run's (router failure 73 and 76 ms against 70 and 90; three links 58 and 71 ms
+  against 75 and 97).
 
 ## How it was run
 

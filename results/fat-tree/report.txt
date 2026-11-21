@@ -1,0 +1,62 @@
+Link changes: every link-down and link-up window; diameter and two-hop multiplicity of the topology; mean LSPs sent and isisd ms net of the quiet window, off -> on; pairs with the on figure lower; windows satisfied
+topology                           degree diam 2-hop  LSPs off      on saving pairs net ms off      on saving pairs median satisfied
+fat-tree {"k": 4, "routers": 20}      3.2    4  1.48        97      58    40%  6/6         110      82    26%  4/6     29%     24/24
+fat-tree {"k": 6, "routers": 45}      4.8    4  1.82       337     158    53%  6/6         598     571     4%  3/6      2%     24/24
+fat-tree {"k": 8, "routers": 80}      6.4    4  2.06       765     313    59%  6/6       2,018   1,660    18%  6/6     18%     24/24
+fat-tree {"k": 10, "routers": 125}    8.0    4  2.25     1,470     556    62%  6/6       4,988   4,804     4%  4/6      4%     24/24
+fat-tree {"k": 12, "routers": 180}    9.6    4  2.39     2,661     847    68%  6/6      12,306  11,101    10%  6/6      9%     24/24
+
+Bring-up: mean LSPs sent and isisd ms from the routers' start, off -> on; runs converged, and quiet windows satisfied, off and on
+topology                           degree    LSPs off        on saving      ms off        on saving converged     quiet
+fat-tree {"k": 4, "routers": 20}      3.2       1,592     1,520     4%       1,905     1,900     0%   2/2 2/2   2/2 2/2
+fat-tree {"k": 6, "routers": 45}      4.8      14,488    12,396    14%       9,195     9,160     0%   2/2 2/2   2/2 2/2
+fat-tree {"k": 8, "routers": 80}      6.4      83,046    59,286    29%      34,945    30,925    12%   2/2 2/2   2/2 2/2
+fat-tree {"k": 10, "routers": 125}    8.0     350,582   218,262    38%     128,400   104,510    19%   2/2 2/2   2/2 2/2
+fat-tree {"k": 12, "routers": 180}    9.6   1,386,100   629,588    55%     528,350   351,115    34%   2/2 2/2   2/2 2/2
+
+isisd CPU per event handler, mean ms per link window net of the quiet window, off -> on
+fat-tree {"k": 4, "routers": 20} (12 and 12 windows)
+  isis_run_spf_cb                                82.2       78.6
+  isis_receive                                   14.2       10.5
+  send_l2_psnp                                    1.9        1.1
+  tx_queue_send_event                             1.9        1.4
+  zclient_read                                    0.7        0.7
+  lsp_refresh                                     0.4        0.4
+  vtysh_read                                      0.2       -0.0
+  lsp_tick                                       -0.1        0.1
+fat-tree {"k": 6, "routers": 45} (12 and 12 windows)
+  isis_run_spf_cb                               525.3      456.6
+  isis_receive                                   73.1       55.8
+  tx_queue_send_event                             6.6        3.6
+  send_l2_psnp                                    6.6        4.3
+  send_hello_cb                                   1.0       -2.2
+  lsp_refresh                                     0.8        0.7
+  zclient_read                                    0.6        0.6
+  dyn_cache_cleanup                               0.1        0.1
+fat-tree {"k": 8, "routers": 80} (12 and 12 windows)
+  isis_run_spf_cb                             1,769.3    1,606.2
+  isis_receive                                  168.0      107.9
+  tx_queue_send_event                            12.6        6.1
+  send_l2_psnp                                   11.7        1.9
+  vtysh_read                                     -0.2        0.8
+  zclient_read                                    0.8        0.7
+  lsp_refresh                                     0.4        0.4
+  dyn_cache_cleanup                               0.3        0.3
+fat-tree {"k": 10, "routers": 125} (12 and 12 windows)
+  isis_run_spf_cb                             5,180.8    4,887.1
+  isis_receive                                  189.1      167.2
+  tx_queue_send_event                            24.6       11.7
+  zclient_read                                    0.9        1.1
+  dyn_cache_cleanup                               0.7        0.7
+  lsp_refresh                                     0.4        0.4
+  vtysh_accept                                    0.2        0.1
+  vtysh_read                                     -1.1       -1.7
+fat-tree {"k": 12, "routers": 180} (12 and 12 windows)
+  isis_run_spf_cb                            12,275.9   12,222.5
+  isis_receive                                  380.9      242.4
+  tx_queue_send_event                            41.2       16.8
+  zclient_read                                    1.2        1.2
+  lsp_refresh                                     0.4        0.5
+  vtysh_accept                                   -0.0        0.3
+  vtysh_read                                     -0.9       -3.6
+  dyn_cache_cleanup                              -1.5       -1.3

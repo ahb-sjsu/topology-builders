@@ -47,7 +47,7 @@ flowchart LR
 
 | Option | What runs | Needs | Speed | Status, 2026-11-20 |
 |---|---|---|---|---|
-| Model: `flood_model` | the draft's reflood decision, no FRR | Python | milliseconds per change, any size | with flood reduction on, within 20% of FRR's LSP counts on 26 of 28 64-router topologies, and within 15% on all 14 graphs of the latest runs (64 and 128 routers), where its lockstep saving is within 5 points of FRR's |
+| Model: `flood_model` | the draft's reflood decision, no FRR | Python | milliseconds per change, any size | with flood reduction on, within 20% of FRR's LSP counts on 26 of 28 64-router topologies, and within 15% on all 14 graphs of the latest runs (64 and 128 routers), where its lockstep saving is within 5 points of FRR's; on fat-trees and n-flies (20 to 180 switches) within 5% when a link goes down, with FRR saving 7 to 14 points more than the lockstep figure |
 | Docker labs: `measure` | real FRR, a container per router | Linux, root, Docker, containerlab | real time | every result in `results/` |
 | Namespace labs: `measure --backend netns` | real FRR, a network namespace per router | Linux, root or `unshare -Urnm` | real time | ran end to end in a container with Colab's permissions: every run converged; link-change LSP counts within 12% of the Docker labs' on the same graph |
 | Colab: `tools/colab` | namespace labs on a Colab runtime | a Google account | real time, on the runtime's CPUs | passed `test_in_docker.sh` (Colab's permissions, 2 CPUs); not yet run on Colab itself |
@@ -363,14 +363,19 @@ routers. LSPs fall by 8%, 19% and 53%, less than at 64 routers of the same degre
 degree, the two sizes agree. isisd CPU falls by 1% to 8%: route computation is nearly all of it, and each costs twice
 as much as at 64 routers. 256-router labs could not be deployed with containerlab on this host.
 
-**Multistage butterflies, model only.** [results/model-nfly](results/model-nfly/README.md): the flooding model on
-k-ary n-flies from 16 to 2,304 switches, each beside a random graph of the same size and degree; no FRR yet. At the
-same size and degree an n-fly saves far more (49% against 18% at 48 switches, 31% against 1% at 1,280), and the
-saving follows the number of two-hop paths.
+**Multistage butterflies.** [results/nfly](results/nfly/README.md): FRR on four k-ary n-flies of 27 to 80 switches.
+LSPs for a link change fall by 25% and 32% on the 2-ary flies and by 51% and 57% on the 3- and 4-ary 3-flies,
+following the two-hop paths (about 1.25 against 1.62 and 1.82); isisd CPU shows no consistent difference, route
+computation being most of it. [results/model-nfly](results/model-nfly/README.md): the model on n-flies up to 2,304
+switches, each beside a random graph of the same size and degree, which saves far less (18% against 49% at 48
+switches, 1% against 31% at 1,280, lockstep figures).
 
-**Fat-trees, model only.** [results/model-fat-tree](results/model-fat-tree/README.md): the same on k-ary fat-trees
-from k = 4 (20 switches) to k = 24 (720). The saving rises with the radix towards two-thirds (27% at k = 4, 60% at
-12, 67% at 24), while random graphs of the same size and degree stay near 20%.
+**Fat-trees.** [results/fat-tree](results/fat-tree/README.md): FRR on k-ary fat-trees from k = 4 (20 switches) to
+k = 12 (180 switches, 864 links). LSPs for a link change fall by 40% at k = 4 and 68% at k = 12, and at bring-up by up
+to 55%; isisd CPU for a link change is lower in 23 of 30 pairs, by a median of 2% to 29%. Without flood reduction the
+180 routers still converged on 20 CPUs. [results/model-fat-tree](results/model-fat-tree/README.md): the model up to
+k = 24 (720 switches), where the saving nears two-thirds while random graphs of the same size and degree stay near
+20%.
 
 ## Without Docker, and on Colab
 
@@ -411,7 +416,10 @@ Against every link change measured on 64 routers, with flood reduction on, the m
 sent on 26 of 28 topologies (the exceptions: the flattened butterfly 16×2×2, 29% over, and the random graph of degree
 48, 26% under), and within 15% on all 14 graphs of 64 and 128 routers measured since; there its lockstep saving is
 within 5 points of FRR's ([seeds-n64](results/seeds-n64/README.md), [random-regular-n128](results/random-regular-n128/README.md);
-`tools/model/validate.py` makes the comparison). Without flood reduction the count depends on timing, which decides how many copies a router receives
+`tools/model/validate.py` makes the comparison). On fat-trees and n-flies of 20 to 180 switches it is within 5% of
+FRR's count when a link goes down, and exact on 5 of the 9; there FRR saves 7 to 14 points more than the lockstep
+figure, because without flood reduction FRR sends more than the lockstep count
+([fat-tree](results/fat-tree/README.md), [nfly](results/nfly/README.md)). Without flood reduction the count depends on timing, which decides how many copies a router receives
 before it sends; the model brackets it rather than predicts it. It leaves out CPU, timers, retransmissions, recovery
 by CSNP and PSNP, and the database exchange over a new adjacency. Checked decision by decision against isisd's own
 debug log ([results/model-decisions](results/model-decisions/README.md)), every one of 1,186 decisions matches,
@@ -420,8 +428,8 @@ new link, while `flood_link_change` assumes the snapshot without it.
 
 ## Not here yet
 
-- FRR runs of fat-trees and k-ary n-flies (so far model only: [model-fat-tree](results/model-fat-tree/README.md),
-  [model-nfly](results/model-nfly/README.md)).
+- FRR runs of n-flies above 80 switches and fat-trees above k = 12 (model only so far:
+  [model-fat-tree](results/model-fat-tree/README.md), [model-nfly](results/model-nfly/README.md)).
 - 256 routers and more, which need a setup other than one containerlab host, for example the namespace backend.
 - An exporter to netlab, as a second, independent path to FRR IS-IS.
 

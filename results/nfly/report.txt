@@ -1,0 +1,51 @@
+Link changes: every link-down and link-up window; diameter and two-hop multiplicity of the topology; mean LSPs sent and isisd ms net of the quiet window, off -> on; pairs with the on figure lower; windows satisfied
+topology                                         degree diam 2-hop  LSPs off      on saving pairs net ms off      on saving pairs median satisfied
+k-ary-n-fly {"k": 2, "routers": 32, "stages": 4}    3.0    6  1.27       141      96    32%  6/6         286     228    20%  5/6     16%     24/24
+k-ary-n-fly {"k": 2, "routers": 80, "stages": 5}    3.2    8  1.25       357     269    25%  6/6       1,094   1,177    -8%  1/6     -9%     24/24
+k-ary-n-fly {"k": 3, "routers": 27, "stages": 3}    4.0    4  1.62       168      82    51%  6/6         146     182   -25%  2/6    -19%     24/24
+k-ary-n-fly {"k": 4, "routers": 48, "stages": 3} 5.3333    4  1.82       402     171    57%  6/6         756     618    18%  4/6     11%     24/24
+
+Bring-up: mean LSPs sent and isisd ms from the routers' start, off -> on; runs converged, and quiet windows satisfied, off and on
+topology                                         degree    LSPs off        on saving      ms off        on saving converged     quiet
+k-ary-n-fly {"k": 2, "routers": 32, "stages": 4}    3.0       3,856     3,721     4%       3,300     3,350    -2%   2/2 2/2   2/2 2/2
+k-ary-n-fly {"k": 2, "routers": 80, "stages": 5}    3.2      24,486    23,224     5%      14,140    14,065     1%   2/2 2/2   2/2 2/2
+k-ary-n-fly {"k": 3, "routers": 27, "stages": 3}    4.0       3,990     3,633     9%       3,585     3,455     4%   2/2 2/2   2/2 2/2
+k-ary-n-fly {"k": 4, "routers": 48, "stages": 3} 5.3333      20,162    16,262    19%      11,715    11,045     6%   2/2 2/2   2/2 2/2
+
+isisd CPU per event handler, mean ms per link window net of the quiet window, off -> on
+k-ary-n-fly {"k": 2, "routers": 32, "stages": 4} (12 and 12 windows)
+  isis_run_spf_cb                               184.4      187.2
+  isis_receive                                   19.8       21.6
+  send_l2_psnp                                    3.7        1.7
+  tx_queue_send_event                             2.9        2.2
+  zclient_read                                    0.7        0.6
+  vtysh_read                                      0.2        0.4
+  lsp_refresh                                     0.3        0.4
+  lsp_tick                                        0.1        0.0
+k-ary-n-fly {"k": 2, "routers": 80, "stages": 5} (12 and 12 windows)
+  isis_run_spf_cb                             1,043.1    1,039.3
+  isis_receive                                   83.2       92.2
+  tx_queue_send_event                             7.4        6.1
+  send_l2_psnp                                    6.9        3.2
+  zclient_read                                    0.7        0.8
+  lsp_refresh                                     0.3        0.3
+  dyn_cache_cleanup                               0.3        0.3
+  vtysh_accept                                    0.1        0.2
+k-ary-n-fly {"k": 3, "routers": 27, "stages": 3} (12 and 12 windows)
+  isis_run_spf_cb                               147.5      154.5
+  isis_receive                                   11.8       13.1
+  send_l2_psnp                                    3.3        2.0
+  tx_queue_send_event                             2.9        1.8
+  zclient_read                                    0.7        0.6
+  lsp_refresh                                     0.3        0.3
+  vtysh_accept                                   -0.3        0.1
+  lsp_tick                                        0.1       -0.0
+k-ary-n-fly {"k": 4, "routers": 48, "stages": 3} (12 and 12 windows)
+  isis_run_spf_cb                               634.5      568.9
+  isis_receive                                   83.2       71.5
+  send_l2_psnp                                    8.3        4.3
+  tx_queue_send_event                             7.5        3.8
+  lsp_refresh                                     0.7        0.7
+  zclient_read                                    0.7        0.7
+  lsp_tick                                        0.4       -0.1
+  vtysh_accept                                    0.2        0.3

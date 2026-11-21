@@ -83,10 +83,19 @@ being built in the window: after router r25 failed with flood reduction on, it f
 - **Below 1 s.** After spine r1 failed, a further 395 pairs arrived between 0.5 and 1 s, most of them by flooding. On
   leaf-spine, router failures were slow with flood reduction off as well, so these are not counted as late.
 
-## What the logs do not show
+## When the snapshot is refreshed, and what is still open
 
-- Why the relays' snapshots were from before the failure. `debug isis spf-events` logs when a route computation is
-  scheduled, not when it ends, so these logs cannot say whether the snapshot is refreshed with the route computation.
+- **From FRR's code at e263c441** (`isisd/isis_lsp.c`, `isisd/isis_spf.c`): the topology a router decides with is
+  built from its LSP database at the first flooding decision after a route computation starts, and dropped only when
+  the next route computation starts; a comment there says this limits rebuilds to one per route computation instead
+  of one per received LSP. Every LSP received schedules a route computation, at most one per `spf-interval` (1 s by
+  default, counted in whole seconds). Between two route computations, decisions therefore use a topology without the
+  LSPs that arrived after it was built.
+- That explains decisions made with some of the failed links still in place. It does not by itself explain the 154
+  relay decisions that only the topology from before the failure reproduces: for those, the topology must have been
+  built before the failure. `debug isis spf-events` logs the start of every route computation ("SPF needed"), which
+  is when the topology is dropped, so the full logs of this lab can show when each relay's topology was built. That
+  check has not been done yet. An earlier version of this README said these logs could not show it; that was wrong.
 - Whether this can leave a router without an LSP for good. Here no router was: every router got every new LSP
   within the window, by CSNP if not by flooding, as in the timing runs. That relies on the periodic CSNPs.
 
