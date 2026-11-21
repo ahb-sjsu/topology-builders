@@ -53,11 +53,11 @@ flowchart LR
     MOD -.->|"decision by decision<br/>tools/model"| N
 ```
 
-| Option | What runs | Needs | Speed | Status, 2026-11-20 |
+| Option | What runs | Needs | Speed | Status, 2026-11-21 |
 |---|---|---|---|---|
 | Model: `flood_model` | the draft's reflood decision, no FRR | Python | milliseconds per change, any size | with flood reduction on, within 20% of FRR's LSP counts on 26 of 28 64-router topologies, and within 15% on all 14 graphs of the latest runs (64 and 128 routers), where its lockstep saving is within 5 points of FRR's; on fat-trees and n-flies (20 to 180 switches) within 5% when a link goes down, with FRR saving 7 to 14 points more than the lockstep figure |
-| Docker labs: `measure` | real FRR, a container per router | Linux, root, Docker, containerlab | real time | every result in `results/` |
-| Namespace labs: `measure --backend netns` | real FRR, a network namespace per router | Linux, root or `unshare -Urnm` | real time | ran end to end in a container with Colab's permissions: every run converged; link-change LSP counts within 12% of the Docker labs' on the same graph |
+| Docker labs: `measure` | real FRR, a container per router | Linux, root, Docker, containerlab | real time | every Atlas result in `results/`, up to 180 routers; 256-router labs could not be deployed on one host |
+| Namespace labs: `measure --backend netns` | real FRR, a network namespace per router | Linux, root or `unshare -Urnm` | real time | the Colab results: with the same links as a Docker run on Atlas, LSP counts with flood reduction on matched it, and without it were 5% to 15% lower; on Atlas, 256-router labs run (degree 4: every run converged, about 34 MB of memory per router), and larger ones are running |
 | Colab: `tools/colab` | namespace labs on a Colab runtime | a Google account | real time, on the runtime's CPUs | passed `test_in_docker.sh` (Colab's permissions, 2 CPUs); on Colab itself, 16-router labs converged on free CPU and TPU runtimes, and 64-router labs of up to 768 links in four Pro sessions with 8 CPUs, whose LSP savings agreed within 1 point (2026-11-21) |
 | Emulated guest: `tools/overlay` | Docker labs inside QEMU, software emulation | QEMU; no root, no KVM | about 10 times slower | a 16-router lab runs on the host and in a cluster pod; link-down LSP counts within 17% of the host's; link-up, router and multi-link windows 1.2 to 1.7 times, bring-up 1.5 to 2.6 times; scaling timers by 10 is not a fix; CPU and times not comparable |
 | Decision check: `tools/model` | FRR's logged decisions against the model's | as namespace labs | real time | all 1,186 decisions logged on five topologies match the model, given the snapshot each router used; after router and multi-link failures, it shows which relays decided with the topology from before the failure |
@@ -369,7 +369,8 @@ degree 32, without flood reduction none of the 9 runs converged on 20 CPUs.
 **128 routers.** [results/random-regular-n128](results/random-regular-n128/README.md): degree 4, 8 and 16 at 128
 routers. LSPs fall by 8%, 19% and 53%, less than at 64 routers of the same degree; matched by two-hop paths instead of
 degree, the two sizes agree. isisd CPU falls by 1% to 8%: route computation is nearly all of it, and each costs twice
-as much as at 64 routers. 256-router labs could not be deployed with containerlab on this host.
+as much as at 64 routers. 256-router labs could not be deployed with containerlab on this host; with the namespace
+backend they run, and larger ones are running ([Not here yet](#not-here-yet)).
 
 **Multistage butterflies.** [results/nfly](results/nfly/README.md): FRR on four k-ary n-flies of 27 to 80 switches.
 LSPs for a link change fall by 25% and 32% on the 2-ary flies and by 51% and 57% on the 3- and 4-ary 3-flies,
@@ -450,7 +451,10 @@ new link, while `flood_link_change` assumes the snapshot without it.
 
 - FRR runs of n-flies above 80 switches and fat-trees above k = 12 (model only so far:
   [model-fat-tree](results/model-fat-tree/README.md), [model-nfly](results/model-nfly/README.md)).
-- 256 routers and more, which need a setup other than one containerlab host, for example the namespace backend.
+- 256 to 2,048 routers. These are running on Atlas with the namespace backend (from 2026-11-21): random regular
+  graphs of degree 4, 8 and 16, one size after another. The first lab, 256 routers at degree 4 (two runs of each
+  variant), converged in every run and sent 9% fewer LSPs per link change with flood reduction (13% at 64 routers, 8%
+  at 128). The data and tables go into `results/` when each size finishes.
 - An exporter to netlab, as a second, independent path to FRR IS-IS.
 
 [SURVEY.md](https://github.com/ahb-sjsu/topology-builders/blob/main/SURVEY.md) lists the existing builders and lab tools, with licences and status, so that this repository
