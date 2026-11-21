@@ -58,7 +58,7 @@ flowchart LR
 | Model: `flood_model` | the draft's reflood decision, no FRR | Python | milliseconds per change, any size | with flood reduction on, within 20% of FRR's LSP counts on 26 of 28 64-router topologies, and within 15% on all 14 graphs of the latest runs (64 and 128 routers), where its lockstep saving is within 5 points of FRR's; on fat-trees and n-flies (20 to 180 switches) within 5% when a link goes down, with FRR saving 7 to 14 points more than the lockstep figure |
 | Docker labs: `measure` | real FRR, a container per router | Linux, root, Docker, containerlab | real time | every result in `results/` |
 | Namespace labs: `measure --backend netns` | real FRR, a network namespace per router | Linux, root or `unshare -Urnm` | real time | ran end to end in a container with Colab's permissions: every run converged; link-change LSP counts within 12% of the Docker labs' on the same graph |
-| Colab: `tools/colab` | namespace labs on a Colab runtime | a Google account | real time, on the runtime's CPUs | passed `test_in_docker.sh` (Colab's permissions, 2 CPUs); on Colab itself, 16-router labs converged on free CPU and TPU runtimes and a Pro CPU runtime, 32-router labs on two of them (2026-11-21) |
+| Colab: `tools/colab` | namespace labs on a Colab runtime | a Google account | real time, on the runtime's CPUs | passed `test_in_docker.sh` (Colab's permissions, 2 CPUs); on Colab itself, 16-router labs converged on free CPU and TPU runtimes, and 64-router labs of up to 768 links in four Pro sessions with 8 CPUs, whose LSP savings agreed within 1 point (2026-11-21) |
 | Emulated guest: `tools/overlay` | Docker labs inside QEMU, software emulation | QEMU; no root, no KVM | about 10 times slower | a 16-router lab runs on the host and in a cluster pod; link-down LSP counts within 17% of the host's; link-up, router and multi-link windows 1.2 to 1.7 times, bring-up 1.5 to 2.6 times; scaling timers by 10 is not a fix; CPU and times not comparable |
 | Decision check: `tools/model` | FRR's logged decisions against the model's | as namespace labs | real time | all 1,186 decisions logged on five topologies match the model, given the snapshot each router used; after router and multi-link failures, it shows which relays decided with the topology from before the failure |
 
@@ -404,6 +404,14 @@ converged and every window consistent, link-change LSP counts within 12% of the 
 ([results/colab-shaped](results/colab-shaped/README.md)). On Colab itself, `topology_builders_sessions.ipynb` ran in
 several sessions at once on 2026-11-21: 16-router labs converged in every run on the free CPU and TPU runtimes and on
 a Pro CPU runtime; [tools/colab](tools/colab/README.md) lists what each runtime type offers.
+
+**Other machines.** [results/colab-sessions](results/colab-sessions/README.md): four Colab Pro sessions (8 CPUs each,
+three at once) ran the 64-router butterfly, the random graph of degree 16 and leaf-spine of the Atlas runs, with other
+links. Every run converged and every window was consistent. The LSP saving was the same on every machine within 1
+point (60%, 71% to 72%, 92% to 93%). Against Atlas it was the same on leaf-spine and 3 and 8 to 10 points lower on
+the other two; on the butterfly, the flooding model puts about half of that gap down to the links chosen. The CPU
+saving per link change, pooled over the sessions, was close to Atlas's (11%, 10%, 28%). Single sessions, though, gave
+-56% to 15% on the same graph: the quiet window it is net of varied by up to 27% there, against at most 9% on Atlas.
 
 ## A model of flooding
 

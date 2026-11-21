@@ -16,12 +16,19 @@ runtime's disk). Link-down windows, LSPs sent off and on: 82 and 56 on the free 
 free CPU runtime, 78 and 54 on a Pro CPU runtime with high memory, against 75 to 81 and 52 to 53 in Docker labs of a
 graph built with the same parameters.
 
+**Batch (2026-11-21, `PLAN = 'batch'`, records kept):** four Pro CPU sessions with high memory, three of them at the
+same time, ran three of the 64-router graphs measured on Atlas: the 4x4x4 butterfly, a random graph of degree 16, and
+leaf-spine with 48 leaves and 16 spines (up to 768 links). Every run converged, and every window ended with every
+router holding the same LSPs. The LSP saving was the same on every machine, within 1 point. The CPU saving varied
+from session to session much more than on Atlas, because the quiet window it is net of varied by up to 27%. See
+[results/colab-sessions](../../results/colab-sessions/README.md).
+
 | Runtime (2026-11-21) | CPUs | Memory | What we saw |
 |---|---:|---:|---|
 | CPU, free | 2 (Intel Xeon 2.2 GHz) | 13 GB | setup 381 s; 16 and 32 routers converged |
 | T4 GPU, free | 2 | 13 GB | no more CPUs than the CPU runtime |
 | TPU v5e-1, free | 24 (AMD EPYC 7B13) | 47 GB | 16 routers converged; after about an hour of three such sessions, Colab refused new TPU sessions for usage limits |
-| CPU with high memory, Pro | 8 | 51 GB | setup 153 s; 16 and 32 routers converged; about 0.26 compute units an hour |
+| CPU with high memory, Pro | 8 (Intel Xeon 2.2 GHz or AMD EPYC 7B12) | 51 GB | setup 105 to 158 s, 46 s with the FRR build from Drive; 64 routers and 768 links converged in every run, 18 to 21 minutes per lab; about 0.26 compute units an hour |
 | L4 GPU, Pro | 12 | 53 GB | about 1.9 compute units an hour |
 | A100 GPU, Pro | 12 | 167 GB | about 8.9 compute units an hour |
 
@@ -40,4 +47,5 @@ cells again.
 | `check_results.py` | Pass or fail for a run: every run converged, every window consistent, no router missing a new LSP. |
 
 Start small: each router runs four FRR daemons, and a lab too large for the machine does not converge. CPU time on
-a shared cloud machine is noisy; compare flood reduction off against on within one run.
+a shared cloud machine is noisy. Compare flood reduction off against on within one run, and pool several sessions
+before reading a CPU saving: on the same graph and links, single sessions gave -56% to 15%.

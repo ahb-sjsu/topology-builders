@@ -1,0 +1,234 @@
+SESSIONS
+  cpu-8cpu-51g-2c3f: AMD EPYC 7B12, 8 CPUs, 50 GB, started 2026-11-21T05:17:46Z, setup 105 s (FRR from the Drive cache: False); labs fb64-444 18.2 min, steal 0.02%, rr64-d16 18.9 min, steal 0.02%, ls64-s16 19.9 min, steal 0.05%
+  cpu-8cpu-51g-a057: Intel(R) Xeon(R) CPU @ 2.20GHz, 8 CPUs, 50 GB, started 2026-11-21T05:17:20Z, setup 158 s (FRR from the Drive cache: False); labs fb64-444 18.8 min, steal 0.09%, rr64-d16 19.8 min, steal 0.25%, ls64-s16 21.0 min, steal 0.35%
+  cpu-8cpu-51g-cd61: Intel(R) Xeon(R) CPU @ 2.20GHz, 8 CPUs, 50 GB, started 2026-11-21T05:27:30Z, setup 46 s (FRR from the Drive cache: True); labs fb64-444 18.8 min, steal 0.06%, rr64-d16 19.7 min, steal 0.11%, ls64-s16 20.7 min, steal 0.1%
+  cpu-8cpu-51g-ff2f: Intel(R) Xeon(R) CPU @ 2.20GHz, 8 CPUs, 50 GB, started 2026-11-21T03:33:11Z, setup 153 s (FRR from the Drive cache: False); labs rr16-d4 12.6 min, steal 0.01%, rr32-d8 13.3 min, steal 0.02%, rr64-d8 14.5 min, steal 0.03%, rr64-d16 15.5 min, steal 0.04%, ls64-s16 16.5 min, steal 0.05%
+
+PER SESSION: link windows (LSPs sent, isisd ms net of the quiet window), pairs, bring-up
+  flattened butterfly 4 x 4 x 4, 64 routers | cpu-8cpu-51g-2c3f | LSPs 827 -> 328 (60% fewer) | net ms 798 -> 672 (16% lower) | CPU lower in 6 of 6 pairs, median 12%; LSPs lower in 6 of 6 | bring-up LSPs 15% fewer, CPU 4% lower | windows satisfied 24 of 24 | converged 2 of 2 off, 2 of 2 on
+  leaf-spine, 48 leaves x 16 spines, 64 routers | cpu-8cpu-51g-2c3f | LSPs 2467 -> 180 (93% fewer) | net ms 2335 -> 1848 (21% lower) | CPU lower in 6 of 6 pairs, median 17%; LSPs lower in 6 of 6 | bring-up LSPs 22% fewer, CPU 16% lower | windows satisfied 24 of 24 | converged 2 of 2 off, 2 of 2 on
+  random regular, degree 16, seed 1, 64 routers | cpu-8cpu-51g-2c3f | LSPs 1508 -> 443 (71% fewer) | net ms 1635 -> 1452 (11% lower) | CPU lower in 6 of 6 pairs, median 11%; LSPs lower in 6 of 6 | bring-up LSPs 27% fewer, CPU 12% lower | windows satisfied 24 of 24 | converged 2 of 2 off, 2 of 2 on
+  flattened butterfly 4 x 4 x 4, 64 routers | cpu-8cpu-51g-a057 | LSPs 842 -> 337 (60% fewer) | net ms 1061 -> 983 (7% lower) | CPU lower in 4 of 6 pairs, median 12%; LSPs lower in 6 of 6 | bring-up LSPs 25% fewer, CPU 10% lower | windows satisfied 24 of 24 | converged 2 of 2 off, 2 of 2 on
+  leaf-spine, 48 leaves x 16 spines, 64 routers | cpu-8cpu-51g-a057 | LSPs 2611 -> 191 (93% fewer) | net ms 2115 -> 2066 (2% lower) | CPU lower in 3 of 6 pairs, median 2%; LSPs lower in 6 of 6 | bring-up LSPs 28% fewer, CPU 21% lower | windows satisfied 24 of 24 | converged 2 of 2 off, 2 of 2 on
+  random regular, degree 16, seed 1, 64 routers | cpu-8cpu-51g-a057 | LSPs 1562 -> 437 (72% fewer) | net ms 1426 -> 2108 (-48% lower) | CPU lower in 0 of 6 pairs, median -56%; LSPs lower in 6 of 6 | bring-up LSPs 32% fewer, CPU 16% lower | windows satisfied 24 of 24 | converged 2 of 2 off, 2 of 2 on
+  flattened butterfly 4 x 4 x 4, 64 routers | cpu-8cpu-51g-cd61 | LSPs 840 -> 334 (60% fewer) | net ms 952 -> 961 (-1% lower) | CPU lower in 2 of 6 pairs, median -4%; LSPs lower in 6 of 6 | bring-up LSPs 25% fewer, CPU 10% lower | windows satisfied 24 of 24 | converged 2 of 2 off, 2 of 2 on
+  leaf-spine, 48 leaves x 16 spines, 64 routers | cpu-8cpu-51g-cd61 | LSPs 2424 -> 183 (92% fewer) | net ms 2814 -> 1917 (32% lower) | CPU lower in 6 of 6 pairs, median 35%; LSPs lower in 6 of 6 | bring-up LSPs 25% fewer, CPU 16% lower | windows satisfied 24 of 24 | converged 2 of 2 off, 2 of 2 on
+  random regular, degree 16, seed 1, 64 routers | cpu-8cpu-51g-cd61 | LSPs 1574 -> 436 (72% fewer) | net ms 1988 -> 1688 (15% lower) | CPU lower in 6 of 6 pairs, median 13%; LSPs lower in 6 of 6 | bring-up LSPs 30% fewer, CPU 16% lower | windows satisfied 24 of 24 | converged 2 of 2 off, 2 of 2 on
+  leaf-spine, 48 leaves x 16 spines, 64 routers | cpu-8cpu-51g-ff2f | LSPs 2378 -> 187 (92% fewer) | net ms 3678 -> 2532 (31% lower) | CPU lower in 4 of 4 pairs, median 32%; LSPs lower in 4 of 4 | bring-up LSPs 27% fewer, CPU 18% lower | windows satisfied 16 of 16 | converged 2 of 2 off, 2 of 2 on
+  random regular, degree 4, seed 1, 16 routers | cpu-8cpu-51g-ff2f | LSPs 97 -> 69 (29% fewer) | net ms 45 -> 75 (-67% lower) | CPU lower in 1 of 4 pairs, median -83%; LSPs lower in 4 of 4 | bring-up LSPs 3% fewer, CPU 8% lower | windows satisfied 16 of 16 | converged 2 of 2 off, 2 of 2 on
+  random regular, degree 8, seed 1, 32 routers | cpu-8cpu-51g-ff2f | LSPs 391 -> 189 (52% fewer) | net ms 322 -> 189 (41% lower) | CPU lower in 4 of 4 pairs, median 43%; LSPs lower in 4 of 4 | bring-up LSPs 7% fewer, CPU 1% lower | windows satisfied 16 of 16 | converged 2 of 2 off, 2 of 2 on
+  random regular, degree 8, seed 1, 64 routers | cpu-8cpu-51g-ff2f | LSPs 726 -> 501 (31% fewer) | net ms 916 -> 1164 (-27% lower) | CPU lower in 0 of 4 pairs, median -25%; LSPs lower in 4 of 4 | bring-up LSPs 10% fewer, CPU 7% lower | windows satisfied 16 of 16 | converged 2 of 2 off, 2 of 2 on
+  random regular, degree 16, seed 1, 64 routers | cpu-8cpu-51g-ff2f | LSPs 1537 -> 443 (71% fewer) | net ms 1814 -> 1595 (12% lower) | CPU lower in 3 of 4 pairs, median 15%; LSPs lower in 4 of 4 | bring-up LSPs 28% fewer, CPU 14% lower | windows satisfied 16 of 16 | converged 2 of 2 off, 2 of 2 on
+
+ACROSS SESSIONS (same topology file, so the same links)
+  flattened butterfly 4 x 4 x 4, 64 routers lsp_saving: 2c3f 60%, a057 60%, cd61 60%; range 60% to 60%
+  flattened butterfly 4 x 4 x 4, 64 routers net_saving: 2c3f 16%, a057 7%, cd61 -1%; range -1% to 16%
+  flattened butterfly 4 x 4 x 4, 64 routers bring_up_lsp_saving: 2c3f 15%, a057 25%, cd61 25%; range 15% to 25%
+  flattened butterfly 4 x 4 x 4, 64 routers bring_up_ms_saving: 2c3f 4%, a057 10%, cd61 10%; range 4% to 10%
+  flattened butterfly 4 x 4 x 4, 64 routers median pair CPU saving: 2c3f 12%, a057 12%, cd61 -4%
+  flattened butterfly 4 x 4 x 4, 64 routers pairs of all 3 sessions: CPU lower in 12 of 18, median 11%, quartiles -5% to 13%; LSPs lower in 18 of 18
+  leaf-spine, 48 leaves x 16 spines, 64 routers lsp_saving: 2c3f 93%, a057 93%, cd61 92%, ff2f 92%; range 92% to 93%
+  leaf-spine, 48 leaves x 16 spines, 64 routers net_saving: 2c3f 21%, a057 2%, cd61 32%, ff2f 31%; range 2% to 32%
+  leaf-spine, 48 leaves x 16 spines, 64 routers bring_up_lsp_saving: 2c3f 22%, a057 28%, cd61 25%, ff2f 27%; range 22% to 28%
+  leaf-spine, 48 leaves x 16 spines, 64 routers bring_up_ms_saving: 2c3f 16%, a057 21%, cd61 16%, ff2f 18%; range 16% to 21%
+  leaf-spine, 48 leaves x 16 spines, 64 routers median pair CPU saving: 2c3f 17%, a057 2%, cd61 35%, ff2f 32%
+  leaf-spine, 48 leaves x 16 spines, 64 routers pairs of all 4 sessions: CPU lower in 19 of 22, median 28%, quartiles 13% to 32%; LSPs lower in 22 of 22
+  random regular, degree 16, seed 1, 64 routers lsp_saving: 2c3f 71%, a057 72%, cd61 72%, ff2f 71%; range 71% to 72%
+  random regular, degree 16, seed 1, 64 routers net_saving: 2c3f 11%, a057 -48%, cd61 15%, ff2f 12%; range -48% to 15%
+  random regular, degree 16, seed 1, 64 routers bring_up_lsp_saving: 2c3f 27%, a057 32%, cd61 30%, ff2f 28%; range 27% to 32%
+  random regular, degree 16, seed 1, 64 routers bring_up_ms_saving: 2c3f 12%, a057 16%, cd61 16%, ff2f 14%; range 12% to 16%
+  random regular, degree 16, seed 1, 64 routers median pair CPU saving: 2c3f 11%, a057 -56%, cd61 13%, ff2f 15%
+  random regular, degree 16, seed 1, 64 routers pairs of all 4 sessions: CPU lower in 15 of 22, median 10%, quartiles -6% to 16%; LSPs lower in 22 of 22
+
+QUIET WINDOWS: isisd ms summed over the routers in the 30 s with no event, one per run
+  2c3f flattened butterfly 4 x 4 x 4, 64 routers: off [3690.0, 3630.0], on [3800.0, 3660.0]; net link window off 798, on 672
+  2c3f leaf-spine, 48 leaves x 16 spines, 64 routers: off [8160.0, 10380.0], on [9210.0, 8940.0]; net link window off 2335, on 1848
+  2c3f random regular, degree 16, seed 1, 64 routers: off [5760.0, 5810.0], on [5750.0, 6060.0]; net link window off 1635, on 1452
+  a057 flattened butterfly 4 x 4 x 4, 64 routers: off [5560.0, 5710.0], on [5610.0, 5670.0]; net link window off 1061, on 983
+  a057 leaf-spine, 48 leaves x 16 spines, 64 routers: off [14950.0, 14020.0], on [13690.0, 12510.0]; net link window off 2115, on 2066
+  a057 random regular, degree 16, seed 1, 64 routers: off [10390.0, 9640.0], on [9340.0, 9340.0]; net link window off 1426, on 2108
+  cd61 flattened butterfly 4 x 4 x 4, 64 routers: off [5360.0, 5190.0], on [5210.0, 5210.0]; net link window off 952, on 961
+  cd61 leaf-spine, 48 leaves x 16 spines, 64 routers: off [11870.0, 12130.0], on [11730.0, 11810.0]; net link window off 2814, on 1917
+  cd61 random regular, degree 16, seed 1, 64 routers: off [8270.0, 9340.0], on [8570.0, 8720.0]; net link window off 1988, on 1688
+  ff2f leaf-spine, 48 leaves x 16 spines, 64 routers: off [10390.0, 10040.0], on [10480.0, 9690.0]; net link window off 3678, on 2532
+  ff2f random regular, degree 4, seed 1, 16 routers: off [690.0, 650.0], on [630.0, 650.0]; net link window off 45, on 75
+  ff2f random regular, degree 8, seed 1, 32 routers: off [2150.0, 2020.0], on [2220.0, 2090.0]; net link window off 322, on 189
+  ff2f random regular, degree 8, seed 1, 64 routers: off [4090.0, 4960.0], on [3930.0, 4440.0]; net link window off 916, on 1164
+  ff2f random regular, degree 16, seed 1, 64 routers: off [8590.0, 7620.0], on [8060.0, 7880.0]; net link window off 1814, on 1595
+
+ATLAS RUNS OF THE SAME GRAPHS (same family, parameters and routers; other links)
+  families-n64: flattened butterfly 4 x 4 x 4, 64 routers, runs {'off': 2, 'on': 2}: LSPs 881 -> 280 (68% fewer); net ms 1906 -> 1543; CPU lower in 6 of 6 pairs, median 22%; bring-up LSPs 33% fewer, CPU 14% lower; quiet isisd ms off [8540.0, 8460.0], on [8450.0, 8600.0]; deploy 24 s; bring-up LSPs 91911 -> 61334
+  families-n64: leaf-spine, 48 leaves x 16 spines, 64 routers, runs {'off': 2, 'on': 2}: LSPs 2795 -> 183 (93% fewer); net ms 4774 -> 2758; CPU lower in 6 of 6 pairs, median 40%; bring-up LSPs 66% fewer, CPU 43% lower; quiet isisd ms off [18900.0, 19450.0], on [19540.0, 20450.0]; deploy 54 s; bring-up LSPs 515440 -> 177696
+  families-n64: random regular, degree 16, seed 1, 64 routers, runs {'off': 2, 'on': 2}: LSPs 1684 -> 435 (74% fewer); net ms 2959 -> 2651; CPU lower in 6 of 6 pairs, median 10%; bring-up LSPs 48% fewer, CPU 26% lower; quiet isisd ms off [14790.0, 14770.0], on [14910.0, 14610.0]; deploy 37 s; bring-up LSPs 243288 -> 126826
+  random-regular-n64: random regular, degree 8, seed 1, 64 routers, runs {'off': 2, 'on': 2}: LSPs 799 -> 513 (36% fewer); net ms 1826 -> 1558; CPU lower in 6 of 6 pairs, median 14%; bring-up LSPs 21% fewer, CPU 8% lower; quiet isisd ms off [7980.0, 8180.0], on [8230.0, 8180.0]; deploy 37 s; bring-up LSPs 82344 -> 65098
+  random-regular-n64: random regular, degree 16, seed 1, 64 routers, runs {'off': 2, 'on': 2}: LSPs 1749 -> 436 (75% fewer); net ms 3382 -> 2749; CPU lower in 6 of 6 pairs, median 19%; bring-up LSPs 47% fewer, CPU 25% lower; quiet isisd ms off [15310.0, 15220.0], on [15170.0, 15300.0]; deploy 69 s; bring-up LSPs 280158 -> 147176
+  seeds-n64: flattened butterfly 4 x 4 x 4, 64 routers, runs {'off': 2, 'on': 2}: LSPs 922 -> 274 (70% fewer); net ms 1675 -> 1591; CPU lower in 3 of 6 pairs, median 5%; bring-up LSPs 31% fewer, CPU 13% lower; quiet isisd ms off [9040.0, 9100.0], on [8890.0, 8770.0]; deploy 24 s; bring-up LSPs 90346 -> 62496
+  seeds-n64: leaf-spine, 48 leaves x 16 spines, 64 routers, runs {'off': 2, 'on': 2}: LSPs 2686 -> 178 (93% fewer); net ms 4037 -> 2717; CPU lower in 6 of 6 pairs, median 31%; bring-up LSPs 62% fewer, CPU 38% lower; quiet isisd ms off [21500.0, 20990.0], on [21310.0, 21460.0]; deploy 53 s; bring-up LSPs 448622 -> 171922
+  seeds-n64: random regular, degree 8, seed 1, 64 routers, runs {'off': 3, 'on': 3}: LSPs 791 -> 503 (36% fewer); net ms 1598 -> 1334; CPU lower in 5 of 6 pairs, median 17%; bring-up LSPs 20% fewer, CPU 9% lower; quiet isisd ms off [7620.0, 7040.0, 7050.0], on [7720.0, 7140.0, 7770.0]; deploy 23 s; bring-up LSPs 73325 -> 58817
+  seeds-n64: random regular, degree 16, seed 1, 64 routers, runs {'off': 3, 'on': 3}: LSPs 1690 -> 422 (75% fewer); net ms 3046 -> 2730; CPU lower in 6 of 6 pairs, median 10%; bring-up LSPs 46% fewer, CPU 25% lower; quiet isisd ms off [14450.0, 14390.0, 14060.0], on [14120.0, 13880.0, 14270.0]; deploy 38 s; bring-up LSPs 241841 -> 130640
+
+THE MODEL FOR EACH SETUP'S LINKS: LSPs per window, lockstep, off -> on (saving)
+  flattened butterfly 4 x 4 x 4, 64 routers Colab (r2-r50, r6-r38, r49-r57): 867.0 -> 304.0 (65%)
+  flattened butterfly 4 x 4 x 4, 64 routers families-n64 (r36-r52, r40-r56, r37-r38): 867.0 -> 261.5 (70%)
+  flattened butterfly 4 x 4 x 4, 64 routers seeds-n64 (r36-r52, r40-r56, r37-r38): 867.0 -> 261.5 (70%)
+  leaf-spine, 48 leaves x 16 spines, 64 routers Colab (r12-r26, r0-r34, r15-r26): 1535.0 -> 157.0 (90%)
+  leaf-spine, 48 leaves x 16 spines, 64 routers families-n64 (r13-r43, r1-r58, r12-r37): 1535.0 -> 157.0 (90%)
+  leaf-spine, 48 leaves x 16 spines, 64 routers seeds-n64 (r13-r43, r1-r58, r12-r37): 1535.0 -> 157.0 (90%)
+  random regular, degree 16, seed 1, 64 routers Colab (r46-r52, r9-r45, r13-r21): 1659.3 -> 380.8 (77%)
+  random regular, degree 16, seed 1, 64 routers families-n64 (r6-r21, r19-r29, r1-r61): 1645.3 -> 387.2 (76%)
+  random regular, degree 16, seed 1, 64 routers random-regular-n64 (r6-r21, r19-r29, r1-r61): 1645.3 -> 387.2 (76%)
+  random regular, degree 16, seed 1, 64 routers seeds-n64 (r13-r44, r20-r46, r2-r13): 1639.3 -> 365.3 (78%)
+  random regular, degree 8, seed 1, 64 routers Colab (r55-r62, r4-r18): 721.5 -> 469.2 (35%)
+  random regular, degree 8, seed 1, 64 routers random-regular-n64 (r15-r32, r22-r47, r36-r58): 721.7 -> 467.3 (35%)
+  random regular, degree 8, seed 1, 64 routers seeds-n64 (r37-r56, r33-r35, r28-r32): 721.7 -> 462.8 (36%)
+
+DEPLOY AND BRING-UP: seconds the deploy step took, LSPs sent at bring-up, off -> on
+  2c3f flattened butterfly 4 x 4 x 4, 64 routers: deploy 28 s; bring-up LSPs 45996 -> 39230
+  2c3f leaf-spine, 48 leaves x 16 spines, 64 routers: deploy 52 s; bring-up LSPs 138126 -> 107386
+  2c3f random regular, degree 16, seed 1, 64 routers: deploy 39 s; bring-up LSPs 121226 -> 88661
+  a057 flattened butterfly 4 x 4 x 4, 64 routers: deploy 35 s; bring-up LSPs 64681 -> 48636
+  a057 leaf-spine, 48 leaves x 16 spines, 64 routers: deploy 66 s; bring-up LSPs 156462 -> 112844
+  a057 random regular, degree 16, seed 1, 64 routers: deploy 48 s; bring-up LSPs 140812 -> 95666
+  cd61 flattened butterfly 4 x 4 x 4, 64 routers: deploy 35 s; bring-up LSPs 66210 -> 49760
+  cd61 leaf-spine, 48 leaves x 16 spines, 64 routers: deploy 63 s; bring-up LSPs 145816 -> 109334
+  cd61 random regular, degree 16, seed 1, 64 routers: deploy 47 s; bring-up LSPs 135790 -> 95550
+  ff2f leaf-spine, 48 leaves x 16 spines, 64 routers: deploy 61 s; bring-up LSPs 145868 -> 106543
+  ff2f random regular, degree 4, seed 1, 16 routers: deploy 8 s; bring-up LSPs 1277 -> 1235
+  ff2f random regular, degree 8, seed 1, 32 routers: deploy 17 s; bring-up LSPs 10519 -> 9766
+  ff2f random regular, degree 8, seed 1, 64 routers: deploy 32 s; bring-up LSPs 45138 -> 40828
+  ff2f random regular, degree 16, seed 1, 64 routers: deploy 46 s; bring-up LSPs 132112 -> 95638
+
+CPU PER EVENT HANDLER, per session
+== cpu-8cpu-51g-2c3f
+
+isisd CPU per event handler, mean ms per link window net of the quiet window, off -> on
+flattened butterfly 4 x 4 x 4 (12 and 12 windows)
+  isis_run_spf_cb                               714.1      684.3
+  isis_receive                                  100.3       68.1
+  send_hello_cb                                  13.5        2.0
+  tx_queue_send_event                             6.9        3.6
+  send_l2_psnp                                    1.9       -9.4
+  zclient_read                                    0.6        0.6
+  vtysh_read                                     -0.2        0.4
+  lsp_tick                                        0.3        0.1
+leaf-spine, 48 leaves x 16 spines (12 and 12 windows)
+  isis_run_spf_cb                             1,902.3    1,480.3
+  isis_receive                                  503.5      217.5
+  send_hello_cb                                  39.2       98.0
+  tx_queue_send_event                            18.5        1.7
+  zclient_read                                    0.9        0.8
+  lsp_tick                                       -0.0        0.6
+  lsp_refresh                                     0.4        0.5
+  dyn_cache_cleanup                               0.2        0.2
+random regular, degree 16, seed 1 (12 and 12 windows)
+  isis_run_spf_cb                             1,401.8    1,345.8
+  isis_receive                                  210.3      139.7
+  send_hello_cb                                  20.2       20.8
+  tx_queue_send_event                            11.5        4.2
+  zclient_read                                    0.8        0.8
+  lsp_refresh                                     0.3        0.3
+  dyn_cache_cleanup                               0.2        0.2
+  lsp_tick                                        0.1        0.0
+
+== cpu-8cpu-51g-a057
+
+isisd CPU per event handler, mean ms per link window net of the quiet window, off -> on
+flattened butterfly 4 x 4 x 4 (12 and 12 windows)
+  isis_run_spf_cb                               982.4      915.1
+  isis_receive                                  126.4      112.1
+  send_hello_cb                                  10.8       23.8
+  tx_queue_send_event                             7.8        4.0
+  lsp_tick                                        1.0        1.3
+  zclient_read                                    0.7        0.8
+  vtysh_read                                      0.7        0.5
+  lsp_refresh                                     0.3        0.4
+leaf-spine, 48 leaves x 16 spines (12 and 12 windows)
+  isis_run_spf_cb                             2,804.2    2,147.2
+  isis_receive                                  418.0      172.9
+  tx_queue_send_event                            23.7        2.1
+  send_hello_cb                                -203.0        1.7
+  zclient_read                                    1.1        1.0
+  lsp_refresh                                     0.7        0.8
+  dyn_cache_cleanup                               0.3        0.3
+  vtysh_accept                                    0.1       -0.1
+random regular, degree 16, seed 1 (12 and 12 windows)
+  isis_run_spf_cb                             2,077.7    1,998.9
+  isis_receive                                  137.6      258.9
+  send_hello_cb                                 -99.9      100.3
+  tx_queue_send_event                            14.5        5.2
+  lsp_tick                                       -2.4        1.9
+  zclient_read                                    1.0        1.0
+  vtysh_read                                     -0.8        0.6
+  lsp_refresh                                     0.4        0.4
+
+== cpu-8cpu-51g-cd61
+
+isisd CPU per event handler, mean ms per link window net of the quiet window, off -> on
+flattened butterfly 4 x 4 x 4 (12 and 12 windows)
+  isis_run_spf_cb                               959.2      909.9
+  isis_receive                                  114.7      106.1
+  send_hello_cb                                  -4.2        9.9
+  tx_queue_send_event                             7.7        3.9
+  zclient_read                                    0.7        0.7
+  vtysh_read                                     -0.3        0.7
+  lsp_tick                                        0.1        0.4
+  lsp_refresh                                     0.4        0.3
+leaf-spine, 48 leaves x 16 spines (12 and 12 windows)
+  isis_run_spf_cb                             2,586.4    1,959.3
+  isis_receive                                  628.5      180.9
+  send_hello_cb                                 -24.4       22.1
+  tx_queue_send_event                            21.0        1.9
+  zclient_read                                    0.9        0.9
+  lsp_refresh                                     0.7        0.6
+  dyn_cache_cleanup                               0.3        0.2
+  vtysh_accept                                    0.1       -0.1
+random regular, degree 16, seed 1 (12 and 12 windows)
+  isis_run_spf_cb                             1,990.7    1,854.9
+  isis_receive                                  324.2      168.4
+  send_hello_cb                                  35.3       25.5
+  tx_queue_send_event                            13.7        4.8
+  zclient_read                                    0.9        0.9
+  lsp_tick                                        0.4        0.5
+  lsp_refresh                                     0.4        0.4
+  vtysh_read                                     -0.3        0.3
+
+== cpu-8cpu-51g-ff2f
+
+isisd CPU per event handler, mean ms per link window net of the quiet window, off -> on
+leaf-spine, 48 leaves x 16 spines (8 and 8 windows)
+  isis_run_spf_cb                             2,518.0    1,988.5
+  isis_receive                                  791.8      274.0
+  send_hello_cb                                 146.9      111.0
+  tx_queue_send_event                            21.0        1.9
+  lsp_tick                                        0.8        1.1
+  zclient_read                                    1.0        0.9
+  lsp_refresh                                     0.6        0.7
+  vtysh_read                                     -0.1        0.4
+random regular, degree 4, seed 1 (8 and 8 windows)
+  isis_run_spf_cb                                30.9       29.2
+  isis_receive                                   10.8       15.1
+  send_l2_psnp                                    1.5        3.3
+  tx_queue_send_event                             1.3        1.0
+  send_hello_cb                                  -4.3        0.8
+  zclient_read                                    0.6        0.6
+  lsp_refresh                                     0.3        0.4
+  vtysh_read                                     -0.0        0.2
+random regular, degree 8, seed 1 (16 and 16 windows)
+  isis_run_spf_cb                               528.3      514.4
+  isis_receive                                   78.7       89.9
+  send_hello_cb                                   6.6       19.0
+  send_l2_psnp                                   -1.3        5.9
+  tx_queue_send_event                             5.3        3.8
+  lsp_tick                                        0.3        0.7
+  zclient_read                                    0.7        0.7
+  vtysh_read                                      0.3        0.6
+random regular, degree 16, seed 1 (8 and 8 windows)
+  isis_run_spf_cb                             1,851.5    1,814.8
+  isis_receive                                  220.5      133.8
+  tx_queue_send_event                            13.2        4.7
+  zclient_read                                    0.9        0.9
+  lsp_refresh                                     0.4        0.5
+  vtysh_read                                      0.4       -0.7
+  dyn_cache_cleanup                               0.2        0.2
+  vtysh_accept                                    0.0       -0.1
+

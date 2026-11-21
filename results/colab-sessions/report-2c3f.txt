@@ -1,0 +1,40 @@
+Link changes: every link-down and link-up window; diameter and two-hop multiplicity of the topology; mean LSPs sent and isisd ms net of the quiet window, off -> on; pairs with the on figure lower; windows satisfied
+topology                          degree diam 2-hop  LSPs off      on saving pairs net ms off      on saving pairs median satisfied
+flattened butterfly 4 x 4 x 4        9.0    3  2.00       827     328    60%  6/6         798     672    16%  6/6     12%     24/24
+leaf-spine, 48 leaves x 16 spines   24.0    2 19.08     2,467     180    93%  6/6       2,335   1,848    21%  6/6     17%     24/24
+random regular, degree 16, seed 1   16.0    3  3.94     1,508     443    71%  6/6       1,635   1,452    11%  6/6     11%     24/24
+
+Bring-up: mean LSPs sent and isisd ms from the routers' start, off -> on; runs converged, and quiet windows satisfied, off and on
+topology                          degree    LSPs off        on saving      ms off        on saving converged     quiet
+flattened butterfly 4 x 4 x 4        9.0      45,996    39,230    15%      10,130     9,675     4%   2/2 2/2   2/2 2/2
+leaf-spine, 48 leaves x 16 spines   24.0     138,126   107,386    22%      41,090    34,465    16%   2/2 2/2   2/2 2/2
+random regular, degree 16, seed 1   16.0     121,226    88,661    27%      23,875    21,125    12%   2/2 2/2   2/2 2/2
+
+isisd CPU per event handler, mean ms per link window net of the quiet window, off -> on
+flattened butterfly 4 x 4 x 4 (12 and 12 windows)
+  isis_run_spf_cb                               714.1      684.3
+  isis_receive                                  100.3       68.1
+  send_hello_cb                                  13.5        2.0
+  tx_queue_send_event                             6.9        3.6
+  send_l2_psnp                                    1.9       -9.4
+  zclient_read                                    0.6        0.6
+  vtysh_read                                     -0.2        0.4
+  lsp_tick                                        0.3        0.1
+leaf-spine, 48 leaves x 16 spines (12 and 12 windows)
+  isis_run_spf_cb                             1,902.3    1,480.3
+  isis_receive                                  503.5      217.5
+  send_hello_cb                                  39.2       98.0
+  tx_queue_send_event                            18.5        1.7
+  zclient_read                                    0.9        0.8
+  lsp_tick                                       -0.0        0.6
+  lsp_refresh                                     0.4        0.5
+  dyn_cache_cleanup                               0.2        0.2
+random regular, degree 16, seed 1 (12 and 12 windows)
+  isis_run_spf_cb                             1,401.8    1,345.8
+  isis_receive                                  210.3      139.7
+  send_hello_cb                                  20.2       20.8
+  tx_queue_send_event                            11.5        4.2
+  zclient_read                                    0.8        0.8
+  lsp_refresh                                     0.3        0.3
+  dyn_cache_cleanup                               0.2        0.2
+  lsp_tick                                        0.1        0.0

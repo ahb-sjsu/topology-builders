@@ -1,0 +1,234 @@
+{
+ "cpu-8cpu-51g-2c3f": {
+  "runtime": {
+   "cpus": 8,
+   "cpu_model": "AMD EPYC 7B12",
+   "threads_per_core": "2",
+   "mem_mb": 52214,
+   "os": "Ubuntu 24.04.5 LTS",
+   "kernel": "6.6.159+",
+   "gpu": "",
+   "tpu": "",
+   "cap_eff": "00000000a82c25fb",
+   "userns_veth": true,
+   "started": "2026-11-21T05:17:46Z",
+   "session": "cpu-8cpu-51g-2c3f",
+   "frr_from_cache": false,
+   "setup_s": 105,
+   "setup_exit": 0,
+   "topology_builders": "0.2.0",
+   "networkx": "3.7"
+  },
+  "labs": [
+   {
+    "lab": "fb64-444",
+    "routers": 64,
+    "links": 288,
+    "runs": 4,
+    "converged": 4,
+    "exit": 0,
+    "minutes": 18.2,
+    "steal_pct": 0.02
+   },
+   {
+    "lab": "rr64-d16",
+    "routers": 64,
+    "links": 512,
+    "runs": 4,
+    "converged": 4,
+    "exit": 0,
+    "minutes": 18.9,
+    "steal_pct": 0.02
+   },
+   {
+    "lab": "ls64-s16",
+    "routers": 64,
+    "links": 768,
+    "runs": 4,
+    "converged": 4,
+    "exit": 0,
+    "minutes": 19.9,
+    "steal_pct": 0.05
+   }
+  ]
+ },
+ "cpu-8cpu-51g-a057": {
+  "runtime": {
+   "cpus": 8,
+   "cpu_model": "Intel(R) Xeon(R) CPU @ 2.20GHz",
+   "threads_per_core": "2",
+   "mem_mb": 52214,
+   "os": "Ubuntu 24.04.5 LTS",
+   "kernel": "6.6.159+",
+   "gpu": "",
+   "tpu": "",
+   "cap_eff": "00000000a82c25fb",
+   "userns_veth": true,
+   "started": "2026-11-21T05:17:20Z",
+   "session": "cpu-8cpu-51g-a057",
+   "frr_from_cache": false,
+   "setup_s": 158,
+   "setup_exit": 0,
+   "topology_builders": "0.2.0",
+   "networkx": "3.7"
+  },
+  "labs": [
+   {
+    "lab": "fb64-444",
+    "routers": 64,
+    "links": 288,
+    "runs": 4,
+    "converged": 4,
+    "exit": 0,
+    "minutes": 18.8,
+    "steal_pct": 0.09
+   },
+   {
+    "lab": "rr64-d16",
+    "routers": 64,
+    "links": 512,
+    "runs": 4,
+    "converged": 4,
+    "exit": 0,
+    "minutes": 19.8,
+    "steal_pct": 0.25
+   },
+   {
+    "lab": "ls64-s16",
+    "routers": 64,
+    "links": 768,
+    "runs": 4,
+    "converged": 4,
+    "exit": 0,
+    "minutes": 21.0,
+    "steal_pct": 0.35
+   }
+  ]
+ },
+ "cpu-8cpu-51g-cd61": {
+  "runtime": {
+   "cpus": 8,
+   "cpu_model": "Intel(R) Xeon(R) CPU @ 2.20GHz",
+   "threads_per_core": "2",
+   "mem_mb": 52214,
+   "os": "Ubuntu 24.04.5 LTS",
+   "kernel": "6.6.159+",
+   "gpu": "",
+   "tpu": "",
+   "cap_eff": "00000000a82c25fb",
+   "userns_veth": true,
+   "started": "2026-11-21T05:27:30Z",
+   "session": "cpu-8cpu-51g-cd61",
+   "frr_from_cache": true,
+   "setup_s": 46,
+   "setup_exit": 0,
+   "topology_builders": "0.2.0",
+   "networkx": "3.7"
+  },
+  "labs": [
+   {
+    "lab": "fb64-444",
+    "routers": 64,
+    "links": 288,
+    "runs": 4,
+    "converged": 4,
+    "exit": 0,
+    "minutes": 18.8,
+    "steal_pct": 0.06
+   },
+   {
+    "lab": "rr64-d16",
+    "routers": 64,
+    "links": 512,
+    "runs": 4,
+    "converged": 4,
+    "exit": 0,
+    "minutes": 19.7,
+    "steal_pct": 0.11
+   },
+   {
+    "lab": "ls64-s16",
+    "routers": 64,
+    "links": 768,
+    "runs": 4,
+    "converged": 4,
+    "exit": 0,
+    "minutes": 20.7,
+    "steal_pct": 0.1
+   }
+  ]
+ },
+ "cpu-8cpu-51g-ff2f": {
+  "runtime": {
+   "cpus": 8,
+   "cpu_model": "Intel(R) Xeon(R) CPU @ 2.20GHz",
+   "threads_per_core": "2",
+   "mem_mb": 52214,
+   "os": "Ubuntu 24.04.5 LTS",
+   "kernel": "6.6.159+",
+   "gpu": "",
+   "tpu": "",
+   "cap_eff": "00000000a82c25fb",
+   "userns_veth": true,
+   "started": "2026-11-21T03:33:11Z",
+   "session": "cpu-8cpu-51g-ff2f",
+   "frr_from_cache": false,
+   "setup_s": 153,
+   "setup_exit": 0,
+   "topology_builders": "0.2.0",
+   "networkx": "3.7"
+  },
+  "labs": [
+   {
+    "lab": "rr16-d4",
+    "routers": 16,
+    "links": 32,
+    "runs": 4,
+    "converged": 4,
+    "exit": 0,
+    "minutes": 12.6,
+    "steal_pct": 0.01
+   },
+   {
+    "lab": "rr32-d8",
+    "routers": 32,
+    "links": 128,
+    "runs": 4,
+    "converged": 4,
+    "exit": 0,
+    "minutes": 13.3,
+    "steal_pct": 0.02
+   },
+   {
+    "lab": "rr64-d8",
+    "routers": 64,
+    "links": 256,
+    "runs": 4,
+    "converged": 4,
+    "exit": 0,
+    "minutes": 14.5,
+    "steal_pct": 0.03
+   },
+   {
+    "lab": "rr64-d16",
+    "routers": 64,
+    "links": 512,
+    "runs": 4,
+    "converged": 4,
+    "exit": 0,
+    "minutes": 15.5,
+    "steal_pct": 0.04
+   },
+   {
+    "lab": "ls64-s16",
+    "routers": 64,
+    "links": 768,
+    "runs": 4,
+    "converged": 4,
+    "exit": 0,
+    "minutes": 16.5,
+    "steal_pct": 0.05
+   }
+  ]
+ }
+}
