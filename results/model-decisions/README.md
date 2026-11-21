@@ -7,15 +7,17 @@ and how many neighbors the LSP was not sent to. This run compares all five with 
 
 **Method.** `tools/model/collect_decisions.py` on 2026-11-20, in the container shaped like Colab (Ubuntu 24.04,
 Colab's capabilities, no network, 2 CPUs of a two-socket Xeon workstation; FRR from pull request 24128 at e263c441,
-built by `tools/colab/setup.sh`), netns backend: five topologies of 16 to 20 routers with flood reduction on, three
+built by `tools/colab/setup.sh`), namespace backend: five topologies of 16 to 20 routers with flood reduction on, three
 links taken down and up one at a time, 12 s apart. `tools/model/compare_decisions.py` finds each decision's
 transmitting neighbor from the router's last "Rcvd" line for that LSP, and runs the model's `decide` for the same
 router, neighbor and LSP, with the topology snapshot with and without the changed link, and the router's neighbor
-list with and without it (at the link's ends the adjacency may not be up yet when the router decides).
+list with and without it (at the link's ends the adjacency may not be up yet when the router decides). A console
+demo engine of ours (running since 2026-09-28) used about 60% of one CPU throughout, not pinned, and the host's
+own Docker daemons also ran; neither changes which decisions isisd makes.
 
 **Result: every decision matches.** All 1,186 decisions compared match the model exactly, on all five fields, for one
-of those combinations. Three decisions per topology were skipped (no transmitting neighbor found in the log, or
-isisd fell back to normal flooding).
+of those combinations. Two or three decisions per topology were skipped, 14 in all (no transmitting neighbor found
+in the log, or isisd fell back to normal flooding).
 
 | Topology | Decisions | Match, any snapshot | Match, snapshot without the changed link | Link down: snapshot without / with / either | Link up: snapshot without / with / either |
 |---|---|---|---|---|---|
@@ -38,13 +40,15 @@ isisd fell back to normal flooding).
   that did not: the model's `flood_link_change` assumes the snapshot without the link, which is right for link-down
   windows and wrong for most decisions after a link comes up.
 - **Scope.** Single link changes on topologies of 16 to 20 routers, 2 CPUs, one run per topology. Router and
-  multi-link failures, where stale snapshots are the suspected cause of the slow flooding in
-  [timing-n64](../timing-n64/README.md), are the next check.
+  multi-link failures are checked in [mechanism](../mechanism/README.md): there, 173 of the 174 relay decisions
+  that left a late router without the LSP are reproduced by a snapshot with none of the failed links removed.
+  FRR builds the snapshot at the first flooding decision after a route computation starts and keeps it until the
+  next one starts ([mechanism](../mechanism/README.md#when-the-snapshot-is-refreshed-and-what-is-still-open)).
 
 Files: [compare.txt](compare.txt) (the comparison as printed); [decisions.tar.gz](decisions.tar.gz) (every router's
 log from just before the first change, the lab and the times of the changes, per topology). Rerun the comparison:
 
 ```
-tar -xzf results/model-decisions/decisions.tar.gz -C /tmp/decisions
+mkdir -p /tmp/decisions && tar -xzf results/model-decisions/decisions.tar.gz -C /tmp/decisions
 python tools/model/compare_decisions.py /tmp/decisions/*/
 ```

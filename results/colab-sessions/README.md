@@ -7,7 +7,8 @@ type "CPU with high memory" (8 vCPUs, 51 GB). The labs ran on the namespace back
 involved.
 
 Three sessions ran at the same time on 2026-11-21, from 05:17 to 06:27 UTC. Each measured the same three 64-router
-graphs as the Atlas runs in [seeds-n64](../seeds-n64/README.md) and [families-n64](../families-n64/README.md):
+graphs as the runs on Atlas (the HP Z840 workstation the other results folders ran on) in
+[seeds-n64](../seeds-n64/README.md) and [families-n64](../families-n64/README.md):
 
 - the 4x4x4 flattened butterfly;
 - the random regular graph of degree 16 (seed 1);
@@ -56,14 +57,15 @@ LSPs are the Level-2 LSPs sent, summed over the 64 routers, as a mean per link w
 | Leaf-spine, 48 x 16 | 768 | 2,378-2,611 -> 180-191 | 93%, 93%, 92%, 92% | 93%, 93% |
 
 - **Machine to machine, the LSP saving moved by at most 1 point.** In all 62 pairs on these three graphs (same link
-  and direction, off against on), and in all 12 of the ladder's other labs, flood reduction sent fewer LSPs. Every run converged. All 296 link windows ended with every router
+  and direction, off against on), and in all 12 pairs of the ladder's three other labs, flood reduction sent fewer
+  LSPs. Every run converged. All 296 link windows ended with every router
   holding the same LSPs as every other router: 24 per lab and session, and 16 per lab in the ladder.
 - **Against Atlas, the saving is the same on leaf-spine, 3 points lower at degree 16, and 8 to 10 points lower on
   the butterfly.** The graphs are the same: rebuilt with the notebook's commands, their edge sets equal those of the
   Atlas topology files. The links taken down differ, though. `measure` picks the links from the topology file's
   hash, and the Colab files carry other builder metadata (Python 3.13 and topology-builders 0.2.0, against Python
-  3.12 and 0.1.0 on Atlas).
-- **The link choice accounts for about half of the butterfly's gap.** The flooding model (lockstep) gives a 65%
+  3.12 and topology-builders 0.1.0 or 0.2.0.dev0 in the Atlas files).
+- **The model puts part of the butterfly's gap down to the link choice.** The flooding model (lockstep) gives a 65%
   saving for the Colab links and 70% for the Atlas links, because with flood reduction on the Colab links flood more
   (304 against 261.5 LSPs per window). On the degree-16 graph the model gives 77% for the Colab links and 76% to 78%
   for the Atlas ones, so link choice does not explain that 3-point gap. The rest is the setup, as the Atlas run with
@@ -98,7 +100,7 @@ LSPs sent per link window, off -> on, and the saving:
   27% on leaf-spine (6 of 6). Those are close to the medians pooled over the Colab sessions (11%, 10%, 28%) and to
   the earlier Atlas runs (5% and 22%, 10% and 19%, 31% and 40%). isisd's CPU per link change on Atlas was 1.7
   to 2 times Colab's (net 1,897 against 937 ms on the butterfly, without flood reduction).
-- **Bring-up saved as much as in the earlier Atlas runs:** 32%, 48% and 59% fewer LSPs, against 31% to 33%, 46% to
+- **Bring-up saved nearly as much as in the earlier Atlas runs:** 32%, 48% and 59% fewer LSPs, against 31% to 33%, 46% to
   48% and 62% to 66% with Atlas's links and 15% to 32% on Colab. The smaller bring-up saving on Colab comes from the
   setup, not the links.
 - During the run, the host's own Docker daemons (containerd about 2.4 CPUs, dockerd about 1.9) and libvirtd (about
@@ -146,7 +148,7 @@ Mean ms per link window net of the quiet window, off -> on, over every window of
 
 - As on Atlas, route computation is most of isisd's CPU for a link change. Without flood reduction it is 94% of the
   net CPU on the butterfly and 92% on leaf-spine. At degree 16 it is slightly more than the net total, because other
-  handlers' net figures are negative. On Atlas the share was 82% to 95%.
+  handlers' net figures are negative. In seeds-n64, on these graphs, the share was 82% to 95%.
 - On leaf-spine, route computation cost 23% less with flood reduction on (13% to 15% less on Atlas, where the routers
   ran fewer route computations). Receiving fell from 567 to 206 ms.
 
@@ -163,7 +165,7 @@ From the routers' start to the check that finds every router with all its adjace
 - On Atlas, without flood reduction, bring-up sent 1.4 to 3.7 times as many LSPs as on Colab. On leaf-spine it was
   449,000 to 515,000 against 138,000 to 156,000. With flood reduction on, the difference is smaller.
 - The deploy step took about as long in both setups: 23 to 69 s on Atlas and 28 to 66 s on Colab for the 64-router
-  labs. With the Colab links on Atlas, bring-up saved as much as in the other Atlas runs, so the difference comes
+  labs. With the Colab links on Atlas, bring-up saved nearly as much as in the other Atlas runs, so the difference comes
   from the setup (backend and machine), not the links. We have not looked further into why.
 
 ## The probe ladder (ff2f)
@@ -189,11 +191,13 @@ Two links per run, two runs of each variant:
 - Four sessions, three of them at the same time. Two runs per variant per session, 3 links per run (2 in the ladder).
 - The Colab links differ from those of the earlier Atlas runs; the Atlas run with the Colab links separates the two
   (above). It is one more run of two repeats, under the load described there.
-- The Atlas run used topology-builders 0.2.0.dev0 in the lab container, which does not record the diameter and
-  two-hop multiplicity, so `report-atlas-colab-links.txt` shows them as `-`.
+- The Atlas run's labs were written by the lab container's copy of topology-builders, an earlier 0.2.0.dev0 build
+  that did not copy the diameter and two-hop multiplicity into the lab, so `report-atlas-colab-links.txt` shows
+  them as `-`. The topology files hold them.
 - Colab does not say what else ran on the physical machines. Low steal time means the hypervisor gave the vCPUs
   their time. It does not mean the caches and memory bandwidth were not shared.
-- The records' `image` field is containerlab's default; the namespace backend does not use it. It runs the FRR in
+- The records' `image` field is the default of `topology-builders clab` (quay.io/frrouting/frr:10.7.1); the
+  namespace backend does not use it. It runs the FRR in
   `/usr/lib/frr` that `setup.sh` built (riw777/frr at e263c441). Every one of the 148 link windows with flood reduction on
   counted suppressed sends.
 - `report.txt` puts the 32- and 64-router graphs of degree 8 on separate rows. In its per-handler table, though, they

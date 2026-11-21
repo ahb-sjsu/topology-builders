@@ -74,7 +74,8 @@ length; the median is over the 6 pairs (same link and direction, off against on)
 - The leaf-spine fabric with 16 spines (768 links) converged with flood reduction off. In the random-regular sweep,
   which had about 25 CPUs and no pinning, degree 32 (1,024 links) converged and degree 48 (1,536) did not. On these
   20 CPUs the limit falls somewhere between 768 and 960 links, whatever the family. That is an inference from these
-  few points, not a measured threshold.
+  few points, not a measured threshold. A fat-tree with k = 12 (180 routers, 864 links) later converged without
+  flood reduction on the same 20 CPUs ([fat-tree](../fat-tree/README.md)).
 - All 64 routers share the CPU set, so this is about the total work, not about a router with CPUs of its own. The
   load average on the host reached about 200 during these runs; the work stayed on the container's 20 CPUs, the
   hottest CPU sensor read at most 76 C at the start and end of each run, and the host's own network was not
@@ -88,7 +89,9 @@ length; the median is over the 6 pairs (same link and direction, off against on)
 | isisd CPU per link change, median over pairs | 19% lower (6 of 6) | 10% lower (6 of 6) |
 | Bring-up | 47% fewer LSPs, 25% less CPU | 48% fewer LSPs, 26% less CPU |
 
-LSP counts and bring-up figures carry over between the setups; the CPU figure for a single link change does not.
+LSP counts and bring-up figures carry over between these two Docker setups; the CPU figure for a single link
+change does not. On Colab's namespace labs, bring-up saved less (15% to 32%;
+[colab-sessions](../colab-sessions/README.md)).
 Compare CPU across families only within one setup.
 
 ## Two-hop multiplicity, not degree, lines up with the saving at low degree
@@ -134,5 +137,5 @@ topology-builders measure labs/<name>/off labs/<name>/on --repeat 2 --links 3 --
 ## Not covered by these runs
 
 - One graph per topology, 64 routers, 2 runs and 3 links each.
-- Convergence time, and failures other than one link at a time. Both are being measured next, with the timing and
-  failure options of `measure`.
+- Convergence time, and failures other than one link at a time: see [timing-n64](../timing-n64/README.md) (router
+  and three-link failures) and [flap10-n64](../flap10-n64/README.md) (ten links at once).

@@ -1,9 +1,9 @@
 # Survey of topology builders
 
-Checked 2026-11-18. Each entry was checked against its primary source: the repository (licence file and last
+Checked 2026-11-18. Each entry was checked against its primary source: the repository (license file and last
 commit through the GitHub or GitLab API), the project's documentation, or its paper. "Unverified" marks what could
-not be checked. Licences are as stated in the licence file, which is not always what GitHub reports. Nothing listed
-here was run, except NetworkX, which this repository uses.
+not be checked. Licenses are as stated in the license file, which is not always what GitHub reports. Nothing listed
+here was run, except NetworkX and containerlab, which this repository uses.
 
 The question: is there already a findable collection of network topology builders, meaning code that generates
 topologies, as distinct from collections of topology data? And if not, what exists that this repository should link
@@ -26,7 +26,7 @@ to or wrap instead of rewriting?
   10 to 100 nodes, but its generator is closed source. No tool found treats a density sweep as a command.
 - **From graph to router configuration is the main gap.** No maintained tool was found that takes an arbitrary graph
   file and writes FRR IS-IS configuration.
-  - VFTGen writes FRR IS-IS and OpenFabric for fat-trees only, states no licence, and was last changed in 2021.
+  - VFTGen writes FRR IS-IS and OpenFabric for fat-trees only, states no license, and was last changed in 2021.
   - topomate reads an edge list and writes FRR IS-IS, but was last changed in 2021.
   - AutoNetkit 0.11 has a Quagga IS-IS template; it is Python 2, from 2014.
   - netlab writes FRR IS-IS from its own YAML, and has no graph import.
@@ -100,14 +100,14 @@ scale `alpha`, NetworkX calls it `beta`. A wrapper has to normalise them.
 | htsim (Broadcom csg-htsim) | Fat tree (2 or 3 tiers, oversubscribed), BCube, CamCube, Dragonfly, VL2, graph from file | Partly (per-tier radix) | Inside the simulator | BSD-2-Clause | Last commit 2026-03-23 | [repo](https://github.com/Broadcom/csg-htsim) |
 | CODES (Argonne et al.) | Dragonfly variants, fat tree, Slim Fly, torus, express mesh | Unverified | Binary connection files | BSD-3-Clause | Last commit 2026-07-19 | [repo](https://github.com/codes-org/codes) |
 | SimGrid | Torus, fat tree, Dragonfly clusters in platform files | Fat-tree parallel links | Inside the simulator | LGPL-2.1-only | v4.1, 2025-11-11 | [docs](https://simgrid.org/doc/latest/Platform_examples.html) |
-| VFTGen (Kathará; Caiazzi, Scazzariello, Ariemma) | Three-level fat trees, single or multi plane, with Kathará lab and FRR configs | Parallel links per neighbour (`--ls_parallel`, `--st_parallel`, `--ring_parallel`) at fixed node counts | Kathará lab directory | None stated | Last commit 2021-05-28 | [repo](https://github.com/KatharaFramework/VFTGen) |
+| VFTGen (Kathará; Caiazzi, Scazzariello, Ariemma) | Three-level fat trees, single or multi plane, with Kathará lab and FRR configs | Parallel links per neighbor (`--ls_parallel`, `--st_parallel`, `--ring_parallel`) at fixed node counts | Kathará lab directory | None stated | Last commit 2021-05-28 | [repo](https://github.com/KatharaFramework/VFTGen) |
 | containerlab `generate` | Multi-tier Clos, adjacent tiers fully meshed | No | containerlab topology file; no routing configs | BSD-3-Clause | Pushed 2026-11-18 | [docs](https://containerlab.dev/cmd/generate/) |
 | Mininet `topolib`; RipL | Tree, 2-D torus; fat tree (RipL) | No | Mininet objects | BSD-3-Clause; RipL GPL-2.0 | 2023; RipL 2013 (moved to brandonheller/ripl) | [Mininet](https://github.com/mininet/mininet), [RipL](https://github.com/brandonheller/ripl) |
 | PolarFly (Intel Labs) | PolarFly and its extension; converter to BookSim | No: size q² + q + 1 | BookSim `anynet` | MIT (archive) | GitHub 404; Zenodo copy 2022-09-02 | [Zenodo](https://zenodo.org/records/7042175) |
 
-Two kinds of density knob appear here. Most tools vary the number of neighbours (Jellyfish degree). VFTGen, SST's
-HyperX and SimGrid's fat tree instead add parallel links between routers that are already neighbours, which raises
-the number of links and adjacencies without adding neighbours. For a flooding test these are different
+Two kinds of density knob appear here. Most tools vary the number of neighbors (Jellyfish degree). VFTGen, SST's
+HyperX and SimGrid's fat tree instead add parallel links between routers that are already neighbors, which raises
+the number of links and adjacencies without adding neighbors. For a flooding test these are different
 experiments.
 
 Not found: a standalone generator that exports a k-ary n-fly as a graph file (BookSim's exists only inside the
@@ -139,7 +139,7 @@ Scale is unverified for every tool here at a few hundred FRR routers on one host
 
 ## 5. What this means for this repository
 
-**Wrap or read, with permissive licences:**
+**Wrap or read, with permissive licenses:**
 - NetworkX (used already).
 - EvalNet's adjacency lists, for Slim Fly, Dragonfly, HyperX, PolarFly, Xpander and the rest.
 - TopoHub's Gabriel graphs, which already use our output format.
@@ -147,15 +147,16 @@ Scale is unverified for every tool here at a few hundred FRR routers on one host
 - SST's `anytopo_utility`.
 
 **Link to only:**
-- VFTGen: no licence.
+- VFTGen: no license.
 - Topology Bench: closed generator; the data is CC BY 4.0.
-- BRITE, GT-ITM, Tiers and IGen: unclear or restrictive licences.
+- BRITE, GT-ITM, Tiers and IGen: unclear or restrictive licenses.
 - Orbis, nem and aSHIIP: no longer downloadable.
 
-**Write, because nothing maintained does it:**
-- An exporter from a graph file to containerlab with FRR IS-IS configuration.
-- An exporter to netlab YAML, as an independent second path.
-- dot2net is worth evaluating first, because it already splits labs across hosts.
+**Written here, because nothing maintained did it:** `clab`, an exporter from a graph file to containerlab with FRR
+IS-IS configuration.
+
+**Still to write:** an exporter to netlab YAML, as an independent second path. dot2net is worth evaluating first,
+because it already splits labs across hosts.
 
 **Already new here:**
 - A density sweep at a fixed number of routers as one command.
@@ -164,7 +165,7 @@ Scale is unverified for every tool here at a few hundred FRR routers on one host
 
 ## 6. Dead or moved links (2026-11-18)
 
-- topology-zoo.org: timed out. A mirror without a licence file is at
+- topology-zoo.org: timed out. A mirror without a license file is at
   [sk2/topologyzoo](https://github.com/sk2/topologyzoo), last commit 2012.
 - Inet (topology.eecs.umich.edu/inet): redirect loop.
 - Tiers at ISI: 403.

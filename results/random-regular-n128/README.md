@@ -24,8 +24,9 @@ CPU time summed over the routers, net of a quiet window. Pairs compare the same 
 
 - In all 18 pairs flood reduction sent fewer LSPs, and every one of the 72 windows ended with every router holding
   the same LSPs as every other router.
-- **The saving follows the two-hop paths, not the degree.** At a fixed degree, a larger random graph has fewer
-  routers joined by two or more two-hop paths. The mean number of common neighbors of routers two hops apart is 1.03,
+- **The saving follows the two-hop multiplicity, not the degree.** At a fixed degree, a larger random graph has
+  fewer routers joined by two or more two-hop paths. The two-hop multiplicity (the mean number of common neighbors
+  of routers two hops apart) is 1.03,
   1.18 and 2.15 at degree 4, 8 and 16 here, against 1.06, 1.41 and 3.95 at 64 routers. Matched by that number
   instead of degree, the two sizes agree: degree 8 here (1.18, 19% fewer) against degree 6 at 64 routers (1.18, 23%
   in the [random-regular sweep](../random-regular-n64/README.md)); degree 16 here (2.15, 53%) against degree 12 at
@@ -80,8 +81,8 @@ With flood reduction on, FRR sent 2% to 15% more LSPs than the model counts (`mo
 The same runs at 256 routers (degree 4 and 8) never started: containerlab failed while deploying the 256 containers
 ("cannot attach link, container network namespace is not available", and Docker API calls cancelled), at degree 4
 after 1.5 minutes and at degree 8 after 5. No records were written. The host's load average rose to about 775 during
-the second attempt. 256 routers need a different setup, for example the namespace backend (`measure --backend
-netns`), which creates no containers, or more than one host.
+the second attempt. 256 routers need another setup. With the namespace backend (`measure --backend netns`), which creates no
+containers, 256-router labs have since run on the same host (main README, "Not here yet").
 
 ## Limits of these runs
 

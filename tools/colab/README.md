@@ -16,9 +16,10 @@ runtime's disk). Link-down windows, LSPs sent off and on: 82 and 56 on the free 
 free CPU runtime, 78 and 54 on a Pro CPU runtime with high memory, against 75 to 81 and 52 to 53 in Docker labs of a
 graph built with the same parameters.
 
-**Batch (2026-11-21, `PLAN = 'batch'`, records kept):** four Pro CPU sessions with high memory, three of them at the
-same time, ran three of the 64-router graphs measured on Atlas: the 4x4x4 butterfly, a random graph of degree 16, and
-leaf-spine with 48 leaves and 16 spines (up to 768 links). Every run converged, and every window ended with every
+**Batch and probe (2026-11-21, records kept):** three Pro CPU sessions with high memory, at the same time, ran
+(`PLAN = 'batch'`) three of the 64-router graphs measured on Atlas: the 4x4x4 butterfly, a random graph of degree 16,
+and leaf-spine with 48 leaves and 16 spines (768 links). A fourth ran the probe ladder, 16 to 64 routers and up to
+768 links. Every run converged, and every window ended with every
 router holding the same LSPs. The LSP saving was the same on every machine, within 1 point. The CPU saving varied
 from session to session much more than on Atlas, because the quiet window it is net of varied by up to 27%. See
 [results/colab-sessions](../../results/colab-sessions/README.md).

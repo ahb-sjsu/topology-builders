@@ -17,9 +17,9 @@ the other 7. On the four n-flies measured since, and on fat-trees, FRR's saving 
 points above its lockstep end ([nfly](../nfly/README.md), [fat-tree](../fat-tree/README.md)). Read the lockstep
 figure as a lower estimate for these families, about 10 points under FRR, and the jittered one as an upper bound.
 
-Two-hop paths: the mean number of common neighbors of two routers two hops apart.
+Two-hop multiplicity: the mean number of common neighbors of two routers two hops apart.
 
-| Topology | Routers | Links | Average degree | Two-hop paths | LSPs off, lockstep | LSPs off, jittered | LSPs on | Saving |
+| Topology | Routers | Links | Average degree | Two-hop multiplicity | LSPs off, lockstep | LSPs off, jittered | LSPs on | Saving |
 |---|---|---|---|---|---|---|---|---|
 | 8-ary 2-fly | 16 | 64 | 8.00 | 8.00 | 126 | 222 | 30 | 76% to 86% |
 | random graph, degree 8 | 16 | 64 | 8.00 | 4.09 | 181 | 222 | 39 | 78% to 82% |
@@ -57,7 +57,7 @@ Two-hop paths: the mean number of common neighbors of two routers two hops apart
   5-fly), lockstep figures.
 - **Radix and stages.** The saving rises with the radix k and falls slowly as stages are added: 2-ary, 20% at 4
   stages and 11% at 9; 3-ary 3-fly 40%; 4-ary 3-fly 49%; 8-ary 3-fly 62%.
-- **Two-hop paths again.** The saving follows the number of two-hop paths, as on the 64-router graphs measured with
+- **Two-hop multiplicity again.** The saving follows the two-hop multiplicity, as on the 64-router graphs measured with
   FRR: about 1.2 for the 2-ary flies, 1.45 to 1.82 for the 3- and 4-ary, 2.3 for the 8-ary 3-fly. A random graph of
   fixed degree has fewer as it grows, towards 1, and its lockstep saving falls towards nothing.
 - **The 8-ary 2-fly** is the complete bipartite graph K8,8, a leaf-spine fabric with 8 leaves and 8 spines.

@@ -15,10 +15,10 @@ range but 7 to 14 points above its lockstep end (41% against 27% at k = 4, 59% a
 lower estimate and the jittered one as an upper bound.
 
 The fat-tree is `families.fat_tree(k)`: k pods of k/2 edge and k/2 aggregation switches and (k/2)² core switches,
-switches only, so edge switches have degree k/2 and the others k. Two-hop paths: the mean number of common neighbors
+switches only, so edge switches have degree k/2 and the others k. Two-hop multiplicity: the mean number of common neighbors
 of two routers two hops apart.
 
-| Topology | Routers | Links | Average degree | Two-hop paths | LSPs off, lockstep | LSPs off, jittered | LSPs on | Saving |
+| Topology | Routers | Links | Average degree | Two-hop multiplicity | LSPs off, lockstep | LSPs off, jittered | LSPs on | Saving |
 |---|---|---|---|---|---|---|---|---|
 | fat-tree, k = 4 | 20 | 32 | 3.20 | 1.48 | 62 | 86 | 45 | 27% to 47% |
 | random graph, degree 3 | 20 | 30 | 3.00 | 1.09 | 70 | 78 | 60 | 14% to 23% |
@@ -43,7 +43,7 @@ of two routers two hops apart.
   and 67% at 24 (lockstep figures).
 - **A random graph of the same size and degree stays near 20%** from 80 routers up (15 to 20%; 14% and 26% at 20
   and 45 routers).
-- **Two-hop paths again.** A fat-tree's two-hop paths go from 1.48 at k = 4 to 2.74 at k = 24, while the random
+- **Two-hop multiplicity again.** A fat-tree's multiplicity goes from 1.48 at k = 4 to 2.74 at k = 24, while the random
   graphs stay between 1.09 and 1.32; the saving follows them, as on the 64-router graphs measured with FRR and on
   the multistage butterflies.
 

@@ -16,7 +16,7 @@ LSPs are Level-2 LSPs sent, summed over the routers, mean per window; each topol
 (2 runs x 3 links x down and up). CPU is isisd's CPU summed over the routers, net of a quiet window of the same length
 in the same run; pairs compare the same link and direction, off against on (6 per topology).
 
-| Fat-tree | Switches | Links | Degree | Two-hop paths | LSPs sent, off | on | Fewer | CPU lower, mean (pairs lower) | median |
+| Fat-tree | Switches | Links | Degree | Two-hop multiplicity | LSPs sent, off | on | Fewer | CPU lower, mean (pairs lower) | median |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | k = 4 | 20 | 32 | 3.2 | 1.48 | 97 | 58 | 40% | 26% (4 of 6) | 29% |
 | k = 6 | 45 | 108 | 4.8 | 1.82 | 337 | 158 | 53% | 4% (3 of 6) | 2% |
@@ -24,10 +24,11 @@ in the same run; pairs compare the same link and direction, off against on (6 pe
 | k = 10 | 125 | 500 | 8.0 | 2.25 | 1,470 | 556 | 62% | 4% (4 of 6) | 4% |
 | k = 12 | 180 | 864 | 9.6 | 2.39 | 2,661 | 847 | 68% | 10% (6 of 6) | 9% |
 
-- **LSPs:** lower with flood reduction on in all 30 pairs; the saving rises with the radix and with the number of
-  two-hop paths (the mean number of common neighbors of two routers two hops apart), from 1.48 at k = 4 to 2.39 at
-  k = 12. Random graphs of 64 routers at similar degrees saved 11% to 13% (degree 4), 23% (degree 6) and 36% (degree
-  8) in the [random-regular sweep](../random-regular-n64/README.md).
+- **LSPs:** lower with flood reduction on in all 30 pairs; the saving rises with the radix and with the two-hop
+  multiplicity (the mean number of common neighbors of two routers two hops apart), from 1.48 at k = 4 to 2.39 at
+  k = 12. Random graphs of 64 routers at similar degrees saved 12% (degree 4), 23% (degree 6) and 36% (degree 8) in
+  the [random-regular sweep](../random-regular-n64/README.md); over three graphs per degree in
+  [seeds-n64](../seeds-n64/README.md), 13% at degree 4.
 - **CPU:** lower in 23 of 30 pairs, by a median of 2% to 29%, with no trend in k. Without flood reduction, route
   computation (`isis_run_spf_cb`) is 75% of isisd's CPU for a link change at k = 4 and all of it at k = 10 and 12
   (12.3 of 12.3 s summed over 180 routers at k = 12), and it costs about the same with flood reduction on. Receiving
@@ -72,7 +73,8 @@ at 1.4 million LSPs.
 ## Limits of these runs
 
 - Two runs per variant, 3 links per run, one topology per radix.
-- **Other load on the host.** Throughout, a long-running service of ours used about 60% of one CPU, not pinned, and
+- **Other load on the host.** Throughout, a console demo engine of ours (running since 2026-09-28) used about 60% of
+  one CPU, not pinned, and
   the host's own Docker daemons, outside the lab container, used about four CPUs. Neither changes which LSPs are sent;
   the off and on labs took turns, so both variants ran under the same conditions within a run.
 

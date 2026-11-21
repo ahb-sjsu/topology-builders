@@ -50,15 +50,16 @@ and timers.
 | 24 | 5,296 | 3,938 | 26% | 6 of 6 | 23% |
 | 32 | 6,667 | 5,096 | 24% | 6 of 6 | 17% |
 
-- These CPU figures depend on the setup. Degree 16 was run again the same day in a different one, with the routers
+- These CPU figures depend on the setup. Degree 16 was run again the same day in a different one
+  ([families-n64](../families-n64/README.md)), with the routers
   in an LXD container with its own Docker, pinned to 20 CPUs: LSPs sent for a link change were within 4% of the
   figures here (1,684 and 435), but net isisd CPU was 10% lower with flood reduction on instead of 19%, still lower
   in 6 of 6 pairs. Bring-up savings matched (48% fewer LSPs, 26% less CPU).
 - Up to degree 6 the difference is smaller than the spread between windows: at degree 6, single windows ranged from
   680 to 1,990 ms off and 740 to 2,000 ms on.
 - At degree 32, flood reduction removed 94% of the LSPs sent but about a fifth of the CPU, so most of the CPU a
-  link change costs in these runs is not in sending LSPs. We have not measured where it goes; route computation and
-  receiving LSPs are the obvious candidates.
+  link change costs in these runs is not in sending LSPs. [seeds-n64](../seeds-n64/README.md) measured where it
+  goes: route computation is 82% to 95% of isisd's net CPU for a link change, and flood reduction hardly changes it.
 - An earlier run on 32 routers at degree 6 (in the main README) showed 46% less net CPU for link down and 47% less for
   link up, with the repeats not overlapping. At 64 routers and degree 6 there is no difference. The graphs, the
   number of routers and the load on the host all differ between the two, and we do not know which of these
@@ -122,8 +123,9 @@ topology-builders report sweep.jsonl
   `make check` passed, including `isisd/test_isis_flood_reduction.py`.
 - Host: HP Z840 with two Xeon E5-2690 v3, of which 25 logical CPUs were online (the 12 cores of one socket with
   their hyperthreads, and one core of the other). Ubuntu 24.04, Docker 29, containerlab 0.78.2. The routers were
-  not pinned to CPUs. Docker's own daemons used about 5 CPUs throughout. The host's load average and hottest CPU
-  sensor at the start and end of each run are in the data.
+  not pinned to CPUs. Docker's own daemons used about 5 CPUs throughout, and a console demo engine of ours (running
+  since 2026-09-28) about 60% of one CPU, not pinned; neither changes which LSPs are sent. The host's load average
+  and hottest CPU sensor at the start and end of each run are in the data. topology-builders 0.1.0.
 - Before each run the harness waited until the hottest CPU sensor was below 80 C.
 - How a run is measured, window by window: the main README, "Measuring flooding and CPU".
 
@@ -132,5 +134,6 @@ topology-builders report sweep.jsonl
 - One graph per degree, 64 routers, 2 runs and 3 links per degree.
 - The time to converge. The harness checks 30 s after deployment, then every 5 s, and once at the end of each
   link change's 30 s window, so it cannot see differences of a few seconds.
-- Other families. Flattened butterflies and leaf-spine fabrics of 64 routers are next, with every router pinned to
-  a fixed set of CPUs.
+- Other families: flattened butterflies and leaf-spine fabrics of 64 routers in
+  [families-n64](../families-n64/README.md); fat-trees and k-ary n-flies in [fat-tree](../fat-tree/README.md) and
+  [nfly](../nfly/README.md).

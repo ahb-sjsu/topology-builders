@@ -5,12 +5,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "topology-builders"
 version = "0.2.0"
-description = "Network topologies whose density can be stepped at a fixed number of routers, and FRR IS-IS labs for containerlab"
+description = "Evaluation of IS-IS distributed flooding reduction (draft-ietf-lsr-distoptflood, FRR PR 24128) on emulated networks of stepped density, and the tools behind it: topology generators, FRR IS-IS labs, a measurement harness and a flooding model"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "Andrew H. Bond", email = "andrew.bond@sjsu.edu" }]
-keywords = ["network-topology", "topology-generator", "containerlab", "frr", "is-is", "networkx"]
+keywords = ["network-topology", "topology-generator", "containerlab", "frr", "is-is", "networkx", "link-state",
+            "flooding", "draft-ietf-lsr-distoptflood", "network-namespaces", "fat-tree", "butterfly"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",

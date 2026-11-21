@@ -37,9 +37,9 @@ tools/overlay/pod/build_image.sh work tools/overlay/jobs/validate16.sh ghcr.io/<
 
 Software emulation is slow. On 2026-11-20, with 4 vCPUs on an HP Z840, deploying the 16-router lab took 225 s,
 against 9 s on the host, and the routers needed 60 s more than on the host to converge. With the labs' normal timers
-(1 s hellos) the slowdown shows in the counts too: in that validation every run converged and 23 of 24 windows were
-consistent, but LSP counts for bring-up and for links coming up were 1.5 to 2.7 times the host's (link-down counts
-were close). CPU times and convergence times inside the guest are not comparable with the host's either; compare
+(1 s hellos) the slowdown shows in the counts too: in that first validation every run converged and 23 of 24 windows
+were consistent, but LSP counts for bring-up and for links coming up were 1.5 to 2.7 times the host's (link-down
+counts were close). The window-by-window comparison below gives the ranges per kind of window. CPU times and convergence times inside the guest are not comparable with the host's either; compare
 them only with other runs in the same setup. QEMU's user-mode networking and the 9p share create nothing on the
 host's network.
 

@@ -32,7 +32,8 @@ quiet window:
 - The saving is in receiving LSPs: with flood reduction off, every router processes many copies of each changed
   LSP. Route computation costs the same either way, since every router still has to recompute its routes.
 - The saving grows with density, from 48% at degree 16 to 59% at degree 24, as the LSPs do.
-- No LSP was retransmitted in any window. With flood reduction on, the fallback counter rose only in the windows
+- No LSP was retransmitted in any window. With flood reduction on, the fallback counter (`fr_fallbacks` in the
+  records: decisions where isisd fell back to normal flooding) rose only in the windows
   where the links came back up (51 to 86 per window), not when they went down.
 - Bring-up: 50% and 77% fewer LSPs, and 29% and 60% less isisd CPU, at degree 16 and 24.
 

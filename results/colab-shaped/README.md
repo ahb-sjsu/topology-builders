@@ -3,7 +3,9 @@
 `tools/colab/test_in_docker.sh` run on 2026-11-20: the recipe the Colab notebook uses, in a Docker container with a
 Colab CPU runtime's permissions. **This is not a run on Colab itself.** The container is Ubuntu 24.04, root, with
 Docker's default capabilities plus SYS_ADMIN and SYS_PTRACE (`CapEff 0xa82c25fb`, the set a Colab CPU runtime showed
-on 2026-11-20), no network, and 2 CPUs of a two-socket Xeon workstation.
+on 2026-11-20), no network, and 2 CPUs of a two-socket Xeon workstation. A console demo engine of ours (running
+since 2026-09-28) used about 60% of one CPU throughout, not pinned, and the host's own Docker daemons also ran;
+neither changes which LSPs are sent.
 
 - **FRR:** built inside the container by `tools/colab/setup.sh` from FRR pull request 24128 (riw777/frr at e263c441),
   with libyang 2.1.128 built from source and only mgmtd, zebra, staticd and isisd. The `image` field in the records'
@@ -29,8 +31,9 @@ differ only in metadata, with the same 32 links. LSPs sent per window:
 | fat-tree k = 4 | namespaces | on | 1,258 | 44-46 | 67-72 | 25 |
 
 Link-change counts in the namespace labs are within 12% of the Docker labs' on the same graph (the links taken down
-differ: each run picks them by the topology file's hash). Bring-up sends 15 to 24% fewer LSPs, perhaps because the
-routers start closer together in time without containers to create. With one run each and debug logging on, read
+differ: each run picks them by the topology file's hash). Bring-up sends 15 to 24% fewer LSPs; we do not know why. On
+Colab, deploys took about as long as Atlas's Docker labs, and bring-up still saved less
+([colab-sessions](../colab-sessions/README.md)). With one run each and debug logging on, read
 these as a check that the recipe works and agrees with the Docker labs, not as measurements; CPU times are not
 comparable across the two setups.
 

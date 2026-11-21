@@ -12,24 +12,24 @@ Runs of 2026-11-21, 01:10 to 02:21 UTC, and 04:15 to 04:32 UTC for the 3-ary 3-f
 for the same links (`tools/model/validate.py`); `topologies.tar.gz` holds the four topology files the labs were
 written from.
 
-## Link changes: 25% to 57% fewer LSPs, following the two-hop paths
+## Link changes: 25% to 57% fewer LSPs, following the two-hop multiplicity
 
 LSPs are Level-2 LSPs sent, summed over the routers, mean per window; each topology has 12 link windows per variant
 (2 runs x 3 links x down and up). CPU is isisd's CPU summed over the routers, net of a quiet window of the same length
 in the same run; pairs compare the same link and direction, off against on (6 per topology).
 
-| n-fly | Switches | Links | Degree | Two-hop paths | LSPs sent, off | on | Fewer | CPU lower, mean (pairs lower) | median |
+| n-fly | Switches | Links | Degree | Two-hop multiplicity | LSPs sent, off | on | Fewer | CPU lower, mean (pairs lower) | median |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | 2-ary 5-fly | 80 | 128 | 3.2 | 1.25 | 357 | 269 | 25% | -8% (1 of 6) | -9% |
 | 2-ary 4-fly | 32 | 48 | 3.0 | 1.27 | 141 | 96 | 32% | 20% (5 of 6) | 16% |
 | 3-ary 3-fly | 27 | 54 | 4.0 | 1.62 | 168 | 82 | 51% | -25% (2 of 6) | -19% |
 | 4-ary 3-fly | 48 | 128 | 5.3 | 1.82 | 402 | 171 | 57% | 18% (4 of 6) | 11% |
 
-- **LSPs:** lower with flood reduction on in all 24 pairs. The saving follows the number of two-hop paths (the mean
+- **LSPs:** lower with flood reduction on in all 24 pairs. The saving follows the two-hop multiplicity (the mean
   number of common neighbors of two routers two hops apart) more than the size: the two 2-ary flies, with about 1.25,
   save 25% and 32%; the 3- and 4-ary 3-flies, with 1.62 and 1.82, save 51% and 57%. In the
-  [random-regular sweep](../random-regular-n64/README.md) random graphs of 64 routers saved 11% to 13% at degree 4
-  and 23% at degree 6.
+  [random-regular sweep](../random-regular-n64/README.md) random graphs of 64 routers saved 12% at degree 4 (13%
+  over three graphs in [seeds-n64](../seeds-n64/README.md)) and 23% at degree 6.
 - **CPU:** no consistent difference. A link change costs these small networks about 150 to 1,200 ms of isisd CPU in
   total, and from 64% to all of it is route computation (`isis_run_spf_cb`, 147 to 1,043 ms without flood
   reduction), which costs the same with flood reduction on. The difference flood reduction makes, in receiving and sending LSPs, is a few to a few tens of
@@ -77,8 +77,8 @@ Every run converged, with flood reduction off and on.
 - **Other load on the host.** Around 02:08 UTC, for a few minutes, during the 2-ary 5-fly's first runs, a database
   job on the host ran a burst of queries on several CPUs, the routers' among them. At 04:09 UTC, before the 3-ary
   3-fly's second measurement, a database backup was using about one CPU, not pinned; we did not check whether it was
-  still running during that measurement. Throughout, a long-running service of ours used about 60% of one CPU, not
-  pinned (it also ran during the families, timing, ten-flap and seeds runs), and the host's own Docker daemons,
+  still running during that measurement. Throughout, a console demo engine of ours (running since 2026-09-28) used
+  about 60% of one CPU, not pinned (it ran during every Atlas run in `results/`), and the host's own Docker daemons,
   outside the lab container, used about four CPUs.
   None of this changes which LSPs are sent; the off and on labs took turns, so both variants ran under the same
   conditions within a run.

@@ -30,14 +30,18 @@ the runs, off against on: 6 per graph, 18 per degree.
 | Leaf-spine, 48 leaves x 16 spines | 2,686 | 178 | 93% | 4,037 | 2,717 | 33% | 6 of 6 | 31% |
 
 - **LSPs:** the three graphs of one degree save within 1 point of each other at degree 8 and 16, and within 6 points
-  at degree 4. Seed 1 agrees with the random-regular sweep, which ran in a different setup (12%, 36% and 75% there),
+  at degree 4. Seed 1 agrees with the random-regular sweep, which ran in a different setup and, from topology files with other
+  metadata, took other links (12%, 36% and 75% there),
   and the butterfly and leaf-spine agree with the families sweep (68% and 93% there). In all 66 pairs (random
   graphs up to degree 16, butterfly, leaf-spine), flood reduction sent fewer LSPs.
 - **CPU:** small and not consistent below degree 16. At degree 16 it is lower in 16 of 18 pairs, by a median of
   10%, as in the families sweep's rerun in this setup (10%) and against 19% in the random-regular sweep's setup.
 - **CPU does not repeat as well as LSPs.** On the butterfly, the families sweep found a median 22% saving, lower in 6
   of 6 pairs; this run finds 5%, lower in 3 of 6, with the same graph, links, configuration and setup. On leaf-spine,
-  40% then and 31% now. Two runs per variant are not enough to pin CPU savings of this size down.
+  40% then and 31% now. Two runs per variant are not enough to pin CPU savings of this size down. Four Colab
+  sessions on the same three graphs, with the same links in each, show the same: the LSP saving moved by at most 1
+  point, and the median CPU saving at degree 16 ranged from -56% to 15%
+  ([colab-sessions](../colab-sessions/README.md)).
 - Every window ended with every router holding the same LSPs as every other router: 372 of 372 on the random graphs
   up to degree 16, the butterfly and leaf-spine, and 54 of 54 with flood reduction on at degree 32.
 

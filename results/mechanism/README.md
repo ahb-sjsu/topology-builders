@@ -5,7 +5,8 @@ flooding with flood reduction on (FRR pull request 24128 at e263c441) often took
 last router, against well under half a second without it. This lab replays those same failures with more of isisd's
 logging, to see how the last routers got the new LSPs and why they got them late.
 
-**Answer.** The late routers got the new LSPs through the periodic CSNP exchange, not through flooding: 241 of the
+**Answer.** The late routers got the new LSPs through the periodic CSNP exchange (complete sequence-number PDUs,
+which neighbors exchange to repair their databases), not through flooding: 241 of the
 249 router-LSP pairs that arrived more than 1 s late. In 172 of the 249, a neighbor that already held the LSP did not
 send it on because it decided with the topology from before the failure: it counted on a router that had just lost
 its links to cover the late router. Without flood reduction, on the same butterfly and the same failures, every
@@ -41,7 +42,9 @@ router had every new LSP within 236 ms.
 - **Setup:** 2026-11-20, 09:06 to 09:58 UTC, in the container shaped like Colab ([colab-shaped](../colab-shaped/README.md):
   Ubuntu 24.04, FRR from the same commit built by `tools/colab/setup.sh`), namespace backend, 64 routers on 4 CPUs.
   Those 4 CPUs share physical cores with 4 of the CPUs a measurement campaign was using at the same time, so
-  absolute times here are not comparable with the timing runs' (some delays here are longer, some shorter).
+  absolute times here are not comparable with the timing runs' (some delays here are longer, some shorter). A
+  console demo engine of ours (running since 2026-09-28) used about 60% of one CPU throughout, not pinned, and the
+  host's own Docker daemons also ran; neither changes which LSPs are sent.
 
 ## Results: arrivals more than 1 s after the LSP was built
 
@@ -94,8 +97,10 @@ being built in the window: after router r25 failed with flood reduction on, it f
 - That explains decisions made with some of the failed links still in place. It does not by itself explain the 154
   relay decisions that only the topology from before the failure reproduces: for those, the topology must have been
   built before the failure. `debug isis spf-events` logs the start of every route computation ("SPF needed"), which
-  is when the topology is dropped, so the full logs of this lab can show when each relay's topology was built. That
-  check has not been done yet. An earlier version of this README said these logs could not show it; that was wrong.
+  is when the topology is dropped, so the full logs of this lab can show when each relay's topology was built. The
+  reduced logs in `logs.tar.gz` leave those lines out, so the check needs the full logs, which are not published,
+  or a new run. It has not been done yet. An earlier version of this README said these logs could not show it;
+  that was wrong.
 - Whether this can leave a router without an LSP for good. Here no router was: every router got every new LSP
   within the window, by CSNP if not by flooding, as in the timing runs. That relies on the periodic CSNPs.
 

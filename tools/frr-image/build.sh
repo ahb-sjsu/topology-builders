@@ -14,7 +14,7 @@
 #       e263c441160c7cf25749a9695978ffe5649678f9 frr-distoptflood:e263c441
 set -u
 HERE=$(cd "$(dirname "$0")" && pwd)
-[ $# -eq 4 ] || { sed -n '2,15p' "$0"; exit 2; }
+[ $# -eq 4 ] || { sed -n '2,14p' "$0"; exit 2; }
 W=$1 URL=$2 REF=$3 TAG=$4
 [[ $REF =~ ^[0-9a-f]{40}$ ]] || { echo "give the full 40-character commit SHA, not $REF"; exit 2; }
 mkdir -p "$W" && cd "$W" || exit 1

@@ -5,7 +5,7 @@ check it against the decisions FRR's isisd actually makes, use it to explain FRR
 with measured ones.
 
 1. `collect_decisions.py` (root, or inside `unshare -Urnm`): for each topology file, writes a lab with flood
-   reduction on, `debug isis flooding` and timing logs, deploys it with the netns backend, waits for convergence,
+   reduction on, `debug isis flooding` and timing logs, deploys it with the namespace backend, waits for convergence,
    takes links down and up one at a time, and saves every router's log and the lab.
 2. `compare_decisions.py`: for every "Flooding LSP ... with reduction" line, finds the transmitting neighbor from
    the router's last "Rcvd" line for that LSP, runs the model's `decide` for the same router, neighbor and LSP, and
@@ -52,3 +52,9 @@ failure ([results/mechanism](../../results/mechanism/README.md)).
 mkdir topos && tar -xzf results/seeds-n64/topologies.tar.gz -C topos
 TOPOLOGY_DIRS=topos python tools/model/validate.py results/seeds-n64/measurements.jsonl.gz
 ```
+
+**Status (2026-11-21):** it gives the `model.txt` of [seeds-n64](../../results/seeds-n64/README.md),
+[random-regular-n128](../../results/random-regular-n128/README.md), [nfly](../../results/nfly/README.md) and
+[fat-tree](../../results/fat-tree/README.md). The earlier comparison over 28 topologies of 64 routers, quoted in the
+main README, was run on the original topology files of random-regular-n64 and families-n64, which are not in
+`results/` yet.

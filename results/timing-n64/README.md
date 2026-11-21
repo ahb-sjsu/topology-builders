@@ -43,9 +43,11 @@ the four topologies. Convergence after a link went down, from 0.4 to 1 s, is set
   except router failures on leaf-spine, which took 1.5 to 1.9 s with flood reduction on or off.
 - Every window still ended with every router holding the same LSPs. This is about speed, not correctness.
 - The mechanism, from a lab that replays these failures with flooding, CSNP and PSNP logs
-  ([mechanism](../mechanism/README.md)): the last routers got the new LSPs through the periodic CSNP exchange, not
-  through flooding, because a neighbor that held the LSP decided with the topology from before the failure and left
-  them to a router that had just lost its links.
+  ([mechanism](../mechanism/README.md)): 241 of the 249 router-LSP pairs that arrived more than 1 s late came
+  through the periodic CSNP exchange (complete sequence-number PDUs, which neighbors exchange to repair their
+  databases), not through flooding. In 172 of them, a neighbor that held the LSP decided with the topology from
+  before the failure and left the late router to a router that had just lost its links. Why that topology
+  predates the failure is still open.
 
 ## Recoveries were not slower
 
