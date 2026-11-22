@@ -200,9 +200,9 @@ Two links per run, two runs of each variant:
   namespace backend does not use it. It runs the FRR in
   `/usr/lib/frr` that `setup.sh` built (riw777/frr at e263c441). Every one of the 148 link windows with flood reduction on
   counted suppressed sends.
-- `report.txt` puts the 32- and 64-router graphs of degree 8 on separate rows. In its per-handler table, though, they
-  share one line, because that table groups by name and the name leaves out the number of routers. `tables.txt`
-  keeps them apart.
+- The probe ladder has graphs of degree 8 at 32 and 64 routers. `report` now adds the number of routers to a name
+  that covers graphs of more than one size, so `report.txt` and `report-ff2f.txt` keep them apart in every table
+  (an earlier version merged them in the per-handler table).
 
 ## How it was run
 

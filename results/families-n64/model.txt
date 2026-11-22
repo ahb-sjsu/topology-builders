@@ -1,0 +1,75 @@
+topology                                     red win    n  measured         lockstep          jitter1  jitter1-proc0.5   measured-minus-model (jitter1)
+flattened-butterfly radices=[16, 2, 2]       off down   6    1554.0           1902.0           2046.0           1968.5     -492.0
+flattened-butterfly radices=[16, 2, 2]       off up     6    2192.7           1928.0           2050.0           1979.7      142.7
+flattened-butterfly radices=[16, 2, 2]       on  down   6     420.3            560.7            540.6            557.1     -120.3
+flattened-butterfly radices=[16, 2, 2]       on  up     6     719.0            601.7            582.0            599.7      137.0
+flattened-butterfly radices=[16, 4]          off down   6    1647.7           2080.0           2174.0           2119.2     -526.3
+flattened-butterfly radices=[16, 4]          off up     6    2351.5           2088.0           2178.0           2120.7      173.5
+flattened-butterfly radices=[16, 4]          on  down   6     373.3            399.7            395.1            399.2      -21.7
+flattened-butterfly radices=[16, 4]          on  up     6     619.2            383.7            404.2            399.8      214.9
+flattened-butterfly radices=[2, 2, 2, 2, 2,  off down   6     457.7            382.0            638.0            511.2     -180.3
+flattened-butterfly radices=[2, 2, 2, 2, 2,  off up     6     695.3            384.0            642.0            509.4       53.3
+flattened-butterfly radices=[2, 2, 2, 2, 2,  on  down   6     194.2            184.7            188.5            191.0        5.7
+flattened-butterfly radices=[2, 2, 2, 2, 2,  on  up     6     268.7            188.0            197.5            193.0       71.1
+flattened-butterfly radices=[32, 2]          on  down   6     331.3            402.0            390.1            401.9      -58.8
+flattened-butterfly radices=[32, 2]          on  up     6     788.3            468.7            458.6            474.3      329.7
+flattened-butterfly radices=[4, 2, 2, 2, 2]  off down   6     556.5            544.7            766.0            655.0     -209.5
+flattened-butterfly radices=[4, 2, 2, 2, 2]  off up     6     846.2            544.0            770.0            655.0       76.2
+flattened-butterfly radices=[4, 2, 2, 2, 2]  on  down   6     219.2            227.7            225.1            225.0       -5.9
+flattened-butterfly radices=[4, 2, 2, 2, 2]  on  up     6     293.8            222.0            232.0            228.2       61.8
+flattened-butterfly radices=[4, 4, 2, 2]     off down   6     605.7            708.0            894.0            796.8     -288.3
+flattened-butterfly radices=[4, 4, 2, 2]     off up     6     964.8            704.0            898.0            794.9       66.8
+flattened-butterfly radices=[4, 4, 2, 2]     on  down   6     221.2            231.0            239.1            238.0      -17.9
+flattened-butterfly radices=[4, 4, 2, 2]     on  up     6     335.5            246.7            246.5            246.3       89.0
+flattened-butterfly radices=[4, 4, 4]        off down   6     709.7            870.0           1022.0            937.7     -312.3
+flattened-butterfly radices=[4, 4, 4]        off up     6    1052.7            864.0           1026.0            935.6       26.7
+flattened-butterfly radices=[4, 4, 4]        on  down   6     242.8            250.7            244.7            244.1       -1.8
+flattened-butterfly radices=[4, 4, 4]        on  up     6     317.2            272.3            267.7            266.5       49.5
+flattened-butterfly radices=[8, 2, 2, 2]     off down   6     846.2            970.0           1150.0           1057.7     -303.8
+flattened-butterfly radices=[8, 2, 2, 2]     off up     6    1207.0            976.0           1154.0           1058.7       53.0
+flattened-butterfly radices=[8, 2, 2, 2]     on  down   6     273.0            318.0            310.8            316.2      -37.8
+flattened-butterfly radices=[8, 2, 2, 2]     on  up     6     429.5            338.3            316.4            319.2      113.1
+flattened-butterfly radices=[8, 4, 2]        off down   6     974.7           1135.3           1278.0           1199.4     -303.3
+flattened-butterfly radices=[8, 4, 2]        off up     6    1353.7           1136.0           1282.0           1199.5       71.7
+flattened-butterfly radices=[8, 4, 2]        on  down   6     309.7            357.0            340.9            346.1      -31.3
+flattened-butterfly radices=[8, 4, 2]        on  up     6     435.3            377.3            359.4            362.8       75.9
+flattened-butterfly radices=[8, 8]           off down   6    1271.7           1568.0           1662.0           1605.8     -390.3
+flattened-butterfly radices=[8, 8]           off up     6    1792.7           1568.0           1666.0           1606.7      126.7
+flattened-butterfly radices=[8, 8]           on  down   6     337.8            396.3            393.5            395.3      -55.6
+flattened-butterfly radices=[8, 8]           on  up     6     497.7            396.0            403.6            399.4       94.0
+leaf-spine leaves=32,spines=32               on  down   6     142.3            126.0            126.0            126.0       16.3
+leaf-spine leaves=32,spines=32               on  up     6     245.8            188.0            188.9            188.4       57.0
+leaf-spine leaves=40,spines=24               on  down   6     140.8            126.0            126.0            126.0       14.8
+leaf-spine leaves=40,spines=24               on  up     6     244.0            188.0            188.9            188.4       55.1
+leaf-spine leaves=48,spines=16               off down   6    2321.0           1534.0           2942.0           2562.6     -621.0
+leaf-spine leaves=48,spines=16               off up     6    3269.3           1536.0           2946.0           2602.5      323.3
+leaf-spine leaves=48,spines=16               on  down   6     137.8            126.0            126.0            126.0       11.8
+leaf-spine leaves=48,spines=16               on  up     6     227.5            188.0            189.1            188.3       38.4
+leaf-spine leaves=52,spines=12               off down   6    1801.3           1246.0           2366.0           2056.7     -564.7
+leaf-spine leaves=52,spines=12               off up     6    2703.3           1248.0           2370.0           2080.4      333.3
+leaf-spine leaves=52,spines=12               on  down   6     135.5            126.0            126.0            126.0        9.5
+leaf-spine leaves=52,spines=12               on  up     6     221.5            188.0            188.9            188.4       32.6
+leaf-spine leaves=56,spines=8                off down   6    1228.5            894.0           1662.0           1428.2     -433.5
+leaf-spine leaves=56,spines=8                off up     6    1869.0            896.0           1666.0           1458.9      203.0
+leaf-spine leaves=56,spines=8                on  down   6     129.2            126.0            126.0            126.0        3.2
+leaf-spine leaves=56,spines=8                on  up     6     231.8            188.0            188.8            188.3       43.0
+leaf-spine leaves=58,spines=6                off down   6     852.8            694.0           1262.0           1079.6     -409.2
+leaf-spine leaves=58,spines=6                off up     6    1434.2            696.0           1266.0           1075.2      168.2
+leaf-spine leaves=58,spines=6                on  down   6     127.3            126.0            126.0            126.0        1.3
+leaf-spine leaves=58,spines=6                on  up     6     232.5            188.0            189.0            188.5       43.5
+leaf-spine leaves=60,spines=4                off down   6     617.3            478.0            830.0            715.8     -212.7
+leaf-spine leaves=60,spines=4                off up     6     986.2            480.0            834.0            711.9      152.2
+leaf-spine leaves=60,spines=4                on  down   6     127.3            126.0            126.0            126.0        1.3
+leaf-spine leaves=60,spines=4                on  up     6     201.7            188.0            188.7            188.3       13.0
+leaf-spine leaves=61,spines=3                off down   6     470.0            364.0            602.0            530.0     -132.0
+leaf-spine leaves=61,spines=3                off up     6     751.0            366.0            606.0            513.6      145.0
+leaf-spine leaves=61,spines=3                on  down   6     127.0            126.0            126.0            126.0        1.0
+leaf-spine leaves=61,spines=3                on  up     6     211.0            188.0            189.2            188.4       21.8
+leaf-spine leaves=62,spines=2                off down   6     287.2            246.0            366.0            341.5      -78.8
+leaf-spine leaves=62,spines=2                off up     6     463.2            248.0            370.0            316.6       93.2
+leaf-spine leaves=62,spines=2                on  down   6     126.7            126.0            126.0            126.0        0.7
+leaf-spine leaves=62,spines=2                on  up     6     210.3            188.0            189.0            188.4       21.3
+random-regular degree=16,seed=1              off down   6    1378.8           1650.7           1918.0           1791.5     -539.2
+random-regular degree=16,seed=1              off up     6    1988.7           1640.0           1922.0           1789.5       66.7
+random-regular degree=16,seed=1              on  down   6     353.0            376.7            375.7            376.5      -22.7
+random-regular degree=16,seed=1              on  up     6     517.8            397.7            400.2            398.4      117.6

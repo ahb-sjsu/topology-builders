@@ -46,7 +46,8 @@ def _run(jobs, out, argv):
 def main(argv=None):
     argv = sys.argv[1:] if argv is None else argv
     p = argparse.ArgumentParser(prog="python -m topology_builders",
-                                description="Topologies whose density can be stepped at a fixed number of routers.")
+                                description="Topology generators, FRR IS-IS labs, a measurement harness and a flooding "
+                                            "model, for evaluating IS-IS flood reduction.")
     sub = p.add_subparsers(dest="command", required=True)
 
     s = sub.add_parser("sweep", help="topologies with one number of routers, from sparse to the full mesh")
@@ -95,12 +96,14 @@ def main(argv=None):
     c.add_argument("--timing-logs", action="store_true",
                    help="log every LSP built or received, with microsecond times, for measure --timing (costs CPU)")
 
-    m = sub.add_parser("measure", help="deploy labs written by clab and measure flooding and CPU around a link flap")
+    m = sub.add_parser("measure", help="deploy labs written by clab and measure flooding and CPU around link, router "
+                                       "or multi-link failures (Docker or network namespaces)")
     m.add_argument("labs", nargs="+", help="lab directories of one topology, e.g. <out>/off <out>/on")
     m.add_argument("--repeat", type=int, default=1, help="runs of each lab; the order alternates (default 1)")
     m.add_argument("--settle", type=int, default=30, help="seconds after deploy before the first check (default 30)")
-    m.add_argument("--window", type=int, default=30, help="seconds after the link goes down, and up (default 30)")
-    m.add_argument("--seed", type=int, default=1, help="chooses the links (default 1)")
+    m.add_argument("--window", type=int, default=30,
+                   help="seconds of every window: quiet, and after each event goes down and comes up (default 30)")
+    m.add_argument("--seed", type=int, default=1, help="chooses the links, routers and link sets (default 1)")
     m.add_argument("--event", default="link",
                    help="link: one link down and up; node: every link of one router at once; multi: --fail links "
                         "at once, keeping the graph connected; several comma-separated, e.g. link,node,multi, run in "

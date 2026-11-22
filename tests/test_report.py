@@ -92,6 +92,30 @@ def test_other_event_kinds_and_pooled_seeds():
     assert "Node changes" in R.text([pool], "node")
 
 
+def test_graphs_of_different_sizes_stay_apart():
+    def rr(routers, seed):
+        return {"family": "random-regular", "parameters": {"routers": routers, "degree": 3, "seed": seed},
+                "routers": routers, "links": routers * 3 // 2, "average_degree": 3.0}
+    recs = []
+    for sha, routers, seed in (("a", 8, 1), ("b", 16, 1), ("c", 16, 2)):
+        for on in (False, True):
+            r = record(on, 0, (40, 200.0), (60, 400.0), sha=sha, topology=rr(routers, seed))
+            r["profile"] = True
+            for p in r["phases"][2:]:
+                p["net_of_quiet"]["event_cpu_ms"] = {"isis_receive": 30.0 if not on else 10.0}
+            recs.append(r)
+    table = R.rows(recs)
+    assert sorted(r["topology"] for r in table) == ["random regular, degree 3, seed 1, 16 routers",
+                                                    "random regular, degree 3, seed 1, 8 routers",
+                                                    "random regular, degree 3, seed 2, 16 routers"]
+    pools = {p["topology"]: p["graphs"] for p in R.pooled(table)}
+    assert pools == {"random regular, degree 3, 8 routers": 1, "random regular, degree 3, 16 routers": 2}
+    prof = R.profile_text(recs)
+    assert prof.count("isis_receive") == 3 and "seed 1, 8 routers (2 and 2 windows)" in prof
+    # one size only: names as before
+    assert R.rows(recs[:2])[0]["topology"] == "random regular, degree 3, seed 1"
+
+
 def test_timing_and_profile_text():
     recs = []
     for on in (False, True):

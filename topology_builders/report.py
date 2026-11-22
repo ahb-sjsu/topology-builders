@@ -45,6 +45,19 @@ def label(topology, seed=True):
     return f"{family} {json.dumps(p, sort_keys=True)}"
 
 
+def _namer(records):
+    """label(), with the number of routers added where one label covers graphs of more than one size in `records`,
+    so that rows, pools and the timing and per-handler tables keep those graphs apart."""
+    sizes = {}  # by the label without the seed, so that the graphs of one size pool alike
+    for rec in records:
+        sizes.setdefault(label(rec["topology"], seed=False), set()).add(rec["topology"].get("routers"))
+
+    def name(topology, seed=True):
+        n = label(topology, seed)
+        return f"{n}, {topology.get('routers')} routers" if len(sizes.get(label(topology, False), ())) > 1 else n
+    return name
+
+
 def _span(values):
     return {"mean": mean(values), "min": min(values), "max": max(values)} if values else None
 
@@ -56,6 +69,7 @@ def _saving(off, on):
 def rows(records, kind="link"):
     """One dict per topology, in order of family, then average degree. Event windows are those of `kind`."""
     phases = _phases(kind)
+    name = _namer(records)
     by_source = {}
     for rec in records:
         if rec.get("timing"):
@@ -66,7 +80,7 @@ def rows(records, kind="link"):
         t = recs[0]["topology"]
         side = {"off": [r for r in recs if not r["settings"]["flood_reduction"]],
                 "on": [r for r in recs if r["settings"]["flood_reduction"]]}
-        row = {"topology": label(t), "pool": label(t, seed=False), "family": t.get("family"),
+        row = {"topology": name(t), "pool": name(t, seed=False), "family": t.get("family"),
                "routers": t.get("routers"), "links": t.get("links"), "diameter": t.get("diameter"),
                "two_hop_multiplicity": t.get("two_hop_multiplicity"),
                "average_degree": t.get("average_degree"), "runs": {k: len(v) for k, v in side.items()}}
@@ -152,6 +166,7 @@ def timing_text(records, kind="link"):
     time until the last router held the new LSPs (and the slowest window), in ms; windows with a router whose log
     never showed them are counted as missing."""
     groups = {}
+    name = _namer(records)
     for rec in records:
         if not rec.get("timing"):
             continue
@@ -159,7 +174,7 @@ def timing_text(records, kind="link"):
         for p in rec["phases"]:
             if p["phase"] in _phases(kind) and p.get("timing"):
                 g = groups.setdefault((rec["topology"].get("family") or "", rec["topology"].get("average_degree") or 0,
-                                       label(rec["topology"])), {"off": [], "on": []})
+                                       name(rec["topology"])), {"off": [], "on": []})
                 g[fr].append((p["timing"]["max_ms"], p["timing"].get("flood_ms")))
     if not groups:
         return ""
@@ -190,11 +205,12 @@ def profile_text(records, kind="link", top=8):
     """isisd CPU per event handler in profile runs: per topology and handler, mean ms per event window net of the
     quiet window, off and on, for the handlers with the most CPU."""
     groups = {}
+    name = _namer(records)
     for rec in records:
         if not rec.get("profile") or rec.get("timing"):
             continue
         fr = "on" if rec["settings"]["flood_reduction"] else "off"
-        key = (rec["topology"].get("family") or "", rec["topology"].get("average_degree") or 0, label(rec["topology"]))
+        key = (rec["topology"].get("family") or "", rec["topology"].get("average_degree") or 0, name(rec["topology"]))
         for p in rec["phases"]:
             ev = (p.get("net_of_quiet") or {}).get("event_cpu_ms")
             if p["phase"] in _phases(kind) and ev is not None:

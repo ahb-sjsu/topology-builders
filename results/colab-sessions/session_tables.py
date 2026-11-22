@@ -21,7 +21,9 @@ def pct(x):
 
 
 def name(row):
-    return f"{row['topology']}, {row['routers']} routers"
+    # report adds the router count itself where one name covers several sizes
+    t = row["topology"]
+    return t if t.endswith(" routers") else f"{t}, {row['routers']} routers"
 
 
 def rname(r):

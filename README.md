@@ -56,7 +56,7 @@ flowchart LR
 
 | Option | What runs | Needs | Speed | Status, 2026-11-21 |
 |---|---|---|---|---|
-| Model: `flood_model` | the draft's reflood decision, no FRR | Python | milliseconds per change, any size | with flood reduction on, within 20% of FRR's LSP counts on 26 of 28 64-router topologies, and within 15% on all 14 graphs of the seeds-n64 and random-regular-n128 runs, where its lockstep saving is within 5 points of FRR's; on fat-trees and n-flies (20 to 180 switches) within 5% when a link goes down, with FRR saving 7 to 14 points more than the lockstep figure |
+| Model: `flood_model` | the draft's reflood decision, no FRR | Python | milliseconds per change, any size | with flood reduction on, within 20% of FRR's LSP counts on link-down windows on 26 of 28 64-router topologies, and within 15% on all 14 graphs of the seeds-n64 and random-regular-n128 runs, where its lockstep saving is within 5 points of FRR's; on fat-trees and n-flies (20 to 180 switches) within 5% when a link goes down, with FRR saving 7 to 14 points more than the lockstep figure |
 | Docker labs: `measure` | real FRR, a container per router | Linux, root, Docker, containerlab | real time | the measurements on Atlas (an HP Z840 workstation with two Xeon E5-2690 v3) in `results/`, except mechanism, model-decisions and colab-shaped, up to 180 routers; 256-router Docker labs could not be deployed on Atlas |
 | Namespace labs: `measure --backend netns` | real FRR, a network namespace per router | Linux, root or `unshare -Urnm` | real time | the Colab results, and on Atlas the decision check, the failure replay (mechanism) and colab-shaped. With the same links as a Docker run on Atlas, Colab's LSP counts with flood reduction on nearly matched it, and without it were 5% to 15% lower. On Atlas, 256-router labs run (degree 4: every run converged, about 34 MB of memory per router), and larger ones are running |
 | Colab: `tools/colab` | namespace labs on a Colab runtime | a Google account | real time, on the runtime's CPUs | passed `test_in_docker.sh` (Colab's permissions, 2 CPUs); on Colab itself, 16-router labs converged on free CPU and TPU runtimes, and 64-router labs of up to 768 links in four Pro sessions with 8 CPUs, whose LSP savings agreed within 1 point (2026-11-21) |
@@ -309,8 +309,8 @@ Two options record more about each event window:
 by 0.2.0 or later), the event windows of one kind (`--event`, default link) pooled and paired, bring-up, and,
 when present, convergence times and the CPU per handler. `--pool-seeds` merges
 graphs that differ only in their seed into one row, with each saving's range across graphs. `--json` gives the
-same rows as JSON. Rows are named by family and parameters, which leave out the number of routers: give `report`
-one network size at a time, or `--pool-seeds` and the per-handler table merge graphs of different sizes.
+same rows as JSON. Rows are named by family and parameters; where one name covers graphs of more than one size,
+the number of routers is added to it, so `--pool-seeds` and the timing and per-handler tables keep sizes apart.
 
 Runs of 2026-11-19 on the HP Z840 above, with the image from FRR pull request 24128 at e263c441, 2 repeats of each
 lab. The host's load average was 4 to 11 from other work. Means, flood reduction off and on; LSPs sent and isisd CPU
@@ -441,9 +441,11 @@ for reduction in (False, True):
     print(reduction, fm.flood_link_change(topo, link, "down", reduction)["sent"])
 ```
 
-Against every link change measured on 64 routers, with flood reduction on, the model is within 20% of the LSPs FRR
-sent on 26 of 28 topologies (the exceptions: the flattened butterfly 16×2×2, 29% over, and the random graph of degree
-48, 26% under), and within 15% on all 14 graphs of 64 and 128 routers measured since; there its lockstep saving
+On the link-down windows of the first two 64-router sweeps, with flood reduction on, the model with jittered link
+delays is within 20% of the LSPs FRR sent on 26 of 28 topologies (the exceptions: the flattened butterfly 16×2×2,
+29% over, and the random graph of degree 48, 27% under; `model.txt` in
+[random-regular-n64](results/random-regular-n64/README.md) and [families-n64](results/families-n64/README.md)),
+and within 15% on all 14 graphs of 64 and 128 routers measured since; there its lockstep saving
 (every link takes one time unit, with no processing delay) is within 5 points of FRR's ([seeds-n64](results/seeds-n64/README.md), [random-regular-n128](results/random-regular-n128/README.md);
 `tools/model/validate.py` makes the comparison). On fat-trees and n-flies of 20 to 180 switches it is within 5% of
 FRR's count when a link goes down, and exact on 5 of the 9; there FRR saves 7 to 14 points more than the lockstep

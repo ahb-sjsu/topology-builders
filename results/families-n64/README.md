@@ -8,7 +8,10 @@ each change. The random regular graph of degree 16 from the [random-regular swee
 was run again first, as a check on the change of setup.
 
 Runs of 2026-11-19 17:01 UTC to 2026-11-20 00:38 UTC. Data: `measurements.jsonl.gz` (one JSON line per run, with
-per-router figures). The tables are from `topology-builders report measurements.jsonl.gz`, rounded. The two-hop
+per-router figures); `topologies.tar.gz`, the 20 topology files the labs were written from (matched by sha256);
+`model.txt`, the flooding model's count for the same links (`tools/model/validate.py`, as in
+[random-regular-n64](../random-regular-n64/README.md)). The tables are from `topology-builders report
+measurements.jsonl.gz`, rounded. The two-hop
 multiplicity (for two routers two hops apart, the mean number of neighbours they share) is computed from the topology
 files; it was added to the package after these runs, so the records themselves do not carry it.
 

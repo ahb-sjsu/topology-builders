@@ -52,8 +52,8 @@ QUIET WINDOWS: isisd ms summed over the routers in the 30 s with no event, one p
   cd61 random regular, degree 16, seed 1, 64 routers: off [8270.0, 9340.0], on [8570.0, 8720.0]; net link window off 1988, on 1688
   ff2f leaf-spine, 48 leaves x 16 spines, 64 routers: off [10390.0, 10040.0], on [10480.0, 9690.0]; net link window off 3678, on 2532
   ff2f random regular, degree 4, seed 1, 16 routers: off [690.0, 650.0], on [630.0, 650.0]; net link window off 45, on 75
-  ff2f random regular, degree 8, seed 1, 32 routers: off [2150.0, 2020.0], on [2220.0, 2090.0]; net link window off 322, on 189
-  ff2f random regular, degree 8, seed 1, 64 routers: off [4090.0, 4960.0], on [3930.0, 4440.0]; net link window off 916, on 1164
+  ff2f random regular, degree 8, seed 1, 32 routers: off [], on []; net link window off 322, on 189
+  ff2f random regular, degree 8, seed 1, 64 routers: off [], on []; net link window off 916, on 1164
   ff2f random regular, degree 16, seed 1, 64 routers: off [8590.0, 7620.0], on [8060.0, 7880.0]; net link window off 1814, on 1595
 
 ATLAS RUNS OF THE SAME GRAPHS (same family, parameters and routers; other links)
@@ -257,15 +257,24 @@ random regular, degree 4, seed 1 (8 and 8 windows)
   zclient_read                                    0.6        0.6
   lsp_refresh                                     0.3        0.4
   vtysh_read                                     -0.0        0.2
-random regular, degree 8, seed 1 (16 and 16 windows)
-  isis_run_spf_cb                               528.3      514.4
-  isis_receive                                   78.7       89.9
-  send_hello_cb                                   6.6       19.0
-  send_l2_psnp                                   -1.3        5.9
-  tx_queue_send_event                             5.3        3.8
-  lsp_tick                                        0.3        0.7
-  zclient_read                                    0.7        0.7
-  vtysh_read                                      0.3        0.6
+random regular, degree 8, seed 1, 32 routers (8 and 8 windows)
+  isis_run_spf_cb                               202.1      192.1
+  isis_receive                                   63.8       42.8
+  send_l2_psnp                                    8.3        0.1
+  send_hello_cb                                   6.4       -1.5
+  tx_queue_send_event                             3.6        2.2
+  zclient_read                                    0.6        0.6
+  lsp_refresh                                     0.3        0.3
+  lsp_tick                                        0.3        0.1
+random regular, degree 8, seed 1, 64 routers (8 and 8 windows)
+  isis_run_spf_cb                               854.5      836.8
+  isis_receive                                   93.5      137.0
+  send_hello_cb                                   6.8       39.6
+  send_l2_psnp                                  -10.9       11.7
+  tx_queue_send_event                             6.9        5.4
+  lsp_tick                                        0.4        1.4
+  vtysh_read                                      0.4        1.1
+  zclient_read                                    0.8        0.7
 random regular, degree 16, seed 1 (8 and 8 windows)
   isis_run_spf_cb                             1,851.5    1,814.8
   isis_receive                                  220.5      133.8

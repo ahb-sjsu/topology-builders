@@ -1,8 +1,9 @@
-"""Measure flooding and CPU in FRR IS-IS labs written by `clab`, around a link going down and coming back up.
+"""Measure flooding and CPU in FRR IS-IS labs written by `clab`, around link, router and multi-link failures, in
+containerlab (the default) or with one network namespace per router (`backend="netns"`).
 
 One run of one lab:
 
-1. Deploy it with containerlab, then wait a fixed settle time without querying the routers.
+1. Deploy it (containerlab, or namespaces), then wait a fixed settle time without querying the routers.
 2. Check that every router has one adjacency Up per link and the same LSPs as every other router. If not, keep
    checking every 5 s (the run records how long that took).
 3. Snapshot every router: the PDU counters and flooding-reduction counters of `show isis summary`, and the CPU time

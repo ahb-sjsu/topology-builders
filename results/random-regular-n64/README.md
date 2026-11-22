@@ -6,7 +6,10 @@ degree, so in this sweep the degree is the only thing that changes. Each topolog
 twice each. In each run, 3 links were taken down and brought back up, one at a time, with a 30 s window after each
 change.
 
-Runs of 2026-11-19, 07:10 to 10:57 UTC. Data: `measurements.jsonl.gz` (one JSON line per run, with per-router figures).
+Runs of 2026-11-19, 07:10 to 10:57 UTC. Data: `measurements.jsonl.gz` (one JSON line per run, with per-router figures);
+`topologies.tar.gz`, the 9 topology files the labs were written from (matched by sha256); `model.txt`, the flooding
+model's count for the same links (`mkdir topos && tar -xzf topologies.tar.gz -C topos && TOPOLOGY_DIRS=topos python
+tools/model/validate.py measurements.jsonl.gz`).
 The tables below are the output of `topology-builders report measurements.jsonl.gz`, rounded.
 
 ## Link changes: LSPs sent fall from 7% fewer at degree 3 to 94% fewer at degree 32

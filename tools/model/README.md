@@ -53,8 +53,9 @@ mkdir topos && tar -xzf results/seeds-n64/topologies.tar.gz -C topos
 TOPOLOGY_DIRS=topos python tools/model/validate.py results/seeds-n64/measurements.jsonl.gz
 ```
 
-**Status (2026-11-21):** it gives the `model.txt` of [seeds-n64](../../results/seeds-n64/README.md),
-[random-regular-n128](../../results/random-regular-n128/README.md), [nfly](../../results/nfly/README.md) and
-[fat-tree](../../results/fat-tree/README.md). The earlier comparison over 28 topologies of 64 routers, quoted in the
-main README, was run on the original topology files of random-regular-n64 and families-n64, which are not in
-`results/` yet.
+**Status (2026-11-22):** it gives the `model.txt` of every FRR results folder with topology files:
+[seeds-n64](../../results/seeds-n64/README.md), [random-regular-n128](../../results/random-regular-n128/README.md),
+[nfly](../../results/nfly/README.md), [fat-tree](../../results/fat-tree/README.md), and the first two 64-router
+sweeps, [random-regular-n64](../../results/random-regular-n64/README.md) and
+[families-n64](../../results/families-n64/README.md) (28 topologies; their topology files were added on
+2026-11-22).
