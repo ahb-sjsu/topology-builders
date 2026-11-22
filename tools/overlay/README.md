@@ -73,7 +73,7 @@ Under a storm, 2026-11-22: the 256-router random regular graph of degree 16, whi
 (QEMU at about 1,570% CPU) and 34 GiB, on the lab CPUs only. The host, sampled every 30 s (125 samples): uplink
 configured throughout, interface count unchanged, netlink route dump 2 to 13 ms, every router ping answered within
 10 ms, load 19 to 30 against about 20 before the guest started. The same lab run directly on the host (2026-11-21)
-held the host's load at about 800 for its five hours.
+held the host's load at about 800 for most of its five hours.
 
 Status, 2026-11-20. The 16-router validation (random graph of degree 4) passed in a cluster pod as well: uid 1000,
 no capabilities, no KVM, 2 vCPUs, 96 minutes, every window consistent. Averaged over link-down and link-up windows,
