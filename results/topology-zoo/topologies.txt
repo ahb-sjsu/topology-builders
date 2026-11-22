@@ -1,0 +1,14 @@
+ZOO TataNld own degree 2.5315 targets 2.527972,4,8
+ZOO Uninett2011 own degree 2.8182 targets 2.810606,4,8
+ZOO Uunet own degree 3.6667 targets 3.654762,8
+ZOO AttMpls own degree 4.4800 targets 4.460000,8
+TOPOLOGY 7ffed28d5cc8302a988a4de1fff39a85afb8e1352d90ebcc168eb12b072658cc  topos/zoo-AttMpls/zoo-AttMpls-avg4.46-nearest.json
+TOPOLOGY bab17e7b004f475e20fbddc6a76a1cc8159fa341267ef4d363dcd4d7c735810c  topos/zoo-AttMpls/zoo-AttMpls-avg8-nearest.json
+TOPOLOGY efe65251568bff86163cfed0f30634c1165d8b6468da697b330d6e3440028a0f  topos/zoo-TataNld/zoo-TataNld-avg2.52797-nearest.json
+TOPOLOGY 63e4f303ed7c13b0c08d23802956a45ab2a7b460123522da8eb92bd80c56aa31  topos/zoo-TataNld/zoo-TataNld-avg4-nearest.json
+TOPOLOGY 7a4de4ef7919085a7f2ff3d4ef6c530128fbf2cf83ad092fd718e7dcda91a01b  topos/zoo-TataNld/zoo-TataNld-avg8-nearest.json
+TOPOLOGY 988194c0a52d5e9fd4933bb4fa7ca9e6dd8117c2e0e55806fa9f45b77491d2c4  topos/zoo-Uninett2011/zoo-Uninett2011-avg2.81061-nearest.json
+TOPOLOGY 71e4972a339264c147d8ec89b5005a55f5610f6feca10288746dd3325ede9f58  topos/zoo-Uninett2011/zoo-Uninett2011-avg4-nearest.json
+TOPOLOGY f919ab6a2cc0e7c8f652f04fc0f3f0c2e632a7f78df9b7a3fe91d9f326082a45  topos/zoo-Uninett2011/zoo-Uninett2011-avg8-nearest.json
+TOPOLOGY 30c28ca36022b7953aeeb1537e80375e2010327662cb72c0c5c6d85d4c5c1f5f  topos/zoo-Uunet/zoo-Uunet-avg3.65476-nearest.json
+TOPOLOGY 79815d668eb4724db30e428e6b6684a186ef3cf31c214eaacc4c51966f276be1  topos/zoo-Uunet/zoo-Uunet-avg8-nearest.json

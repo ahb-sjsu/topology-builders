@@ -58,7 +58,7 @@ flowchart LR
 |---|---|---|---|---|
 | Model: `flood_model` | the draft's reflood decision, no FRR | Python | milliseconds per change, any size | with flood reduction on, within 20% of FRR's LSP counts on link-down windows on 26 of 28 64-router topologies, and within 15% on all 14 graphs of the seeds-n64 and random-regular-n128 runs, where its lockstep saving is within 5 points of FRR's; on fat-trees and n-flies (20 to 180 switches) within 5% when a link goes down, with FRR saving 7 to 14 points more than the lockstep figure |
 | Docker labs: `measure` | real FRR, a container per router | Linux, root, Docker, containerlab | real time | the measurements on Atlas (an HP Z840 workstation with two Xeon E5-2690 v3) in `results/`, except mechanism, model-decisions and colab-shaped, up to 180 routers; 256-router Docker labs could not be deployed on Atlas |
-| Namespace labs: `measure --backend netns` | real FRR, a network namespace per router | Linux, root or `unshare -Urnm` | real time | the Colab results, and on Atlas the decision check, the failure replay (mechanism) and colab-shaped. With the same links as a Docker run on Atlas, Colab's LSP counts with flood reduction on nearly matched it, and without it were 5% to 15% lower. On Atlas, 256-router labs run (degree 4 and 8 converged in every run, at about 35 and 48 MiB per router; degree 16 never converged on 20 CPUs, with or without flood reduction); larger ones stopped on 2026-11-22 and will run in KVM guests |
+| Namespace labs: `measure --backend netns` | real FRR, a network namespace per router | Linux, root or `unshare -Urnm` | real time | the Colab results, and on Atlas the decision check, the failure replay (mechanism) and colab-shaped. With the same links as a Docker run on Atlas, Colab's LSP counts with flood reduction on nearly matched it, and without it were 5% to 15% lower. On Atlas, 256-router labs run (degree 4 and 8 converged in every run, at about 35 and 48 MiB per router; degree 16 never converged on 20 CPUs, with or without flood reduction); larger ones run in KVM guests since 2026-11-22 |
 | Colab: `tools/colab` | namespace labs on a Colab runtime | a Google account | real time, on the runtime's CPUs | passed `test_in_docker.sh` (Colab's permissions, 2 CPUs); on Colab itself, 16-router labs converged on free CPU and TPU runtimes, and 64-router labs of up to 768 links in four Pro sessions with 8 CPUs, whose LSP savings agreed within 1 point (2026-11-21) |
 | Emulated guest: `tools/overlay` | Docker labs inside QEMU, software emulation | QEMU; no root, no KVM | much slower: deploying a 16-router lab took 225 s, against 9 s on the host | a 16-router lab runs on the host and in a cluster pod; link-down LSP counts within 17% of the host's; link-up, router and multi-link windows 1.2 to 1.7 times, bring-up 1.5 to 2.6 times; scaling timers by 10 is not a fix; CPU and times not comparable |
 | Decision check: `tools/model` | FRR's logged decisions against the model's | as namespace labs | real time | all 1,186 decisions logged on five topologies match the model, given the snapshot each router used; after router and multi-link failures, it shows which relays decided with the topology from before the failure |
@@ -387,7 +387,8 @@ down with size (degree 8: 35%, 19% and 15% at 64, 128 and 256 routers); isisd CP
 all at degree 8, where receiving LSPs costs 2.5 times as much with flood reduction on. At degree 16 (2,048 links)
 the network never converged on 20 CPUs, with or without flood reduction: it flooded itself continuously (6.5
 million LSPs in a 30 s window with no event) while adjacencies kept expiring, and flood reduction, which suppressed
-about 6% of the sends, did not rescue it as it did at 64 routers and degree 32. Larger sizes are running
+about 6% of the sends, did not rescue it as it did at 64 routers and degree 32. Under FRR's default timers it
+converges ([operator-timers](results/operator-timers/README.md)). Larger sizes run in KVM guests
 ([Not here yet](#not-here-yet)).
 
 **Multistage butterflies.** [results/nfly](results/nfly/README.md): FRR on four k-ary n-flies of 27 to 80 switches.
@@ -403,6 +404,20 @@ to 55%; isisd CPU for a link change is lower in 23 of 30 pairs, by a median of 2
 180 routers still converged on 20 CPUs. [results/model-fat-tree](results/model-fat-tree/README.md): the model up to
 k = 24 (720 switches), where the saving nears two-thirds while random graphs of the same size and degree stay near
 20%.
+
+**FRR's default timers.** [results/operator-timers](results/operator-timers/README.md): four 64-router graphs under
+the study's timers (hello 1 s x 3, `lsp-gen-interval` 2) and under FRR's defaults (hello 3 s x 10,
+`lsp-gen-interval` 30), in KVM guests. The LSP saving for a link change is the same under both, within one point
+(68% to 94%). Bring-up is not: without flood reduction FRR's defaults send far fewer LSPs, and the bring-up saving
+falls from 31-70% to 6-12%. The 256-router graph of degree 16, which never converged under the study's timers,
+converges under FRR's defaults and saves 23% per link change; its isisd CPU does not fall, route computation being
+nearly all of it.
+
+**Real networks.** [results/topology-zoo](results/topology-zoo/README.md): four Topology Zoo networks of 25 to 143
+routers (TataNld, Uninett2011, Uunet, AttMpls), as they are and with the shortest links added up to average degree 4
+and 8. As they are, they save 9% to 56% of the LSPs for a link change, in the order of their two-hop multiplicity
+(1.05 to 1.41); at average degree 8, 64% to 76%. FRR's default timers change the link-change saving by at most 2
+points. The topology files are not included (the Zoo data states no license); their sha256 are.
 
 ## Without Docker, and on Colab
 
@@ -474,13 +489,13 @@ a snapshot with the new link, while `flood_link_change` assumes the snapshot wit
 
 - FRR runs of n-flies above 80 switches and fat-trees above k = 12 (model only so far:
   [model-fat-tree](results/model-fat-tree/README.md), [model-nfly](results/model-nfly/README.md)).
-- 512 to 2,048 routers: random regular graphs of degree 4, 8 and 16. Stopped on 2026-11-22: on the namespace
-  backend directly on Atlas, the first 512-router lab (degree 4, flood reduction off) never converged and took the
-  host's uplink down (see the placement note above). They will run in KVM guests (`tools/overlay/run_vm.sh`), one at
-  a time. The sealed test of the two-hop law in
-  [observation-theory-campaigns](https://github.com/ahb-sjsu/observation-theory-campaigns)
-  (`experiments/PREREG-FL1-001.md`) fixes these sizes and their setup (the namespace backend, one container per degree,
-  routers on Atlas's CPUs 12-23,36-43); whether runs in a guest can grade it is open.
+- 512 and 1,024 routers: random regular graphs of degree 4, 8 and 16. The first attempt, on the namespace backend
+  directly on Atlas, stopped on 2026-11-22: the first 512-router lab (degree 4, flood reduction off) never converged
+  and took the host's uplink down (see the placement note above). They run now in KVM guests under FRR's default
+  timers, one at a time, as the sealed test of the two-hop law in
+  [observation-theory-campaigns](https://github.com/ahb-sjsu/observation-theory-campaigns) fixes them
+  (`experiments/PREREG-FL1-002.md`, the successor of `PREREG-FL1-001`, whose setup can no longer run). 2,048 routers
+  are left out: their labs would need more memory and time than a guest on this host has.
 - An exporter to netlab, as a second, independent path to FRR IS-IS.
 
 [SURVEY.md](https://github.com/ahb-sjsu/topology-builders/blob/main/SURVEY.md) lists the existing builders and lab tools, with licenses and status, so that this repository
