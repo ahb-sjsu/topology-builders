@@ -58,7 +58,7 @@ flowchart LR
 |---|---|---|---|---|
 | Model: `flood_model` | the draft's reflood decision, no FRR | Python | milliseconds per change, any size | with flood reduction on, within 20% of FRR's LSP counts on link-down windows on 26 of 28 64-router topologies, and within 15% on all 14 graphs of the seeds-n64 and random-regular-n128 runs, where its lockstep saving is within 5 points of FRR's; on fat-trees and n-flies (20 to 180 switches) within 5% when a link goes down, with FRR saving 7 to 14 points more than the lockstep figure |
 | Docker labs: `measure` | real FRR, a container per router | Linux, root, Docker, containerlab | real time | the measurements on Atlas (an HP Z840 workstation with two Xeon E5-2690 v3) in `results/`, except mechanism, model-decisions and colab-shaped, up to 180 routers; 256-router Docker labs could not be deployed on Atlas |
-| Namespace labs: `measure --backend netns` | real FRR, a network namespace per router | Linux, root or `unshare -Urnm` | real time | the Colab results, and on Atlas the decision check, the failure replay (mechanism) and colab-shaped. With the same links as a Docker run on Atlas, Colab's LSP counts with flood reduction on nearly matched it, and without it were 5% to 15% lower. On Atlas, 256-router labs run (degree 4 and 8 converged in every run, at about 35 and 48 MiB per router; degree 16 never converged on 20 CPUs, with or without flood reduction), and larger ones are running |
+| Namespace labs: `measure --backend netns` | real FRR, a network namespace per router | Linux, root or `unshare -Urnm` | real time | the Colab results, and on Atlas the decision check, the failure replay (mechanism) and colab-shaped. With the same links as a Docker run on Atlas, Colab's LSP counts with flood reduction on nearly matched it, and without it were 5% to 15% lower. On Atlas, 256-router labs run (degree 4 and 8 converged in every run, at about 35 and 48 MiB per router; degree 16 never converged on 20 CPUs, with or without flood reduction); larger ones stopped on 2026-11-22 and will run in KVM guests |
 | Colab: `tools/colab` | namespace labs on a Colab runtime | a Google account | real time, on the runtime's CPUs | passed `test_in_docker.sh` (Colab's permissions, 2 CPUs); on Colab itself, 16-router labs converged on free CPU and TPU runtimes, and 64-router labs of up to 768 links in four Pro sessions with 8 CPUs, whose LSP savings agreed within 1 point (2026-11-21) |
 | Emulated guest: `tools/overlay` | Docker labs inside QEMU, software emulation | QEMU; no root, no KVM | much slower: deploying a 16-router lab took 225 s, against 9 s on the host | a 16-router lab runs on the host and in a cluster pod; link-down LSP counts within 17% of the host's; link-up, router and multi-link windows 1.2 to 1.7 times, bring-up 1.5 to 2.6 times; scaling timers by 10 is not a fix; CPU and times not comparable |
 | Decision check: `tools/model` | FRR's logged decisions against the model's | as namespace labs | real time | all 1,186 decisions logged on five topologies match the model, given the snapshot each router used; after router and multi-link failures, it shows which relays decided with the topology from before the failure |
@@ -147,23 +147,27 @@ topotest:
 `--cpu-set 12-23,36-43` confines every router of the lab to those CPUs (containerlab's `cpu-set`), so that a dense
 lab cannot take the whole host and its runs see the same CPUs every time.
 
-Run large labs inside a container or VM with its own network namespace, not directly on a host whose own network
-matters. A 64-router lab creates over a thousand interfaces in the namespace containerlab runs in. On one host,
-deploying a 512-link lab made systemd-networkd time out and give up on the host's uplink, whose DHCP lease then
-lapsed. We now run containerlab and its own Docker inside a privileged LXD container with nesting enabled:
+Run large labs in a virtual machine with its own kernel, not on a host whose own network matters. A network
+namespace or a container (Docker, LXD) keeps a lab's interfaces and routes apart from the host's, but not its kernel:
+the lab's netlink traffic, processes and memory are the host kernel's too. A 64-router lab creates over a thousand
+interfaces. On one host, deploying a 512-link lab made systemd-networkd time out and give up on the host's uplink,
+whose DHCP lease then lapsed. On 2026-11-22 it happened again with every router in a network namespace inside a
+container with no network device: a 512-router lab whose flooding never converged pushed the host's load to about
+1,560, and a netlink request from systemd-networkd for the uplink's route timed out. `tools/overlay/run_vm.sh` runs a
+lab in a KVM guest instead:
 
 ```mermaid
 flowchart TB
-    subgraph host["Host: its uplink and network manager never see a lab interface"]
-        subgraph lxd["LXD container: own network namespace, limited to a CPU set"]
-            D["Docker and containerlab"] --> R1["FRR router"] & R2["FRR router"] & R3["... one container per router"]
+    subgraph host["Host: no lab interface, process or route; started without sudo"]
+        subgraph vm["KVM guest: its own kernel, no network device, CPUs confined at low weight"]
+            D["the lab: Docker, or a namespace per router"] --> R1["FRR router"] & R2["FRR router"] & R3["..."]
             R1 -.-|veth pairs| R2
         end
+        S[("shared folder: job in, records out")] <--> vm
     end
 ```
 
-In a test with an 8-router lab, the host's interface count did not change during deployment and systemd-networkd
-logged nothing about the lab.
+See [tools/overlay](tools/overlay/README.md).
 
 Each lab directory holds the containerlab file, one directory per router, `lab.json` (every router's loopback,
 NET and port count, and every link's ports and addresses) and `manifest.json` (SHA-256 of each file). Node kind
@@ -470,11 +474,13 @@ a snapshot with the new link, while `flood_link_change` assumes the snapshot wit
 
 - FRR runs of n-flies above 80 switches and fat-trees above k = 12 (model only so far:
   [model-fat-tree](results/model-fat-tree/README.md), [model-nfly](results/model-nfly/README.md)).
-- 512 to 2,048 routers. These are running on Atlas with the namespace backend (from 2026-11-21): random regular
-  graphs of degree 4, 8 and 16, one size after another, after the 256-router results above. Before each size's
-  labs start, a prediction of its saving from the two-hop multiplicity is written down and hashed, for a sealed test
-  of that law in the [observation-theory-campaigns](https://github.com/ahb-sjsu/observation-theory-campaigns)
-  repository (`experiments/PREREG-FL1-001.md`). The data and tables go into `results/` when each size finishes.
+- 512 to 2,048 routers: random regular graphs of degree 4, 8 and 16. Stopped on 2026-11-22: on the namespace
+  backend directly on Atlas, the first 512-router lab (degree 4, flood reduction off) never converged and took the
+  host's uplink down (see the placement note above). They will run in KVM guests (`tools/overlay/run_vm.sh`), one at
+  a time. The sealed test of the two-hop law in
+  [observation-theory-campaigns](https://github.com/ahb-sjsu/observation-theory-campaigns)
+  (`experiments/PREREG-FL1-001.md`) fixes these sizes and their setup (the namespace backend, one container per degree,
+  routers on Atlas's CPUs 12-23,36-43); whether runs in a guest can grade it is open.
 - An exporter to netlab, as a second, independent path to FRR IS-IS.
 
 [SURVEY.md](https://github.com/ahb-sjsu/topology-builders/blob/main/SURVEY.md) lists the existing builders and lab tools, with licenses and status, so that this repository

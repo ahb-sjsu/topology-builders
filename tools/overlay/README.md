@@ -23,6 +23,8 @@ flowchart LR
 | `build.sh` | Bakes the guest once, with KVM: Ubuntu 24.04, Docker and containerlab copied from the host, an FRR image, topology-builders. Writes `golden-flat.qcow2`. |
 | `guest/` | Installed in the guest by the bake. At boot, `tb-job.sh` mounts the 9p share, runs `job.sh` with a timeout, writes `out/`, and powers off. |
 | `run_tcg.sh` | Runs one job in the guest under TCG, unprivileged, on a host. |
+| `run_vm.sh` | Runs one job in the guest under KVM through libvirt, as a user in the libvirt group (no sudo): no network device, vCPUs confined to a CPU set at low CPU weight. It refuses to start while the host-network watchdog's STOP file exists or another job VM runs, and destroys the guest when STOP appears or at the timeout. Use it for any lab on a host whose own network matters. |
+| `jobs/netns/` | A job for `run_vm.sh`: one lab pair on the namespace backend in the `tb-colab-test` image (loaded from a read-only `images` share), records appended to the share as each finishes. |
 | `jobs/validate16.sh` | The 16-router validation: random regular, degree 4; CPU per handler for one link; timing for link, router and multi-link failures. |
 | `pod/` | The pod image (`build_image.sh`, `Dockerfile`, `entry.sh`) and a submitter for nats-bursting (`submit_nats.py`). The pod prints its results to its log, gzipped and base64-encoded between markers. |
 
@@ -42,6 +44,29 @@ were consistent, but LSP counts for bring-up and for links coming up were 1.5 to
 counts were close). The window-by-window comparison below gives the ranges per kind of window. CPU times and convergence times inside the guest are not comparable with the host's either; compare
 them only with other runs in the same setup. QEMU's user-mode networking and the 9p share create nothing on the
 host's network.
+
+## Labs in a KVM guest: run_vm.sh
+
+On a host whose own network matters, run every lab with `run_vm.sh`, not in a namespace or container on the host
+(see the placement note in the top-level README). The guest has its own kernel and no network device; the host
+sees only QEMU's threads, on the lab CPUs at low weight, running as libvirt's QEMU user. One job VM at a time; none
+starts while the host-network watchdog's STOP file exists.
+
+```
+docker save tb-colab-test:latest -o work/images/tb-colab-test.tar     # once, for jobs/netns
+mkdir -p job/labs && cp tools/overlay/jobs/netns/job.sh job/ && cp -r topology_builders job/
+topology-builders clab rr64-d16.json --out job/labs/rr64-d16 --name rr64-d16
+echo "--profile --links 3 --repeat 2 --max-wait 600 --window 60" > job/measure.args
+tools/overlay/run_vm.sh work rr64-d16 job 16 32768 10800    # records: work/runs/rr64-d16/share/out/
+```
+
+Validation, 2026-11-22 on the HP Z840: the 64-router random regular graph of degree 16 (`random-regular-n64-d16-s1`,
+hello 1 s x 3, lsp-gen-interval 2), flood reduction off and on, two runs each, 16 vCPUs, 38 minutes. Every run
+converged. With flood reduction on, link-down windows sent 334 to 366 LSPs and link-up windows 505 to 540, against
+330 to 372 and 496 to 548 in a Docker run on the host with the same links. Without it, 8% (link down) and 10% (link
+up) fewer on average than Docker, inside the 5% to 15% by which Colab's namespace labs sent fewer. The host, sampled
+every 30 s: its uplink stayed configured in systemd-networkd, its interface count did not change, a netlink route
+dump took 3 to 7 ms and the router answered every ping within 5.2 ms.
 
 Status, 2026-11-20. The 16-router validation (random graph of degree 4) passed in a cluster pod as well: uid 1000,
 no capabilities, no KVM, 2 vCPUs, 96 minutes, every window consistent. Averaged over link-down and link-up windows,
