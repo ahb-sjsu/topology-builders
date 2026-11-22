@@ -58,7 +58,7 @@ flowchart LR
 |---|---|---|---|---|
 | Model: `flood_model` | the draft's reflood decision, no FRR | Python | milliseconds per change, any size | with flood reduction on, within 20% of FRR's LSP counts on link-down windows on 26 of 28 64-router topologies, and within 15% on all 14 graphs of the seeds-n64 and random-regular-n128 runs, where its lockstep saving is within 5 points of FRR's; on fat-trees and n-flies (20 to 180 switches) within 5% when a link goes down, with FRR saving 7 to 14 points more than the lockstep figure |
 | Docker labs: `measure` | real FRR, a container per router | Linux, root, Docker, containerlab | real time | the measurements on Atlas (an HP Z840 workstation with two Xeon E5-2690 v3) in `results/`, except mechanism, model-decisions and colab-shaped, up to 180 routers; 256-router Docker labs could not be deployed on Atlas |
-| Namespace labs: `measure --backend netns` | real FRR, a network namespace per router | Linux, root or `unshare -Urnm` | real time | the Colab results, and on Atlas the decision check, the failure replay (mechanism) and colab-shaped. With the same links as a Docker run on Atlas, Colab's LSP counts with flood reduction on nearly matched it, and without it were 5% to 15% lower. On Atlas, 256-router labs run (degree 4: every run converged, about 34 MB of memory per router), and larger ones are running |
+| Namespace labs: `measure --backend netns` | real FRR, a network namespace per router | Linux, root or `unshare -Urnm` | real time | the Colab results, and on Atlas the decision check, the failure replay (mechanism) and colab-shaped. With the same links as a Docker run on Atlas, Colab's LSP counts with flood reduction on nearly matched it, and without it were 5% to 15% lower. On Atlas, 256-router labs run (degree 4 and 8 converged in every run, at about 35 and 48 MiB per router; degree 16 never converged on 20 CPUs, with or without flood reduction), and larger ones are running |
 | Colab: `tools/colab` | namespace labs on a Colab runtime | a Google account | real time, on the runtime's CPUs | passed `test_in_docker.sh` (Colab's permissions, 2 CPUs); on Colab itself, 16-router labs converged on free CPU and TPU runtimes, and 64-router labs of up to 768 links in four Pro sessions with 8 CPUs, whose LSP savings agreed within 1 point (2026-11-21) |
 | Emulated guest: `tools/overlay` | Docker labs inside QEMU, software emulation | QEMU; no root, no KVM | much slower: deploying a 16-router lab took 225 s, against 9 s on the host | a 16-router lab runs on the host and in a cluster pod; link-down LSP counts within 17% of the host's; link-up, router and multi-link windows 1.2 to 1.7 times, bring-up 1.5 to 2.6 times; scaling timers by 10 is not a fix; CPU and times not comparable |
 | Decision check: `tools/model` | FRR's logged decisions against the model's | as namespace labs | real time | all 1,186 decisions logged on five topologies match the model, given the snapshot each router used; after router and multi-link failures, it shows which relays decided with the topology from before the failure |
@@ -375,7 +375,16 @@ degree 32, without flood reduction none of the 9 runs converged on 20 CPUs.
 routers. LSPs fall by 8%, 19% and 53%, less than at 64 routers of the same degree; matched by two-hop multiplicity
 instead of degree, the two sizes agree. isisd CPU falls by 1% to 8%: route computation is nearly all of it, and each costs twice
 as much as at 64 routers. 256-router labs could not be deployed with containerlab on this host; with the namespace
-backend they run, and larger ones are running ([Not here yet](#not-here-yet)).
+backend they run (next).
+
+**256 routers.** [results/random-regular-n256](results/random-regular-n256/README.md): degree 4, 8 and 16 at 256
+routers, on the namespace backend. LSPs fall by 9% and 15% at degree 4 and 8, following the two-hop multiplicity
+down with size (degree 8: 35%, 19% and 15% at 64, 128 and 256 routers); isisd CPU falls 9% at degree 4 and not at
+all at degree 8, where receiving LSPs costs 2.5 times as much with flood reduction on. At degree 16 (2,048 links)
+the network never converged on 20 CPUs, with or without flood reduction: it flooded itself continuously (6.5
+million LSPs in a 30 s window with no event) while adjacencies kept expiring, and flood reduction, which suppressed
+about 6% of the sends, did not rescue it as it did at 64 routers and degree 32. Larger sizes are running
+([Not here yet](#not-here-yet)).
 
 **Multistage butterflies.** [results/nfly](results/nfly/README.md): FRR on four k-ary n-flies of 27 to 80 switches.
 LSPs for a link change fall by 25% and 32% on the 2-ary flies and by 51% and 57% on the 3- and 4-ary 3-flies,
@@ -461,10 +470,11 @@ a snapshot with the new link, while `flood_link_change` assumes the snapshot wit
 
 - FRR runs of n-flies above 80 switches and fat-trees above k = 12 (model only so far:
   [model-fat-tree](results/model-fat-tree/README.md), [model-nfly](results/model-nfly/README.md)).
-- 256 to 2,048 routers. These are running on Atlas with the namespace backend (from 2026-11-21): random regular
-  graphs of degree 4, 8 and 16, one size after another. The first lab, 256 routers at degree 4 (two runs of each
-  variant), converged in every run and sent 9% fewer LSPs per link change with flood reduction (13% at 64 routers, 8%
-  at 128). The data and tables go into `results/` when each size finishes.
+- 512 to 2,048 routers. These are running on Atlas with the namespace backend (from 2026-11-21): random regular
+  graphs of degree 4, 8 and 16, one size after another, after the 256-router results above. Before each size's
+  labs start, a prediction of its saving from the two-hop multiplicity is written down and hashed, for a sealed test
+  of that law in the [observation-theory-campaigns](https://github.com/ahb-sjsu/observation-theory-campaigns)
+  repository (`experiments/PREREG-FL1-001.md`). The data and tables go into `results/` when each size finishes.
 - An exporter to netlab, as a second, independent path to FRR IS-IS.
 
 [SURVEY.md](https://github.com/ahb-sjsu/topology-builders/blob/main/SURVEY.md) lists the existing builders and lab tools, with licenses and status, so that this repository

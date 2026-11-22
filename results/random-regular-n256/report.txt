@@ -1,0 +1,40 @@
+Link changes: every link-down and link-up window; diameter and two-hop multiplicity of the topology; mean LSPs sent and isisd ms net of the quiet window, off -> on; pairs with the on figure lower; windows satisfied
+topology                          degree diam 2-hop  LSPs off      on saving pairs net ms off      on saving pairs median satisfied
+random regular, degree 4, seed 1     4.0    7  1.01     1,452   1,328     9%  6/6       9,282   8,418     9%  5/6     11%     24/24
+random regular, degree 8, seed 1     8.0    4  1.09     3,133   2,678    15%  6/6      16,697  17,428    -4%  2/6     -2%     24/24
+random regular, degree 16, seed 1   16.0    3  1.50 6,653,448 6,965,558    -5%  1/6      29,431  38,483   -31%  3/6     16%      0/24
+
+Bring-up: mean LSPs sent and isisd ms from the routers' start, off -> on; runs converged, and quiet windows satisfied, off and on
+topology                          degree    LSPs off        on saving      ms off        on saving converged     quiet
+random regular, degree 4, seed 1     4.0     338,477   327,995     3%     114,590    99,575    13%   2/2 2/2   2/2 2/2
+random regular, degree 8, seed 1     8.0   1,135,831 1,018,720    10%     345,700   346,405    -0%   2/2 2/2   2/2 2/2
+random regular, degree 16, seed 1   16.0  49,204,294 39,815,684    19%   9,333,210 8,776,655     6%   0/2 0/2   0/2 0/2
+
+isisd CPU per event handler, mean ms per link window net of the quiet window, off -> on
+random regular, degree 4, seed 1 (12 and 12 windows)
+  isis_run_spf_cb                            10,154.1    8,671.7
+  isis_receive                                  117.7      434.7
+  tx_queue_send_event                            27.0       24.9
+  vtysh_read                                      8.6       -2.7
+  dyn_cache_cleanup                               3.6        3.1
+  vtysh_accept                                    2.2        0.4
+  zclient_read                                    1.4        1.1
+  lsp_refresh                                     0.4        0.4
+random regular, degree 8, seed 1 (12 and 12 windows)
+  isis_run_spf_cb                            16,540.4   16,768.4
+  isis_receive                                  400.7    1,013.5
+  tx_queue_send_event                            44.1       40.6
+  dyn_cache_cleanup                               3.1        3.2
+  zclient_read                                    1.4        1.5
+  lsp_refresh                                     0.3        0.3
+  vtysh_read                                     -1.9       -1.1
+  vtysh_accept                                   -1.4       -1.8
+random regular, degree 16, seed 1 (12 and 12 windows)
+  isis_run_spf_cb                            21,382.6   21,549.9
+  isis_receive                                3,206.8   12,517.2
+  isis_adj_expire                             2,414.5      589.1
+  tx_queue_send_event                         1,189.0    2,393.4
+  send_hello_cb                                 232.2       20.8
+  send_l2_psnp                                  126.2       75.1
+  lsp_refresh                                    59.3       -1.2
+  lsp_tick                                       40.1       17.4
