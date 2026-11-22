@@ -68,6 +68,13 @@ up) fewer on average than Docker, inside the 5% to 15% by which Colab's namespac
 every 30 s: its uplink stayed configured in systemd-networkd, its interface count did not change, a netlink route
 dump took 3 to 7 ms and the router answered every ping within 5.2 ms.
 
+Under a storm, 2026-11-22: the 256-router random regular graph of degree 16, which never converged on the host
+(`results/random-regular-n256`), for one hour in a guest with 16 vCPUs and 64 GiB. The guest used all 16 vCPUs
+(QEMU at about 1,570% CPU) and 34 GiB, on the lab CPUs only. The host, sampled every 30 s (125 samples): uplink
+configured throughout, interface count unchanged, netlink route dump 2 to 13 ms, every router ping answered within
+10 ms, load 19 to 30 against about 20 before the guest started. The same lab run directly on the host (2026-11-21)
+held the host's load at about 800 for its five hours.
+
 Status, 2026-11-20. The 16-router validation (random graph of degree 4) passed in a cluster pod as well: uid 1000,
 no capabilities, no KVM, 2 vCPUs, 96 minutes, every window consistent. Averaged over link-down and link-up windows,
 flood reduction off and on sent 138 and 93 LSPs per change in the pod against 96 and 61 on the host. Window by
