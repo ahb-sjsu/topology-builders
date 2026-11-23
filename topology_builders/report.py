@@ -12,6 +12,8 @@ import gzip
 import json
 from statistics import mean, median
 
+from .measure import net_isisd_ms
+
 LINK_PHASES = ("link-down", "link-up")
 
 
@@ -94,8 +96,7 @@ def rows(records, kind="link"):
         for k, rs in side.items():
             link = [p for r in rs for p in r["phases"] if p["phase"] in phases]
             windows[k] = {"lsps": _span([p["counters"].get("tx_l2_lsp", 0) for p in link]),
-                          "net_ms": _span([p["net_of_quiet"]["cpu_ms"].get("isisd", 0) for p in link
-                                           if p.get("net_of_quiet")]),
+                          "net_ms": _span([x for x in map(net_isisd_ms, link) if x is not None]),
                           "satisfied": sum(p["outcome"] == "satisfied" for p in link), "windows": len(link)}
             up = [p for r in rs for p in r["phases"] if p["phase"] == "bring-up"]
             quiet = [p for r in rs for p in r["phases"] if p["phase"] == "quiet"]
@@ -104,9 +105,9 @@ def rows(records, kind="link"):
                            "converged": sum(bool(r.get("converged")) for r in rs),
                            "quiet_satisfied": sum(p["outcome"] == "satisfied" for p in quiet), "quiet": len(quiet)}
             for p in link:
-                if p.get("net_of_quiet"):
+                if (n := net_isisd_ms(p)) is not None:
                     pair = pairs.setdefault((_index(p), p["phase"]), {"off": [], "on": []})
-                    pair[k].append((p["counters"].get("tx_l2_lsp", 0), p["net_of_quiet"]["cpu_ms"].get("isisd", 0)))
+                    pair[k].append((p["counters"].get("tx_l2_lsp", 0), n))
         both = [x for x in pairs.values() if x["off"] and x["on"]]
         lsp = [(mean(a for a, _ in x["off"]), mean(a for a, _ in x["on"])) for x in both]
         cpu = [(mean(b for _, b in x["off"]), mean(b for _, b in x["on"])) for x in both]

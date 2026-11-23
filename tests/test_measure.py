@@ -280,3 +280,18 @@ def test_netns_run_with_a_log_does_not_wait_for_forked_children(tmp_path):
     lab.frr_lib, lab.run_base = "/frr", "/run/frr"
     assert lab.daemon_log(lab.daemon_command("r4", "zebra")) == "/run/frr/r4/zebra.start.log"
     assert lab.daemon_log(["nsenter", "--net=/run/netns/r4", "--", "ip", "link"]) is None
+
+
+def test_a_window_without_net_cpu_is_skipped_not_fatal():
+    # net() is None when a router could not be read; records written before 2026-11-23 could then carry only the
+    # per-handler figures. Neither may stop the one-line summary or the table.
+    base = {"counters": {"tx_l2_lsp": 7}, "cpu_ms": {"isisd": 40.0}, "outcome": "unknown"}
+    phases = [dict(base, phase="link-down", net_of_quiet=None),
+              dict(base, phase="link-down", net_of_quiet={"event_cpu_ms": {"isis_receive": 1.5}}),
+              dict(base, phase="link-down", net_of_quiet={"counters": {}, "cpu_ms": {"isisd": 4.0}})]
+    assert [M.net_isisd_ms(p) for p in phases] == [None, None, 4.0]
+    rec = {"lab": "x-off", "repeat": 0, "settings": {"flood_reduction": False}, "phases": phases}
+    text = M.line(rec)
+    assert text.count("net of quiet") == 1 and "+4 ms net of quiet" in text
+    (row,) = M.summarize([rec])
+    assert row["isisd_net_ms"] == 4.0 and row["runs"] == 3

@@ -205,6 +205,14 @@ def net(total, quiet):
             "cpu_ms": {k: round(v, 1) for k, v in diff(total["cpu_ms"], quiet["cpu_ms"]).items()}}
 
 
+def net_isisd_ms(phase):
+    """isisd ms of a window net of the quiet window, or None when there is none: a router could not be read in either
+    window. Records written before 2026-11-23 can then hold only the per-handler figures (`event_cpu_ms`), with no
+    `cpu_ms`; this reads them the same way."""
+    cpu = (phase.get("net_of_quiet") or {}).get("cpu_ms")
+    return None if cpu is None else cpu.get("isisd", 0)
+
+
 def pick_links(lab, seed, k=1):
     """k different links to take down, one after another: chosen by the seed and the topology file, so every variant
     gets the same ones. The first is the one pick_link gives."""
@@ -669,8 +677,8 @@ def run_one(lab, events, settle, window, max_wait, repeat, position, timing=Fals
                          "net_of_quiet": net(total, quiet), "per_router": per, "outcome": result, "detail": detail}
                 if ev["kind"] == "link":
                     phase["link"] = j
-                if profile and "event_cpu" in total and "event_cpu" in quiet:
-                    phase["net_of_quiet"] = dict(phase["net_of_quiet"] or {}, event_cpu_ms={
+                if profile and phase["net_of_quiet"] is not None and "event_cpu" in total and "event_cpu" in quiet:
+                    phase["net_of_quiet"] = dict(phase["net_of_quiet"], event_cpu_ms={
                         k: round(total["event_cpu"].get(k, [0, 0])[0] - quiet["event_cpu"].get(k, [0, 0])[0], 3)
                         for k in sorted(set(total["event_cpu"]) | set(quiet["event_cpu"]))})
                 ref = next((db for r, db in dbs.items() if r not in failed and db is not None), None)
@@ -729,7 +737,7 @@ def summarize(records):
         outcomes = {}
         for p in ps:
             outcomes[p["outcome"]] = outcomes.get(p["outcome"], 0) + 1
-        nets = [p["net_of_quiet"]["cpu_ms"].get("isisd", 0) for p in ps if p.get("net_of_quiet")]
+        nets = [x for x in map(net_isisd_ms, ps) if x is not None]
         rows.append({"lab": lab, "flood_reduction": fr, "phase": phase, "runs": n,
                      "lsps_sent": round(sum(p["counters"].get("tx_l2_lsp", 0) for p in ps) / n, 1),
                      "suppressed_sends": round(sum(p["counters"].get("fr_suppressed_sends", 0) for p in ps) / n, 1),
@@ -746,8 +754,8 @@ def line(rec):
     for p in rec["phases"]:
         c = p["counters"]
         cpu = f"isisd {p['cpu_ms'].get('isisd', 0):.0f} ms"
-        if p.get("net_of_quiet"):
-            cpu += f" ({p['net_of_quiet']['cpu_ms'].get('isisd', 0):+.0f} ms net of quiet)"
+        if (n := net_isisd_ms(p)) is not None:
+            cpu += f" ({n:+.0f} ms net of quiet)"
         conv = ""
         if p.get("timing"):
             conv = f", converged {p['timing']['max_ms']} ms"

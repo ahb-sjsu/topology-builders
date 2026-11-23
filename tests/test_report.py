@@ -148,3 +148,13 @@ def test_zoo_graphs_get_a_readable_label():
                                            "method": "random", "seed": 3}}
     assert R.label(rnd) == "Uunet (Topology Zoo), 91 links added (random), average degree 8, seed 3"
     assert R.label(rnd, seed=False) == "Uunet (Topology Zoo), 91 links added (random), average degree 8"
+
+
+def test_windows_without_net_cpu_are_left_out_of_cpu_but_not_of_lsps():
+    recs = [record(False, 0, (40, 200.0), (60, 400.0)), record(True, 0, (10, 150.0), (20, 450.0))]
+    for p in recs[1]["phases"]:
+        if p["phase"] == "link-up":
+            p["net_of_quiet"] = {"event_cpu_ms": {"isis_receive": 1.0}}  # as records written before 2026-11-23
+    (row,) = R.rows(recs)
+    assert row["windows"]["on"]["lsps"]["mean"] == 15 and row["windows"]["on"]["net_ms"]["mean"] == 150.0
+    assert row["pairs"]["n"] == 1  # the link-up pair has no CPU on one side
