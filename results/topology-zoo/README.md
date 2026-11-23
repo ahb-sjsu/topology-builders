@@ -92,10 +92,12 @@ on the same topology file (same sha256). The table uses the complete run; the th
 
 - `measurements.jsonl.gz`: the 56 records (14 labs x 2 variants x 2 runs). They carry each network's summary and
   the links taken down, not the graph.
-- `tables.txt`: from `zoo_tables.py`. `topology-builders report` does not yet label Zoo graphs readably, so its
-  report is not included.
+- `report-study-timers.txt`, `report-frr-default-timers.txt`: `topology-builders report`, one per timer set so
+  that the sets never pool, with isisd CPU per event handler.
+- `tables.txt`: from `zoo_tables.py`, one line per lab with the timer set.
 - `topologies.txt`: zoo targets and topology sha256 per file.
 
 ```
 python results/topology-zoo/zoo_tables.py results/topology-zoo/measurements.jsonl.gz
+topology-builders report <the records of one timer set>
 ```

@@ -42,6 +42,12 @@ def label(topology, seed=True):
         return f"leaf-spine, {p['leaves']} leaves x {p['spines']} spines"
     if family == "flattened-butterfly":
         return "flattened butterfly " + " x ".join(map(str, p["radices"]))
+    if family == "zoo":
+        name = f"{p.get('name')} (Topology Zoo)"
+        if not p.get("added_links"):
+            return f"{name}, as it is"
+        name += f", {p['added_links']} links added ({p.get('method')}), average degree {p.get('average_degree'):g}"
+        return name + (f", seed {p['seed']}" if seed and p.get("method") == "random" and "seed" in p else "")
     return f"{family} {json.dumps(p, sort_keys=True)}"
 
 

@@ -1,0 +1,51 @@
+Link changes: every link-down and link-up window; diameter and two-hop multiplicity of the topology; mean LSPs sent and isisd ms net of the quiet window, off -> on; pairs with the on figure lower; windows satisfied
+topology                             degree diam 2-hop  LSPs off      on saving pairs net ms off      on saving pairs median satisfied
+TataNld (Topology Zoo), as it is     2.5315   28  1.05       467     425     9%  6/6       2,595   2,549     2%  4/6      4%     24/24
+Uninett2011 (Topology Zoo), as it is 2.8182    9  1.07       252     218    13%  6/6         578     558     3%  3/6      0%     24/24
+Uunet (Topology Zoo), as it is       3.6667    8  1.27       226     140    38%  6/6         282     291    -3%  3/6      1%     24/24
+AttMpls (Topology Zoo), as it is       4.48    5  1.41       178      79    55%  6/6          38     168  -349%  0/6    -87%     24/24
+
+Bring-up: mean LSPs sent and isisd ms from the routers' start, off -> on; runs converged, and quiet windows satisfied, off and on
+topology                             degree    LSPs off        on saving      ms off        on saving converged     quiet
+TataNld (Topology Zoo), as it is     2.5315      55,777    55,034     1%      27,380    28,885    -5%   2/2 2/2   2/2 2/2
+Uninett2011 (Topology Zoo), as it is 2.8182      13,620    13,314     2%       7,810     7,905    -1%   2/2 2/2   2/2 2/2
+Uunet (Topology Zoo), as it is       3.6667       7,622     7,416     3%       4,570     4,695    -3%   2/2 2/2   2/2 2/2
+AttMpls (Topology Zoo), as it is       4.48       3,589     3,232    10%       2,430     2,555    -5%   2/2 2/2   2/2 2/2
+
+isisd CPU per event handler, mean ms per link window net of the quiet window, off -> on
+TataNld (Topology Zoo), as it is (12 and 12 windows)
+  isis_run_spf_cb                             2,183.8    2,325.7
+  isis_receive                                  116.2      184.2
+  send_l2_psnp                                   44.9       13.4
+  tx_queue_send_event                            13.6       11.5
+  send_hello_cb                                  12.6       -3.9
+  lsp_tick                                        7.1       -1.8
+  vtysh_accept                                    2.5        1.7
+  dyn_cache_cleanup                               1.7        1.8
+Uninett2011 (Topology Zoo), as it is (12 and 12 windows)
+  isis_run_spf_cb                               366.6      417.6
+  isis_receive                                   47.6       50.7
+  send_l2_psnp                                   13.6       19.0
+  tx_queue_send_event                             6.4        5.3
+  send_hello_cb                                   2.2        2.3
+  zclient_read                                    0.8        0.8
+  dyn_cache_cleanup                               0.5        0.5
+  lsp_refresh                                     0.3        0.3
+Uunet (Topology Zoo), as it is (12 and 12 windows)
+  isis_run_spf_cb                               233.6      228.8
+  isis_receive                                   35.8       35.2
+  tx_queue_send_event                             4.6        3.7
+  send_l2_psnp                                    0.9       -0.0
+  zclient_read                                    0.8        0.7
+  vtysh_read                                     -0.9        0.6
+  lsp_refresh                                     0.4        0.4
+  vtysh_accept                                   -0.1        0.3
+AttMpls (Topology Zoo), as it is (12 and 12 windows)
+  isis_run_spf_cb                                77.9       98.7
+  isis_receive                                   22.6       27.9
+  tx_queue_send_event                             5.5        2.6
+  send_l2_psnp                                   -3.3        1.4
+  send_hello_cb                                  -4.2        1.2
+  vtysh_read                                      0.2        0.9
+  zclient_read                                    0.7        0.8
+  lsp_refresh                                     0.3        0.4

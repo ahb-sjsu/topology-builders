@@ -135,3 +135,16 @@ def test_timing_and_profile_text():
     prof = R.profile_text(recs)
     assert prof.index("isis_receive") < prof.index("lsp_tick") and "30.0" in prof and "10.0" in prof
     assert R.timing_text([record(False, 0, (1, 1.0), (1, 1.0))]) == ""
+
+
+def test_zoo_graphs_get_a_readable_label():
+    own = {"family": "zoo", "parameters": {"name": "TataNld", "added_links": 0, "average_degree": 2.527972,
+                                           "method": "nearest", "routers": 143}}
+    assert R.label(own) == "TataNld (Topology Zoo), as it is"
+    denser = {"family": "zoo", "parameters": {"name": "TataNld", "added_links": 105, "average_degree": 4,
+                                              "method": "nearest"}}
+    assert R.label(denser) == "TataNld (Topology Zoo), 105 links added (nearest), average degree 4"
+    rnd = {"family": "zoo", "parameters": {"name": "Uunet", "added_links": 91, "average_degree": 8.0,
+                                           "method": "random", "seed": 3}}
+    assert R.label(rnd) == "Uunet (Topology Zoo), 91 links added (random), average degree 8, seed 3"
+    assert R.label(rnd, seed=False) == "Uunet (Topology Zoo), 91 links added (random), average degree 8"

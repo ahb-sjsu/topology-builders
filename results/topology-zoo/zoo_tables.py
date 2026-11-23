@@ -4,7 +4,7 @@
 
 Per row, as `topology-builders report` defines them: mean LSPs sent per link window (link-down and link-up pooled),
 flood reduction off and on, and the saving; mean isisd ms per link window net of the run's quiet window; bring-up
-LSPs; runs converged. The report's own topology labels do not yet name Zoo graphs, hence this script."""
+LSPs; runs converged. Unlike `topology-builders report`, it keeps the two timer sets apart in one file."""
 import gzip
 import json
 import sys
