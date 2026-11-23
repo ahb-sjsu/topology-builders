@@ -247,6 +247,26 @@ def test_netns_backend_commands_and_configs(tmp_path):
     assert M.BACKENDS == {"docker": M.Lab, "netns": M.NetnsLab}
 
 
+def test_netns_configuration_load_has_its_own_time_limit(tmp_path, monkeypatch):
+    from topology_builders import clab as C
+    from topology_builders import families as F
+    from topology_builders import output as O
+
+    src = tmp_path / "t.json"
+    O.write(F.leaf_spine(2, 1), str(src))
+    C.write_lab(str(src), str(tmp_path / "lab"), name="x")
+    lab = M.NetnsLab(str(tmp_path / "lab"), etc_base=str(tmp_path / "etc"), run_base=str(tmp_path / "run"),
+                     lib_base=str(tmp_path / "lib"), frr_lib="/frr")
+    lab.NETNS_DIR = str(tmp_path / "netns")  # never a real namespace of the machine running the test
+    calls = []
+    monkeypatch.setattr(lab, "_run", lambda args, timeout=120, log=None: calls.append((args, timeout)))
+    monkeypatch.setattr(M.time, "sleep", lambda s: None)
+    lab._deploy()
+    loads = [t for a, t in calls if a[-4:-2] == ["vtysh", "-N"] and a[-1] == "-b"]
+    assert len(loads) == len(lab.routers) and set(loads) == {lab.CONFIG_TIMEOUT} and lab.CONFIG_TIMEOUT >= 1800
+    assert {t for a, t in calls if a[-1] != "-b"} == {120}  # every other deploy command keeps the default
+
+
 def test_netns_run_with_a_log_does_not_wait_for_forked_children(tmp_path):
     import time
 

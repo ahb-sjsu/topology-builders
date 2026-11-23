@@ -451,6 +451,10 @@ class NetnsLab(Lab):
 
     DAEMONS = ("mgmtd", "zebra", "staticd", "isisd")
     NETNS_DIR = "/run/netns"
+    # Loading a router's configuration (vtysh -b) takes seconds on an idle machine, but the routers configured before
+    # it are already flooding: in 512-router labs on 16 vCPUs, the loads of the 360th and the 507th router took more
+    # than 120 s (2026-11-22). The lab's own time limit still bounds the whole deployment.
+    CONFIG_TIMEOUT = 1800
 
     def __init__(self, directory, workers=16, etc_base="/etc/frr", run_base="/var/run/frr", lib_base="/var/lib/frr",
                  frr_lib=None):
@@ -548,7 +552,7 @@ class NetnsLab(Lab):
             self._run(cmd, log=self.daemon_log(cmd))
         time.sleep(1)
         for r in self.routers:
-            self._run(self.enter(r) + ["vtysh", "-N", r, "-b"])
+            self._run(self.enter(r) + ["vtysh", "-N", r, "-b"], timeout=self.CONFIG_TIMEOUT)
 
     def containerlab(self, action):
         t0 = time.time()
