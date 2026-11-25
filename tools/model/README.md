@@ -39,7 +39,10 @@ the snapshot each router decided with ([results/model-decisions](../../results/m
    reproduces the relay's logged decision on that topology, on the one it held at the decision, and with no failed
    link removed.
 6. `filter_logs.py`: copies a lab's output keeping only the log lines the two analyses read, so that they can be
-   published and rerun (`results/mechanism/logs.tar.gz`).
+   published and rerun (`results/mechanism/logs.tar.gz`); with `--sends` also every LSP sent
+   (`results/cache-experiment/logs.tar.gz`).
+7. `count_sends.py`: LSPs sent per failure window (by flooding or on request after a CSNP or PSNP), from the logs'
+   "Sending L2 LSP" lines.
 
 ```
 unshare -Urnm python3 tools/model/collect_events.py --out mech --topology t.json --events events.json --reduction both
@@ -55,11 +58,12 @@ the new LSPs after one router failure and replaced two others with the recovery 
 **Status (2026-11-25):** on the 4x4x4 butterfly and leaf-spine with 16 spines, 242 of the 250 router-LSP pairs that
 arrived more than 1 s late got the LSP by CSNP. For 244 of them a relay skipped the late router because it decided
 with the topology isisd built at its first decision after the failure, which reproduces 245 of the 246 relays'
-logged decisions ([results/mechanism](../../results/mechanism/README.md)).
+logged decisions ([results/mechanism](../../results/mechanism/README.md)). With that topology rebuilt at every
+decision, no pair arrived more than 1 s late ([results/cache-experiment](../../results/cache-experiment/README.md)).
 
 ## The model against measured LSP counts
 
-7. `validate.py`: for every run in a measurements file, finds the topology file the lab was written from (by sha256,
+8. `validate.py`: for every run in a measurements file, finds the topology file the lab was written from (by sha256,
    under the folders in `TOPOLOGY_DIRS`) and prints, per topology, variant and window kind, the LSPs FRR sent against
    the model's count for the same links, in lockstep and with jittered link delays.
 

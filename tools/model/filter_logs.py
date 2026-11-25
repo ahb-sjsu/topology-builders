@@ -1,9 +1,10 @@
 """Copy a mechanism lab's output (collect_events.py), keeping only the log lines that analyze_events.py and
 check_builds.py read, from BEFORE + 1 s before the first event's recorded time to 30 s after the last: LSPs received
 and built, flood-reduction decisions and fallbacks, route-computation starts ("SPF needed"), received CSNPs, and the
-CSNP comparisons that found a newer or older copy (with the line that says which).
+CSNP comparisons that found a newer or older copy (with the line that says which). With --sends, also every LSP sent
+("Sending L2 LSP"), which count_sends.py reads.
 
-    python tools/model/filter_logs.py SRC_LAB DST_LAB
+    python tools/model/filter_logs.py SRC_LAB DST_LAB [--sends]
 """
 import calendar
 import json
@@ -29,7 +30,10 @@ def seconds(line):
     return calendar.timegm((y, mo, d, h, mi, s)) + us / 1e6
 
 
-def main(src, dst):
+SENDS = re.compile(r"Sending L2 LSP ")
+
+
+def main(src, dst, sends=False):
     with open(os.path.join(src, "events.json"), encoding="utf-8") as fh:
         events = json.load(fh)
     t0, t1 = events[0]["time"] - BEFORE - 1, events[-1]["time"] + 30
@@ -55,11 +59,11 @@ def main(src, dst):
                         out += [pending, line]
                     pending = None
                     continue
-                if inside and KEEP.search(line):
+                if inside and (KEEP.search(line) or (sends and SENDS.search(line))):
                     out.append(line)
         with open(os.path.join(dst, "logs", f), "w", encoding="utf-8") as fh:
             fh.writelines(out)
 
 
 if __name__ == "__main__":
-    main(*sys.argv[1:3])
+    main(sys.argv[1], sys.argv[2], "--sends" in sys.argv[3:])

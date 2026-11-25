@@ -1,0 +1,13 @@
+| Lab | Event | Router-LSP pairs | Later than 1 s | Via CSNP | Stale relay | Unmatched relay | Neither | Slowest, ms |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| fb444-on | node down r25 | 558 | 8 | 4 | 8 | 0 | 0 | 2,954 |
+| fb444-on | node down r45 | 558 | 4 | 4 | 4 | 0 | 0 | 4,246 |
+| fb444-on | multi down ['r0-r2', 'r19-r31', 'r32-r40'] | 378 | 1 | 1 | 1 | 0 | 0 | 1,497 |
+| fb444-on | multi down ['r48-r50', 'r52-r55', 'r52-r56'] | 315 | 3 | 3 | 3 | 0 | 0 | 5,856 |
+| ls16-on | node down r6 | 2,976 | 118 | 118 | 79 | 39 | 0 | 8,898 |
+| ls16-on | node down r1 | 2,976 | 84 | 84 | 42 | 42 | 0 | 2,361 |
+| ls16-on | multi down ['r2-r49', 'r7-r40', 'r10-r46'] | 378 | 3 | 3 | 3 | 0 | 0 | 4,281 |
+| ls16-on | multi down ['r4-r36', 'r4-r37', 'r13-r29'] | 315 | 0 | 0 | 0 | 0 | 0 | 238 |
+| **All** | | **8,454** | **221** | **217** | **140** | **81** | **0** | |
+
+Snapshots reproducing the stale relays' decisions (one count per late pair and relay): frozen and old: 141, frozen: 4

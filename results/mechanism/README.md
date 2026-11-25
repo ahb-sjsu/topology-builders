@@ -133,9 +133,10 @@ logged decision none of the four snapshots reproduces. Until 2026-11-25 the anal
   within the window, by CSNP if not by flooding, as in the timing runs. That relies on the periodic CSNPs.
 
 One way to avoid the misses would be to drop the cached topology whenever a newer LSP changes a router's adjacencies,
-or to remove from it the adjacencies that LSP no longer reports. That would change every one of these decisions;
-whether the late routers would then get the LSP by flooding is not checked. The draft's short-timer PSNP would
-shorten the wait whatever the cause. Neither is tested.
+or to remove from it the adjacencies that LSP no longer reports. [results/cache-experiment](../cache-experiment/README.md)
+tests the first, with the topology rebuilt at every decision: no router got a new LSP more than 1 s late, and the
+LSPs sent rose by 1.5% to 4.5%. The draft's short-timer PSNP would shorten the wait whatever the cause; it is not
+tested.
 
 ## Files
 

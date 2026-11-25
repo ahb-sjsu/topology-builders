@@ -1,0 +1,15 @@
+Failures: each originator's first new LSP, from the event's recorded time
+  fb444-on node down r25: 9/9 originators built, first builds +0.090 to +1.123 s; more than 0.5 s before the recorded time: 0
+  fb444-on node down r45: 9/9 originators built, first builds +0.077 to +1.114 s; more than 0.5 s before the recorded time: 0
+  fb444-on multi down r0-r2, r19-r31, r32-r40: 6/6 originators built, first builds +0.117 to +0.135 s; more than 0.5 s before the recorded time: 0
+  fb444-on multi down r48-r50, r52-r55, r52-r56: 5/5 originators built, first builds +0.109 to +0.127 s; more than 0.5 s before the recorded time: 0
+  ls16-on node down r6: 48/48 originators built, first builds -0.262 to +0.776 s; more than 0.5 s before the recorded time: 0
+  ls16-on node down r1: 48/48 originators built, first builds -0.146 to +0.876 s; more than 0.5 s before the recorded time: 0
+  ls16-on multi down r2-r49, r7-r40, r10-r46: 6/6 originators built, first builds +0.106 to +0.122 s; more than 0.5 s before the recorded time: 0
+  ls16-on multi down r4-r36, r4-r37, r13-r29: 5/5 originators built, first builds +0.110 to +0.148 s; more than 0.5 s before the recorded time: 0
+
+Stale relay decisions (a relay counted once per late pair): 0, in 0 pairs; reproduced only by the topology with no failed link removed among analyze_events.py's snapshots: 0
+
+Unmatched relay decisions (a relay counted once per late pair): 0, in 0 pairs; reproduced only by the topology with no failed link removed among analyze_events.py's snapshots: 0
+
+kind | lab | event | late router | originator | relay | published snapshots | held at build | build, decision (s from the recorded time) | reproduced by build / build without / decision / old

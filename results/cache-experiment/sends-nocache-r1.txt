@@ -1,0 +1,8 @@
+fb444-on node r25: 1189 LSPs sent
+fb444-on node r45: 1230 LSPs sent
+fb444-on multi 3: 882 LSPs sent
+fb444-on multi 3: 681 LSPs sent
+ls16-on node r6: 7202 LSPs sent
+ls16-on node r1: 6781 LSPs sent
+ls16-on multi 3: 532 LSPs sent
+ls16-on multi 3: 316 LSPs sent
