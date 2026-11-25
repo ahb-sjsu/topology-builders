@@ -64,6 +64,10 @@ flowchart LR
 | Decision check: `tools/model` | FRR's logged decisions against the model's | as namespace labs | real time | all 1,186 decisions logged on five topologies match the model, given the snapshot each router used; after router and multi-link failures, it shows which relays decided with a topology cached since their first decision after the failure |
 
 Kaggle's notebooks refuse user namespaces, so of the lab options only the emulated guest could run there (untested).
+
+[tools/analysis](tools/analysis/README.md) computes, from `results/` alone, the distance of every graph from the
+spanning-tree floor, four figures, the isisd CPU savings paired by run with 95% intervals, and the run times of every
+campaign.
 Details: [the model](#a-model-of-flooding), [namespaces and Colab](#without-docker-and-on-colab),
 [the emulated guest](tools/overlay/README.md), [measure](#measuring-flooding-and-cpu),
 [the decision check](tools/model/README.md).

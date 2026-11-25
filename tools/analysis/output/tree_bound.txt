@@ -1,0 +1,75 @@
+LSPs sent per link-down window (satisfied windows only) against the spanning-tree floor 2(n-1)
+graph                                                timers          n     m   deg  2hop     off     on floor   full off/full saving bound removed on/floor left out
+AttMpls (Topology Zoo), as it is                     FRR defaults   25    56   4.5  1.41     143     63    48    172      83%    56%   66%     84%     1.31   0    0
+Uunet (Topology Zoo), as it is                       FRR defaults   42    77   3.7  1.27     179    110    82    222      81%    39%   54%     71%     1.34   0    0
+Uninett2011 (Topology Zoo), as it is                 FRR defaults   66    93   2.8  1.07     199    173   130    238      84%    13%   35%     38%     1.33   0    0
+TataNld (Topology Zoo), as it is                     FRR defaults  143   181   2.5  1.05     373    338   284    436      86%     9%   24%     39%     1.19   0    0
+fat-tree {"k": 4, "routers": 20}                     topotest       20    32   3.2  1.48      76     45    38     86      89%    40%   50%     81%     1.19   0    0
+fat-tree {"k": 6, "routers": 45}                     topotest       45   108   4.8  1.82     266    122    88    340      78%    54%   67%     81%     1.39   0    0
+fat-tree {"k": 8, "routers": 80}                     topotest       80   256   6.4  2.06     606    249   158    862      70%    59%   74%     80%     1.58   0    0
+fat-tree {"k": 10, "routers": 125}                   topotest      125   500   8.0  2.25   1,194    442   248   1748      68%    63%   79%     80%     1.78   0    0
+fat-tree {"k": 12, "routers": 180}                   topotest      180   864   9.6  2.39   2,168    719   358   3094      70%    67%   83%     80%     2.01   0    0
+flattened butterfly 2 x 2 x 2 x 2 x 2 x 2            topotest       64   192   6.0  2.00     458    194   126    638      72%    58%   72%     79%     1.54   0    0
+flattened butterfly 4 x 2 x 2 x 2 x 2                topotest       64   224   7.0  2.00     556    219   126    766      73%    61%   77%     78%     1.74   0    0
+flattened butterfly 4 x 4 x 2 x 2                    topotest       64   256   8.0  2.00     606    221   126    894      68%    63%   79%     80%     1.76   0    0
+flattened butterfly 4 x 4 x 4                        topotest       64   288   9.0  2.00     728    238   126   1022      71%    67%   83%     81%     1.89   0    0
+flattened butterfly 8 x 2 x 2 x 2                    topotest       64   320  10.0  2.00     846    273   126   1150      74%    68%   85%     80%     2.17   0    0
+flattened butterfly 8 x 4 x 2                        topotest       64   352  11.0  2.00     975    310   126   1278      76%    68%   87%     78%     2.46   0    0
+flattened butterfly 8 x 8                            topotest       64   448  14.0  2.00   1,272    338   126   1662      77%    73%   90%     82%     2.68   0    0
+flattened butterfly 16 x 2 x 2                       topotest       64   544  17.0  2.00   1,554    420   126   2046      76%    73%   92%     79%     3.34   0    0
+flattened butterfly 16 x 4                           topotest       64   576  18.0  2.00   1,648    373   126   2174      76%    77%   92%     84%     2.96   0    0
+flattened butterfly 32 x 2                           topotest       64  1024  32.0  2.00       -    331   126   3966        -      -     -       -     0.00  12    0
+k-ary-n-fly {"k": 3, "routers": 27, "stages": 3}     topotest       27    54   4.0  1.62     130     64    52    160      81%    51%   60%     85%     1.23   0    0
+k-ary-n-fly {"k": 2, "routers": 32, "stages": 4}     topotest       32    48   3.0  1.27     109     75    62    126      87%    31%   43%     72%     1.22   0    0
+k-ary-n-fly {"k": 4, "routers": 48, "stages": 3}     topotest       48   128   5.3  1.82     316    130    94    414      76%    59%   70%     84%     1.38   0    0
+k-ary-n-fly {"k": 2, "routers": 80, "stages": 5}     topotest       80   128   3.2  1.25     278    213   158    350      80%    24%   43%     55%     1.35   0    0
+leaf-spine, 62 leaves x 2 spines                     topotest       64   124   3.9  2.03     287    127   126    366      78%    56%   56%    100%     1.01   0    0
+leaf-spine, 61 leaves x 3 spines                     topotest       64   183   5.7  3.09     470    127   126    602      78%    73%   73%    100%     1.01   0    0
+leaf-spine, 60 leaves x 4 spines                     topotest       64   240   7.5  4.19     617    127   126    830      74%    79%   80%    100%     1.01   0    0
+leaf-spine, 58 leaves x 6 spines                     topotest       64   348  10.9  6.47     853    127   126   1262      68%    85%   85%    100%     1.01   0    0
+leaf-spine, 56 leaves x 8 spines                     topotest       64   448  14.0  8.86   1,228    129   126   1662      74%    89%   90%    100%     1.03   0    0
+leaf-spine, 52 leaves x 12 spines                    topotest       64   624  19.5 13.90   1,801    136   126   2366      76%    92%   93%     99%     1.08   0    0
+leaf-spine, 48 leaves x 16 spines                    topotest       64   768  24.0 19.08   2,276    136   126   2942      77%    94%   94%    100%     1.08   0    0
+leaf-spine, 40 leaves x 24 spines                    topotest       64   960  30.0 28.18       -    141   126   3710        -      -     -       -     0.00  12    0
+leaf-spine, 32 leaves x 32 spines                    topotest       64  1024  32.0 32.00       -    142   126   3966        -      -     -       -     0.00  12    0
+random regular, degree 3, seed 1, 64 routers         topotest       64    96   3.0  1.01     210    196   126    254      83%     7%   40%     16%     1.56   0    0
+random regular, degree 4, seed 1, 64 routers         topotest       64   128   4.0  1.04     292    258   126    382      77%    12%   57%     21%     2.05   0    0
+random regular, degree 4, seed 2, 64 routers         topotest       64   128   4.0  1.08     293    247   126    382      77%    16%   57%     27%     1.96   0    0
+random regular, degree 4, seed 3, 64 routers         topotest       64   128   4.0  1.06     291    250   126    382      76%    14%   57%     25%     1.99   0    0
+random regular, degree 6, seed 1, 64 routers         topotest       64   192   6.0  1.18     481    366   126    638      75%    24%   74%     32%     2.90   0    0
+random regular, degree 8, seed 1, 64 routers         topotest       64   256   8.0  1.42     633    406   126    894      71%    36%   80%     45%     3.22   0    0
+random regular, degree 8, seed 2, 64 routers         topotest       64   256   8.0  1.40     648    409   126    894      73%    37%   81%     46%     3.25   0    0
+random regular, degree 8, seed 3, 64 routers         topotest       64   256   8.0  1.40     627    416   126    894      70%    34%   80%     42%     3.30   0    0
+random regular, degree 12, seed 1, 64 routers        topotest       64   384  12.0  2.35   1,040    427   126   1406      74%    59%   88%     67%     3.39   0    0
+random regular, degree 16, seed 1, 64 routers        topotest       64   512  16.0  3.94   1,408    344   126   1918      73%    76%   91%     83%     2.73   0    0
+random regular, degree 16, seed 2, 64 routers        topotest       64   512  16.0  3.93   1,401    343   126   1918      73%    76%   91%     83%     2.72   0    0
+random regular, degree 16, seed 3, 64 routers        topotest       64   512  16.0  3.97   1,362    359   126   1918      71%    74%   91%     81%     2.85   0    0
+random regular, degree 24, seed 1, 64 routers        topotest       64   768  24.0  9.06   2,264    208   126   2942      77%    91%   94%     96%     1.65   0    0
+random regular, degree 32, seed 1, 64 routers        topotest       64  1024  32.0 16.30   3,072    176   126   3966      77%    94%   96%     98%     1.39  18    0
+random regular, degree 32, seed 2, 64 routers        topotest       64  1024  32.0 16.30       -    177   126   3966        -      -     -       -     0.00  18    0
+random regular, degree 32, seed 3, 64 routers        topotest       64  1024  32.0 16.16       -    190   126   3966        -      -     -       -     0.00  18    0
+random regular, degree 48, seed 1, 64 routers        topotest       64  1536  48.0 37.14       -    182   126   6014        -      -     -       -     0.00  12    0
+random regular, degree 4, seed 1, 128 routers        topotest      128   256   4.0  1.03     566    528   254    766      74%     7%   55%     12%     2.08   0    0
+random regular, degree 8, seed 1, 128 routers        topotest      128   512   8.0  1.18   1,296  1,000   254   1790      72%    23%   80%     28%     3.94   0    0
+random regular, degree 16, seed 1, 128 routers       topotest      128  1024  16.0  2.15   2,794  1,284   254   3838      73%    54%   91%     59%     5.05   0    0
+random regular, degree 4, seed 1, 256 routers        topotest      256   512   4.0  1.01   1,188  1,075   510   1534      77%    10%   57%     17%     2.11   0    0
+random regular, degree 8, seed 1, 256 routers        topotest      256  1024   8.0  1.09   2,626  2,210   510   3582      73%    16%   81%     20%     4.33   0    0
+random regular, degree 16, seed 1, 256 routers       topotest      256  2048  16.0  1.50       -      -   510   7678        -      -     -       -     0.00  12   12
+AttMpls (Topology Zoo), as it is                     topotest       25    56   4.5  1.41     140     63    48    172      81%    55%   66%     83%     1.32   0    0
+AttMpls (Topology Zoo), 44 links added (nearest), av topotest       25   100   8.0  2.38     277     65    48    348      80%    77%   83%     93%     1.35   0    0
+Uunet (Topology Zoo), as it is                       topotest       42    77   3.7  1.27     180    110    82    222      81%    38%   54%     71%     1.35   0    0
+Uunet (Topology Zoo), 91 links added (nearest), aver topotest       42   168   8.0  2.18     438    104    82    586      75%    76%   81%     94%     1.27   0    0
+Uninett2011 (Topology Zoo), as it is                 topotest       66    93   2.8  1.07     200    173   130    238      84%    14%   35%     39%     1.33   0    0
+Uninett2011 (Topology Zoo), 39 links added (nearest) topotest       66   132   4.0  1.17     301    187   130    394      76%    38%   57%     67%     1.44   0    0
+Uninett2011 (Topology Zoo), 171 links added (nearest topotest       66   264   8.0  2.01     627    225   130    922      68%    64%   79%     81%     1.73   0    0
+TataNld (Topology Zoo), as it is                     topotest      143   181   2.5  1.05     372    339   284    436      85%     9%   24%     37%     1.19   0    0
+TataNld (Topology Zoo), 105 links added (nearest), a topotest      143   286   4.0  1.26     622    376   284    856      73%    40%   54%     73%     1.32   0    0
+TataNld (Topology Zoo), 391 links added (nearest), a topotest      143   572   8.0  2.27   1,347    467   284   2000      67%    65%   79%     83%     1.64   0    0
+flattened butterfly 4 x 4 x 4                        FRR defaults   64   288   9.0  2.00     686    239   126   1022      67%    65%   82%     80%     1.90   0    0
+leaf-spine, 48 leaves x 16 spines                    FRR defaults   64   768  24.0 19.08   2,164    131   126   2942      74%    94%   94%    100%     1.04   0    0
+random regular, degree 16, seed 1, 64 routers        FRR defaults   64   512  16.0  3.94   1,358    351   126   1918      71%    74%   91%     82%     2.78   0    0
+random regular, degree 32, seed 1, 64 routers        FRR defaults   64  1024  32.0 16.30   3,051    177   126   3966      77%    94%   96%     98%     1.41   0    0
+* random regular, degree 16, seed 1, 256 routers     FRR defaults  256  2048  16.0  1.50   9,542  5,635   510   7678     124%    41%   95%     43%    11.05   0    0
+
+* off sent more than full flooding of two LSPs allows: the window carried more than two new LSP instances (or retransmissions), so the floor 2(n-1) is not a bound there.
+left out: windows not satisfied, off and on. A graph's runs from several result folders are pooled.

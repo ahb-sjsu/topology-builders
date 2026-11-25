@@ -1,0 +1,114 @@
+Figure 1: density sweep (random-regular-n64), LSPs per satisfied link-down window, mean [min, max]
+  off degree    3:    209.7 [206, 215] over 6 windows
+  off degree    4:    297.3 [289, 310] over 6 windows
+  off degree    6:    481.2 [462, 512] over 6 windows
+  off degree    8:    636.2 [603, 682] over 6 windows
+  off degree   12:   1040.2 [986, 1086] over 6 windows
+  off degree   16:   1413.0 [1335, 1508] over 6 windows
+  off degree   24:   2264.5 [2128, 2504] over 6 windows
+  off degree   32:   3072.2 [2926, 3452] over 6 windows
+   on degree    3:    196.0 [193, 201] over 6 windows
+   on degree    4:    258.8 [248, 271] over 6 windows
+   on degree    6:    365.8 [359, 371] over 6 windows
+   on degree    8:    406.0 [399, 423] over 6 windows
+   on degree   12:    426.7 [416, 437] over 6 windows
+   on degree   16:    355.8 [330, 372] over 6 windows
+   on degree   24:    208.3 [196, 223] over 6 windows
+   on degree   32:    168.0 [155, 192] over 6 windows
+   on degree   48:    182.3 [140, 243] over 6 windows
+  off degree 48: no satisfied window (12 windows, 0 of 2 runs converged)
+
+Figure 2: link-change LSP saving (down and up windows pooled) against two-hop multiplicity
+  random regular, 64   random regular, degree 3                     n  64 deg   3.0 2hop   1.01 saving   7.0%  (windows off 12, on 12)
+  random regular, 64   random regular, degree 4                     n  64 deg   4.0 2hop   1.04 saving  10.2%  (windows off 30, on 30)
+  random regular, 64   random regular, degree 4                     n  64 deg   4.0 2hop   1.06 saving  13.9%  (windows off 18, on 18)
+  random regular, 64   random regular, degree 4                     n  64 deg   4.0 2hop   1.08 saving  14.8%  (windows off 18, on 18)
+  random regular, 64   random regular, degree 6                     n  64 deg   6.0 2hop   1.18 saving  22.7%  (windows off 12, on 12)
+  random regular, 64   random regular, degree 8                     n  64 deg   8.0 2hop   1.40 saving  35.0%  (windows off 18, on 18)
+  random regular, 64   random regular, degree 8                     n  64 deg   8.0 2hop   1.40 saving  33.7%  (windows off 18, on 18)
+  random regular, 64   random regular, degree 8                     n  64 deg   8.0 2hop   1.42 saving  36.2%  (windows off 30, on 30)
+  random regular, 64   random regular, degree 12                    n  64 deg  12.0 2hop   2.35 saving  58.8%  (windows off 12, on 12)
+  random regular, 64   random regular, degree 16                    n  64 deg  16.0 2hop   3.93 saving  75.0%  (windows off 18, on 18)
+  random regular, 64   random regular, degree 16                    n  64 deg  16.0 2hop   3.94 saving  74.8%  (windows off 42, on 42)
+  random regular, 64   random regular, degree 16                    n  64 deg  16.0 2hop   3.97 saving  74.3%  (windows off 18, on 18)
+  random regular, 64   random regular, degree 24                    n  64 deg  24.0 2hop   9.06 saving  90.5%  (windows off 12, on 12)
+  random regular, 64   random regular, degree 32                    n  64 deg  32.0 2hop  16.30 saving  93.9%  (windows off 12, on 30)
+  random regular, 128  random regular, degree 4                     n 128 deg   4.0 2hop   1.03 saving   8.1%  (windows off 12, on 12)
+  random regular, 128  random regular, degree 8                     n 128 deg   8.0 2hop   1.18 saving  19.5%  (windows off 12, on 12)
+  random regular, 128  random regular, degree 16                    n 128 deg  16.0 2hop   2.15 saving  52.8%  (windows off 12, on 12)
+  random regular, 256  random regular, degree 4                     n 256 deg   4.0 2hop   1.01 saving   8.5%  (windows off 12, on 12)
+  random regular, 256  random regular, degree 8                     n 256 deg   8.0 2hop   1.09 saving  14.5%  (windows off 12, on 12)
+  flattened butterfly  flattened butterfly 2 x 2 x 2 x 2 x 2 x 2    n  64 deg   6.0 2hop   2.00 saving  59.9%  (windows off 12, on 12)
+  flattened butterfly  flattened butterfly 4 x 2 x 2 x 2 x 2        n  64 deg   7.0 2hop   2.00 saving  63.4%  (windows off 12, on 12)
+  flattened butterfly  flattened butterfly 4 x 4 x 2 x 2            n  64 deg   8.0 2hop   2.00 saving  64.6%  (windows off 12, on 12)
+  flattened butterfly  flattened butterfly 4 x 4 x 4                n  64 deg   9.0 2hop   2.00 saving  69.3%  (windows off 24, on 24)
+  flattened butterfly  flattened butterfly 8 x 2 x 2 x 2            n  64 deg  10.0 2hop   2.00 saving  65.8%  (windows off 12, on 12)
+  flattened butterfly  flattened butterfly 8 x 4 x 2                n  64 deg  11.0 2hop   2.00 saving  68.0%  (windows off 12, on 12)
+  flattened butterfly  flattened butterfly 8 x 8                    n  64 deg  14.0 2hop   2.00 saving  72.7%  (windows off 12, on 12)
+  flattened butterfly  flattened butterfly 16 x 2 x 2               n  64 deg  17.0 2hop   2.00 saving  69.6%  (windows off 12, on 12)
+  flattened butterfly  flattened butterfly 16 x 4                   n  64 deg  18.0 2hop   2.00 saving  75.2%  (windows off 12, on 12)
+  leaf-spine           leaf-spine, 62 leaves x 2 spines             n  64 deg   3.9 2hop   2.03 saving  55.1%  (windows off 12, on 12)
+  leaf-spine           leaf-spine, 61 leaves x 3 spines             n  64 deg   5.7 2hop   3.09 saving  72.3%  (windows off 12, on 12)
+  leaf-spine           leaf-spine, 60 leaves x 4 spines             n  64 deg   7.5 2hop   4.19 saving  79.5%  (windows off 12, on 12)
+  leaf-spine           leaf-spine, 58 leaves x 6 spines             n  64 deg  10.9 2hop   6.47 saving  84.3%  (windows off 12, on 12)
+  leaf-spine           leaf-spine, 56 leaves x 8 spines             n  64 deg  14.0 2hop   8.86 saving  88.3%  (windows off 12, on 12)
+  leaf-spine           leaf-spine, 52 leaves x 12 spines            n  64 deg  19.5 2hop  13.90 saving  92.1%  (windows off 12, on 12)
+  leaf-spine           leaf-spine, 48 leaves x 16 spines            n  64 deg  24.0 2hop  19.08 saving  93.4%  (windows off 24, on 24)
+  k-ary n-fly          k-ary-n-fly {"k": 2, "routers": 80, "stages" n  80 deg   3.2 2hop   1.25 saving  24.5%  (windows off 12, on 12)
+  k-ary n-fly          k-ary-n-fly {"k": 2, "routers": 32, "stages" n  32 deg   3.0 2hop   1.27 saving  32.0%  (windows off 12, on 12)
+  k-ary n-fly          k-ary-n-fly {"k": 3, "routers": 27, "stages" n  27 deg   4.0 2hop   1.62 saving  51.5%  (windows off 12, on 12)
+  k-ary n-fly          k-ary-n-fly {"k": 4, "routers": 48, "stages" n  48 deg   5.3 2hop   1.82 saving  57.3%  (windows off 12, on 12)
+  fat-tree             fat-tree {"k": 4, "routers": 20}             n  20 deg   3.2 2hop   1.48 saving  39.8%  (windows off 12, on 12)
+  fat-tree             fat-tree {"k": 6, "routers": 45}             n  45 deg   4.8 2hop   1.82 saving  52.9%  (windows off 12, on 12)
+  fat-tree             fat-tree {"k": 8, "routers": 80}             n  80 deg   6.4 2hop   2.06 saving  59.2%  (windows off 12, on 12)
+  fat-tree             fat-tree {"k": 10, "routers": 125}           n 125 deg   8.0 2hop   2.25 saving  62.1%  (windows off 12, on 12)
+  fat-tree             fat-tree {"k": 12, "routers": 180}           n 180 deg   9.6 2hop   2.39 saving  68.2%  (windows off 12, on 12)
+  Topology Zoo         TataNld (Topology Zoo), as it is             n 143 deg   2.5 2hop   1.05 saving   9.3%  (windows off 12, on 12)
+  Topology Zoo         Uninett2011 (Topology Zoo), as it is         n  66 deg   2.8 2hop   1.07 saving  13.7%  (windows off 12, on 12)
+  Topology Zoo         Uninett2011 (Topology Zoo), 39 links added ( n  66 deg   4.0 2hop   1.17 saving  37.3%  (windows off 12, on 12)
+  Topology Zoo         TataNld (Topology Zoo), 105 links added (nea n 143 deg   4.0 2hop   1.26 saving  39.6%  (windows off 12, on 12)
+  Topology Zoo         Uunet (Topology Zoo), as it is               n  42 deg   3.7 2hop   1.27 saving  39.6%  (windows off 12, on 12)
+  Topology Zoo         AttMpls (Topology Zoo), as it is             n  25 deg   4.5 2hop   1.41 saving  56.4%  (windows off 12, on 12)
+  Topology Zoo         Uninett2011 (Topology Zoo), 171 links added  n  66 deg   8.0 2hop   2.01 saving  64.5%  (windows off 12, on 12)
+  Topology Zoo         Uunet (Topology Zoo), 91 links added (neares n  42 deg   8.0 2hop   2.18 saving  76.0%  (windows off 12, on 12)
+  Topology Zoo         TataNld (Topology Zoo), 391 links added (nea n 143 deg   8.0 2hop   2.27 saving  64.1%  (windows off 12, on 12)
+  Topology Zoo         AttMpls (Topology Zoo), 44 links added (near n  25 deg   8.0 2hop   2.38 saving  73.9%  (windows off 12, on 12)
+  left out: flattened butterfly 32 x 2, 64 routers (satisfied windows off 0/12, on 12/12; multiplicity 2.0)
+  left out: leaf-spine, 40 leaves x 24 spines, 64 routers (satisfied windows off 0/12, on 12/12; multiplicity 28.1818)
+  left out: leaf-spine, 32 leaves x 32 spines, 64 routers (satisfied windows off 0/12, on 12/12; multiplicity 32.0)
+  left out: random regular, degree 32, 64 routers (satisfied windows off 0/18, on 18/18; multiplicity 16.3014)
+  left out: random regular, degree 32, 64 routers (satisfied windows off 0/18, on 18/18; multiplicity 16.1593)
+  left out: random regular, degree 48, 64 routers (satisfied windows off 0/12, on 12/12; multiplicity 37.1375)
+  left out: random regular, degree 16, 256 routers (satisfied windows off 0/12, on 0/12; multiplicity 1.5025)
+
+Figure 3a: isisd CPU per link window by handler, mean, satisfied windows of converged profile runs
+  random, degree 4         off ( 54 windows, 9 runs): total    847.66 ms, run means 775.19 to 968.32; route computation 737.11 (87%), receiving PDUs 89.37 (11%), other handlers 21.18 (2%)
+  random, degree 4          on ( 54 windows, 9 runs): total    863.03 ms, run means 773.17 to 995.89; route computation 736.29 (85%), receiving PDUs 109.77 (13%), other handlers 16.97 (2%)
+  random, degree 8         off ( 54 windows, 9 runs): total   1536.72 ms, run means 1325.06 to 1662.98; route computation 1319.91 (86%), receiving PDUs 185.01 (12%), other handlers 31.81 (2%)
+  random, degree 8          on ( 54 windows, 9 runs): total   1491.98 ms, run means 1271.30 to 1764.85; route computation 1306.21 (88%), receiving PDUs 160.20 (11%), other handlers 25.57 (2%)
+  random, degree 16        off ( 54 windows, 9 runs): total   3084.52 ms, run means 2882.88 to 3264.34; route computation 2702.09 (88%), receiving PDUs 348.90 (11%), other handlers 33.54 (1%)
+  random, degree 16         on ( 54 windows, 9 runs): total   2859.90 ms, run means 2623.89 to 3217.51; route computation 2600.98 (91%), receiving PDUs 237.34 (8%), other handlers 21.58 (1%)
+  butterfly 4x4x4          off ( 12 windows, 2 runs): total   1737.17 ms, run means 1705.25 to 1769.09; route computation 1586.35 (91%), receiving PDUs 125.15 (7%), other handlers 25.68 (1%)
+  butterfly 4x4x4           on ( 12 windows, 2 runs): total   1530.12 ms, run means 1507.18 to 1553.07; route computation 1356.01 (89%), receiving PDUs 157.65 (10%), other handlers 16.46 (1%)
+  leaf-spine, 16 spines    off ( 12 windows, 2 runs): total   4219.64 ms, run means 4113.37 to 4325.91; route computation 3296.11 (78%), receiving PDUs 876.62 (21%), other handlers 46.91 (1%)
+  leaf-spine, 16 spines     on ( 12 windows, 2 runs): total   2991.94 ms, run means 2880.10 to 3103.77; route computation 2854.05 (95%), receiving PDUs 127.44 (4%), other handlers 10.44 (0%)
+Figure 3b: ten links at once, per window
+  random, degree 16        off (  8 windows, 2 runs): total      7.91 s, run means 7.58 to 8.24; route computation 2.93 (37%), receiving PDUs 4.68 (59%), other handlers 0.29 (4%)
+  random, degree 16         on (  8 windows, 2 runs): total      4.22 s, run means 4.16 to 4.27; route computation 2.90 (69%), receiving PDUs 1.21 (29%), other handlers 0.11 (3%)
+  random, degree 24        off (  8 windows, 2 runs): total     17.10 s, run means 16.89 to 17.31; route computation 5.78 (34%), receiving PDUs 10.80 (63%), other handlers 0.52 (3%)
+  random, degree 24         on (  8 windows, 2 runs): total      7.36 s, run means 6.58 to 8.14; route computation 5.80 (79%), receiving PDUs 1.48 (20%), other handlers 0.08 (1%)
+  left out (a variant with no converged profile run): ['random, degree 32']
+
+Figure 4: flooding time per window (s), from each new LSP's origin to the last router holding it
+  random 8               link         off [0.021, 0.033, 0.045, 0.053]  on [0.046, 0.05, 0.056, 0.057]
+  random 8               3 links      off [0.062, 0.069, 0.07, 0.083]  on [0.066, 0.074, 0.406, 0.446]
+  random 8               router       off [0.061, 0.071, 0.072, 0.08]  on [0.059, 1.299, 1.755, 2.978]
+  random 16              link         off [0.091, 0.1, 0.114, 0.117]  on [0.078, 0.081, 0.106, 0.11]
+  random 16              3 links      off [0.122, 0.13, 0.133, 0.161]  on [0.094, 0.1, 0.553, 0.812]
+  random 16              router       off [0.231, 0.242, 0.254, 0.315]  on [0.103, 0.115, 0.295, 0.527]
+  butterfly              link         off [0.056, 0.058, 0.062, 0.076]  on [0.045, 0.046, 0.051, 0.058]
+  butterfly              3 links      off [0.058, 0.071, 0.075, 0.097]  on [0.053, 0.335, 3.037, 3.305]
+  butterfly              router       off [0.07, 0.073, 0.076, 0.09]  on [1.143, 3.107, 3.437, 6.281]
+  leaf-spine             link         off [0.158, 0.163, 0.178]  on [0.154, 0.165, 0.173, 0.183]
+  leaf-spine             3 links      off [0.275, 0.284, 0.329, 0.427]  on [1.606, 1.855, 7.566, 8.082]
+  leaf-spine             router       off [1.49, 1.527, 1.806, 1.929]  on [1.491, 1.842, 1.879, 2.571]

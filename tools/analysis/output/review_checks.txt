@@ -1,0 +1,175 @@
+A. Two triangles sharing router c; link a1-a2 fails
+   two-hop multiplicity 1.0, four-cycles 0, triangles 2
+   reduction off: sent 12; result keys ['fallbacks', 'last', 'per_router', 'reached', 'sent', 'suppressed']
+   reduction on : sent 8; result keys ['fallbacks', 'last', 'per_router', 'reached', 'sent', 'suppressed']
+   floor 2(n-1) = 8
+
+B. Link-change saving across the 54 Figure 2 graphs
+   degree                 Spearman 0.779; R^2 of saving on log(degree) 0.595
+   two-hop multiplicity   Spearman 0.930; R^2 of saving on log(multiplicity) 0.705
+   within fat-tree (5 graphs): Spearman degree 1.00, multiplicity 1.00
+   within flattened-butterfly (9 graphs): Spearman degree 0.93, multiplicity constant
+   within k-ary-n-fly (4 graphs): Spearman degree 0.80, multiplicity 1.00
+   within leaf-spine (7 graphs): Spearman degree 1.00, multiplicity 1.00
+   within random-regular (19 graphs): Spearman degree 0.95, multiplicity 0.99
+   within zoo (10 graphs): Spearman degree 0.93, multiplicity 0.94
+   size at fixed degree (random regular): n128 d4: mult 1.03 saving 8%, n256 d4: mult 1.01 saving 9%, n128 d8: mult 1.18 saving 19%, n256 d8: mult 1.09 saving 15%, n128 d16: mult 2.15 saving 53%
+
+C. isisd CPU per window, net of the idle window, paired by run (saving = 1 - on/off per pair)
+  random-regular-n64
+    random-regular degree=12,seed=1 n=64                 topotest            pairs 2: per pair +17%, +19%; mean +18%, range +17% to +19%; pooled +18%
+    random-regular degree=16,seed=1 n=64                 topotest            pairs 2: per pair +17%, +21%; mean +19%, range +17% to +21%; pooled +19%
+    random-regular degree=24,seed=1 n=64                 topotest            pairs 2: per pair +33%, +18%; mean +25%, range +18% to +33%; pooled +26%
+    random-regular degree=3,seed=1 n=64                  topotest            pairs 2: per pair -6%, +13%; mean +4%, range -6% to +13%; pooled +4%
+    random-regular degree=32,seed=1 n=64                 topotest            pairs 2: per pair +31%, +15%; mean +23%, range +15% to +31%; pooled +24%
+    random-regular degree=4,seed=1 n=64                  topotest            pairs 2: per pair -13%, -5%; mean -9%, range -13% to -5%; pooled -9%
+    random-regular degree=6,seed=1 n=64                  topotest            pairs 2: per pair -6%, +1%; mean -2%, range -6% to +1%; pooled -2%
+    random-regular degree=8,seed=1 n=64                  topotest            pairs 2: per pair +19%, +10%; mean +15%, range +10% to +19%; pooled +15%
+  seeds-n64
+    flattened-butterfly radices=[4, 4, 4] n=64           topotest            pairs 2: per pair +9%, +1%; mean +5%, range +1% to +9%; pooled +5%
+    leaf-spine leaves=48,spines=16 n=64                  topotest            pairs 2: per pair +29%, +36%; mean +33%, range +29% to +36%; pooled +33%
+    random-regular degree=16,seed=1 n=64                 topotest            pairs 3: per pair +18%, +12%, +2%; mean +11%, range +2% to +18%; pooled +10%
+    random-regular degree=16,seed=2 n=64                 topotest            pairs 3: per pair +6%, +10%, +22%; mean +13%, range +6% to +22%; pooled +13%
+    random-regular degree=16,seed=3 n=64                 topotest            pairs 3: per pair +12%, +7%, +2%; mean +7%, range +2% to +12%; pooled +7%
+    random-regular degree=4,seed=1 n=64                  topotest            pairs 3: per pair +11%, -1%, +6%; mean +5%, range -1% to +11%; pooled +5%
+    random-regular degree=4,seed=2 n=64                  topotest            pairs 3: per pair -42%, +16%, -29%; mean -18%, range -42% to +16%; pooled -16%
+    random-regular degree=4,seed=3 n=64                  topotest            pairs 3: per pair -43%, +27%, -5%; mean -7%, range -43% to +27%; pooled -4%
+    random-regular degree=8,seed=1 n=64                  topotest            pairs 3: per pair +15%, -14%, +45%; mean +15%, range -14% to +45%; pooled +16%
+    random-regular degree=8,seed=2 n=64                  topotest            pairs 3: per pair +19%, +28%, -10%; mean +12%, range -10% to +28%; pooled +13%
+    random-regular degree=8,seed=3 n=64                  topotest            pairs 3: per pair -26%, +20%, -46%; mean -18%, range -46% to +20%; pooled -13%
+  families-n64
+    flattened-butterfly radices=[16, 2, 2] n=64          topotest            pairs 2: per pair +9%, +0%; mean +5%, range +0% to +9%; pooled +5%
+    flattened-butterfly radices=[16, 4] n=64             topotest            pairs 2: per pair +27%, +11%; mean +19%, range +11% to +27%; pooled +19%
+    flattened-butterfly radices=[2, 2, 2, 2, 2, 2] n=64  topotest            pairs 2: per pair +8%, +6%; mean +7%, range +6% to +8%; pooled +7%
+    flattened-butterfly radices=[4, 2, 2, 2, 2] n=64     topotest            pairs 2: per pair +29%, -17%; mean +6%, range -17% to +29%; pooled +8%
+    flattened-butterfly radices=[4, 4, 2, 2] n=64        topotest            pairs 2: per pair +17%, +18%; mean +17%, range +17% to +18%; pooled +17%
+    flattened-butterfly radices=[4, 4, 4] n=64           topotest            pairs 2: per pair +15%, +23%; mean +19%, range +15% to +23%; pooled +19%
+    flattened-butterfly radices=[8, 2, 2, 2] n=64        topotest            pairs 2: per pair +14%, -3%; mean +5%, range -3% to +14%; pooled +6%
+    flattened-butterfly radices=[8, 4, 2] n=64           topotest            pairs 2: per pair +19%, -50%; mean -15%, range -50% to +19%; pooled -12%
+    flattened-butterfly radices=[8, 8] n=64              topotest            pairs 2: per pair +1%, +9%; mean +5%, range +1% to +9%; pooled +5%
+    leaf-spine leaves=48,spines=16 n=64                  topotest            pairs 2: per pair +36%, +49%; mean +42%, range +36% to +49%; pooled +42%
+    leaf-spine leaves=52,spines=12 n=64                  topotest            pairs 2: per pair +51%, +3%; mean +27%, range +3% to +51%; pooled +31%
+    leaf-spine leaves=56,spines=8 n=64                   topotest            pairs 2: per pair +27%, +45%; mean +36%, range +27% to +45%; pooled +37%
+    leaf-spine leaves=58,spines=6 n=64                   topotest            pairs 2: per pair +25%, +27%; mean +26%, range +25% to +27%; pooled +26%
+    leaf-spine leaves=60,spines=4 n=64                   topotest            pairs 2: per pair +19%, +35%; mean +27%, range +19% to +35%; pooled +28%
+    leaf-spine leaves=61,spines=3 n=64                   topotest            pairs 2: per pair +3%, +36%; mean +19%, range +3% to +36%; pooled +23%
+    leaf-spine leaves=62,spines=2 n=64                   topotest            pairs 2: per pair +25%, +21%; mean +23%, range +21% to +25%; pooled +23%
+    random-regular degree=16,seed=1 n=64                 topotest            pairs 2: per pair +19%, +2%; mean +10%, range +2% to +19%; pooled +10%
+  random-regular-n128
+    random-regular degree=16,seed=1 n=128                topotest            pairs 2: per pair +2%, +6%; mean +4%, range +2% to +6%; pooled +5%
+    random-regular degree=4,seed=1 n=128                 topotest            pairs 2: per pair +6%, -4%; mean +1%, range -4% to +6%; pooled +1%
+    random-regular degree=8,seed=1 n=128                 topotest            pairs 2: per pair +8%, +8%; mean +8%, range +8% to +8%; pooled +8%
+  random-regular-n256
+    random-regular degree=4,seed=1 n=256                 topotest            pairs 2: per pair +22%, -8%; mean +7%, range -8% to +22%; pooled +9%
+    random-regular degree=8,seed=1 n=256                 topotest            pairs 2: per pair -4%, -5%; mean -4%, range -5% to -4%; pooled -4%
+  nfly
+    k-ary-n-fly k=3,stages=3 n=27                        topotest            pairs 2: per pair +6%, -68%; mean -31%, range -68% to +6%; pooled -25%
+    k-ary-n-fly k=2,stages=4 n=32                        topotest            pairs 2: per pair +30%, +11%; mean +20%, range +11% to +30%; pooled +20%
+    k-ary-n-fly k=4,stages=3 n=48                        topotest            pairs 2: per pair +27%, +9%; mean +18%, range +9% to +27%; pooled +18%
+    k-ary-n-fly k=2,stages=5 n=80                        topotest            pairs 2: per pair -7%, -8%; mean -8%, range -8% to -7%; pooled -8%
+  fat-tree
+    fat-tree k=4 n=20                                    topotest            pairs 2: per pair +52%, -9%; mean +22%, range -9% to +52%; pooled +26%
+    fat-tree k=6 n=45                                    topotest            pairs 2: per pair +9%, -1%; mean +4%, range -1% to +9%; pooled +4%
+    fat-tree k=8 n=80                                    topotest            pairs 2: per pair +25%, +10%; mean +18%, range +10% to +25%; pooled +18%
+    fat-tree k=10 n=125                                  topotest            pairs 2: per pair +6%, +2%; mean +4%, range +2% to +6%; pooled +4%
+    fat-tree k=12 n=180                                  topotest            pairs 2: per pair +12%, +7%; mean +10%, range +7% to +12%; pooled +10%
+  topology-zoo
+    zoo added_links=0,average_degree=4.46,dropped_nodes=0,method=nearest,name=AttMpls,original_links=56,source=AttMpls.json,source_sha256=0740b25cfce9a2596294ae73d045181bc939a0b7d55f99d7568ff0316fd7bc7d n=25 FRR defaults        pairs 2: per pair -606%, -193%; mean -399%, range -606% to -193%; pooled -349%
+    zoo added_links=0,average_degree=4.46,dropped_nodes=0,method=nearest,name=AttMpls,original_links=56,source=AttMpls.json,source_sha256=0740b25cfce9a2596294ae73d045181bc939a0b7d55f99d7568ff0316fd7bc7d n=25 topotest            pairs 2: per pair +23%, +26%; mean +24%, range +23% to +26%; pooled +24%
+    zoo added_links=44,average_degree=8,dropped_nodes=0,method=nearest,name=AttMpls,original_links=56,source=AttMpls.json,source_sha256=0740b25cfce9a2596294ae73d045181bc939a0b7d55f99d7568ff0316fd7bc7d n=25 topotest            pairs 2: per pair +32%, +39%; mean +36%, range +32% to +39%; pooled +36%
+    zoo added_links=0,average_degree=3.654762,dropped_nodes=0,method=nearest,name=Uunet,original_links=77,source=Uunet.json,source_sha256=b892ff7f49c0c2bd06e37287619161d8d195b6cc5ed9a68fe35d12eccbe6dabb n=42 FRR defaults        pairs 2: per pair -22%, +24%; mean +1%, range -22% to +24%; pooled -3%
+    zoo added_links=0,average_degree=3.654762,dropped_nodes=0,method=nearest,name=Uunet,original_links=77,source=Uunet.json,source_sha256=b892ff7f49c0c2bd06e37287619161d8d195b6cc5ed9a68fe35d12eccbe6dabb n=42 topotest            pairs 2: per pair +43%, +2%; mean +23%, range +2% to +43%; pooled +23%
+    zoo added_links=91,average_degree=8,dropped_nodes=0,method=nearest,name=Uunet,original_links=77,source=Uunet.json,source_sha256=b892ff7f49c0c2bd06e37287619161d8d195b6cc5ed9a68fe35d12eccbe6dabb n=42 topotest            pairs 2: per pair +34%, +23%; mean +29%, range +23% to +34%; pooled +29%
+    zoo added_links=0,average_degree=2.810606,dropped_nodes=0,method=nearest,name=Uninett2011,original_links=93,source=Uninett2011.json,source_sha256=0bbf4b152519fa1cdbbe24f3679e59827c9b225d972beccf573ba322a1c947b7 n=66 FRR defaults        pairs 2: per pair +22%, -17%; mean +3%, range -17% to +22%; pooled +3%
+    zoo added_links=0,average_degree=2.810606,dropped_nodes=0,method=nearest,name=Uninett2011,original_links=93,source=Uninett2011.json,source_sha256=0bbf4b152519fa1cdbbe24f3679e59827c9b225d972beccf573ba322a1c947b7 n=66 topotest            pairs 2: per pair -26%, -15%; mean -21%, range -26% to -15%; pooled -20%
+    zoo added_links=171,average_degree=8,dropped_nodes=0,method=nearest,name=Uninett2011,original_links=93,source=Uninett2011.json,source_sha256=0bbf4b152519fa1cdbbe24f3679e59827c9b225d972beccf573ba322a1c947b7 n=66 topotest            pairs 2: per pair +37%, -4%; mean +17%, range -4% to +37%; pooled +18%
+    zoo added_links=39,average_degree=4,dropped_nodes=0,method=nearest,name=Uninett2011,original_links=93,source=Uninett2011.json,source_sha256=0bbf4b152519fa1cdbbe24f3679e59827c9b225d972beccf573ba322a1c947b7 n=66 topotest            pairs 2: per pair -17%, +17%; mean +0%, range -17% to +17%; pooled +3%
+    zoo added_links=0,average_degree=2.527972,dropped_nodes=0,method=nearest,name=TataNld,original_links=181,source=TataNld.json,source_sha256=63bef0d57890585f7fd943afc1d051e6ae08bfd7d368ecbf53532ea8c3f4661d n=143 FRR defaults        pairs 2: per pair -4%, +7%; mean +1%, range -4% to +7%; pooled +2%
+    zoo added_links=0,average_degree=2.527972,dropped_nodes=0,method=nearest,name=TataNld,original_links=181,source=TataNld.json,source_sha256=63bef0d57890585f7fd943afc1d051e6ae08bfd7d368ecbf53532ea8c3f4661d n=143 topotest            pairs 2: per pair +3%, -5%; mean -1%, range -5% to +3%; pooled -1%
+    zoo added_links=105,average_degree=4,dropped_nodes=0,method=nearest,name=TataNld,original_links=181,source=TataNld.json,source_sha256=63bef0d57890585f7fd943afc1d051e6ae08bfd7d368ecbf53532ea8c3f4661d n=143 topotest            pairs 2: per pair +4%, -7%; mean -2%, range -7% to +4%; pooled -2%
+    zoo added_links=391,average_degree=8,dropped_nodes=0,method=nearest,name=TataNld,original_links=181,source=TataNld.json,source_sha256=63bef0d57890585f7fd943afc1d051e6ae08bfd7d368ecbf53532ea8c3f4661d n=143 topotest            pairs 2: per pair -10%, +8%; mean -1%, range -10% to +8%; pooled -1%
+  operator-timers
+    flattened-butterfly radices=[4, 4, 4] n=64           FRR defaults        pairs 2: per pair +23%, +61%; mean +42%, range +23% to +61%; pooled +42%
+    flattened-butterfly radices=[4, 4, 4] n=64           topotest            pairs 2: per pair +45%, +53%; mean +49%, range +45% to +53%; pooled +49%
+    leaf-spine leaves=48,spines=16 n=64                  FRR defaults        pairs 2: per pair +79%, +47%; mean +63%, range +47% to +79%; pooled +63%
+    leaf-spine leaves=48,spines=16 n=64                  topotest            pairs 2: per pair +39%, +41%; mean +40%, range +39% to +41%; pooled +40%
+    random-regular degree=16,seed=1 n=64                 FRR defaults        pairs 2: per pair +13%, +29%; mean +21%, range +13% to +29%; pooled +21%
+    random-regular degree=16,seed=1 n=64                 topotest            pairs 2: per pair +36%, +13%; mean +24%, range +13% to +36%; pooled +25%
+    random-regular degree=32,seed=1 n=64                 FRR defaults        pairs 2: per pair +43%, +49%; mean +46%, range +43% to +49%; pooled +46%
+    random-regular degree=32,seed=1 n=64                 topotest            pairs 2: per pair +44%, +51%; mean +47%, range +44% to +51%; pooled +47%
+    random-regular degree=16,seed=1 n=256                FRR defaults        pairs 2: per pair -11%, -2%; mean -6%, range -11% to -2%; pooled -7%
+  flap10-n64
+    random-regular degree=16,seed=1 n=64                 topotest            pairs 2: per pair +46%, +50%; mean +48%, range +46% to +50%; pooled +48%
+    random-regular degree=24,seed=1 n=64                 topotest            pairs 2: per pair +55%, +63%; mean +59%, range +55% to +63%; pooled +59%
+  colab-sessions
+    flattened-butterfly radices=[4, 4, 4] n=64           topotest     cpu-8cpu-51g-2c3f pairs 2: per pair +24%, +7%; mean +16%, range +7% to +24%; pooled +16%
+    flattened-butterfly radices=[4, 4, 4] n=64           topotest     cpu-8cpu-51g-a057 pairs 2: per pair +3%, +12%; mean +7%, range +3% to +12%; pooled +7%
+    flattened-butterfly radices=[4, 4, 4] n=64           topotest     cpu-8cpu-51g-cd61 pairs 2: per pair -4%, +2%; mean -1%, range -4% to +2%; pooled -1%
+    leaf-spine leaves=48,spines=16 n=64                  topotest     cpu-8cpu-51g-2c3f pairs 2: per pair +41%, +1%; mean +21%, range +1% to +41%; pooled +21%
+    leaf-spine leaves=48,spines=16 n=64                  topotest     cpu-8cpu-51g-a057 pairs 2: per pair +28%, -22%; mean +3%, range -22% to +28%; pooled +2%
+    leaf-spine leaves=48,spines=16 n=64                  topotest     cpu-8cpu-51g-cd61 pairs 2: per pair +30%, +34%; mean +32%, range +30% to +34%; pooled +32%
+    leaf-spine leaves=48,spines=16 n=64                  topotest     cpu-8cpu-51g-ff2f pairs 2: per pair +35%, +27%; mean +31%, range +27% to +35%; pooled +31%
+    random-regular degree=4,seed=1 n=16                  topotest     cpu-8cpu-51g-ff2f pairs 2: per pair -175%, -12%; mean -94%, range -175% to -12%; pooled -67%
+    random-regular degree=8,seed=1 n=32                  topotest     cpu-8cpu-51g-ff2f pairs 2: per pair +50%, +33%; mean +41%, range +33% to +50%; pooled +41%
+    random-regular degree=16,seed=1 n=64                 topotest     cpu-8cpu-51g-2c3f pairs 2: per pair +10%, +12%; mean +11%, range +10% to +12%; pooled +11%
+    random-regular degree=16,seed=1 n=64                 topotest     cpu-8cpu-51g-a057 pairs 2: per pair -45%, -50%; mean -48%, range -50% to -45%; pooled -48%
+    random-regular degree=16,seed=1 n=64                 topotest     cpu-8cpu-51g-cd61 pairs 2: per pair +31%, -7%; mean +12%, range -7% to +31%; pooled +15%
+    random-regular degree=16,seed=1 n=64                 topotest     cpu-8cpu-51g-ff2f pairs 2: per pair +1%, +23%; mean +12%, range +1% to +23%; pooled +12%
+    random-regular degree=8,seed=1 n=64                  topotest     cpu-8cpu-51g-ff2f pairs 2: per pair -42%, -15%; mean -29%, range -42% to -15%; pooled -27%
+
+D. Pooled over the graphs of one family and degree (and size, timers): one value per run pair, or per Colab session; mean and 95% t-interval
+  colab-sessions       flattened-butterfly  degree -    n=64   topotest     units  3: mean +7.4%, 95% CI -13% to +28%; range -1% to +16%; lower with reduction in 2 of 3
+  colab-sessions       leaf-spine           degree -    n=64   topotest     units  4: mean +21.6%, 95% CI -0% to +43%; range +2% to +32%; lower with reduction in 4 of 4
+  colab-sessions       random-regular       degree 16   n=64   topotest     units  4: mean -2.4%, 95% CI -51% to +46%; range -48% to +15%; lower with reduction in 3 of 4
+  colab-sessions       random-regular       degree 4    n=16   topotest     units  1: mean -66.7%, 95% CI -; range -67% to -67%; lower with reduction in 0 of 1
+  colab-sessions       random-regular       degree 8    n=32   topotest     units  1: mean +41.5%, 95% CI -; range +41% to +41%; lower with reduction in 1 of 1
+  colab-sessions       random-regular       degree 8    n=64   topotest     units  1: mean -27.0%, 95% CI -; range -27% to -27%; lower with reduction in 0 of 1
+  families-n64         flattened-butterfly  degree -    n=64   topotest     units 18: mean +7.5%, 95% CI -2% to +17%; range -50% to +29%; lower with reduction in 14 of 18
+  families-n64         leaf-spine           degree -    n=64   topotest     units 14: mean +28.7%, 95% CI +20% to +37%; range +3% to +51%; lower with reduction in 14 of 14
+  families-n64         random-regular       degree 16   n=64   topotest     units  2: mean +10.4%, 95% CI -99% to +119%; range +2% to +19%; lower with reduction in 2 of 2
+  fat-tree             fat-tree             degree -    n=125  topotest     units  2: mean +3.7%, 95% CI -21% to +28%; range +2% to +6%; lower with reduction in 2 of 2
+  fat-tree             fat-tree             degree -    n=180  topotest     units  2: mean +9.7%, 95% CI -24% to +43%; range +7% to +12%; lower with reduction in 2 of 2
+  fat-tree             fat-tree             degree -    n=20   topotest     units  2: mean +21.6%, 95% CI -364% to +408%; range -9% to +52%; lower with reduction in 1 of 2
+  fat-tree             fat-tree             degree -    n=45   topotest     units  2: mean +4.3%, 95% CI -61% to +69%; range -1% to +9%; lower with reduction in 1 of 2
+  fat-tree             fat-tree             degree -    n=80   topotest     units  2: mean +17.6%, 95% CI -73% to +108%; range +10% to +25%; lower with reduction in 2 of 2
+  flap10-n64           random-regular       degree 16   n=64   topotest     units  2: mean +48.0%, 95% CI +18% to +78%; range +46% to +50%; lower with reduction in 2 of 2
+  flap10-n64           random-regular       degree 24   n=64   topotest     units  2: mean +58.9%, 95% CI +4% to +114%; range +55% to +63%; lower with reduction in 2 of 2
+  nfly                 k-ary-n-fly          degree -    n=27   topotest     units  2: mean -30.8%, 95% CI -498% to +436%; range -68% to +6%; lower with reduction in 1 of 2
+  nfly                 k-ary-n-fly          degree -    n=32   topotest     units  2: mean +20.3%, 95% CI -103% to +144%; range +11% to +30%; lower with reduction in 2 of 2
+  nfly                 k-ary-n-fly          degree -    n=48   topotest     units  2: mean +17.8%, 95% CI -100% to +136%; range +9% to +27%; lower with reduction in 2 of 2
+  nfly                 k-ary-n-fly          degree -    n=80   topotest     units  2: mean -7.5%, 95% CI -12% to -3%; range -8% to -7%; lower with reduction in 0 of 2
+  operator-timers      flattened-butterfly  degree -    n=64   FRR defaults units  2: mean +41.9%, 95% CI -204% to +288%; range +23% to +61%; lower with reduction in 2 of 2
+  operator-timers      flattened-butterfly  degree -    n=64   topotest     units  2: mean +49.2%, 95% CI +1% to +97%; range +45% to +53%; lower with reduction in 2 of 2
+  operator-timers      leaf-spine           degree -    n=64   FRR defaults units  2: mean +63.0%, 95% CI -140% to +266%; range +47% to +79%; lower with reduction in 2 of 2
+  operator-timers      leaf-spine           degree -    n=64   topotest     units  2: mean +40.0%, 95% CI +21% to +59%; range +39% to +41%; lower with reduction in 2 of 2
+  operator-timers      random-regular       degree 16   n=256  FRR defaults units  2: mean -6.3%, 95% CI -65% to +52%; range -11% to -2%; lower with reduction in 0 of 2
+  operator-timers      random-regular       degree 16   n=64   FRR defaults units  2: mean +20.9%, 95% CI -80% to +122%; range +13% to +29%; lower with reduction in 2 of 2
+  operator-timers      random-regular       degree 16   n=64   topotest     units  2: mean +24.1%, 95% CI -120% to +169%; range +13% to +36%; lower with reduction in 2 of 2
+  operator-timers      random-regular       degree 32   n=64   FRR defaults units  2: mean +45.7%, 95% CI +5% to +86%; range +43% to +49%; lower with reduction in 2 of 2
+  operator-timers      random-regular       degree 32   n=64   topotest     units  2: mean +47.4%, 95% CI -1% to +96%; range +44% to +51%; lower with reduction in 2 of 2
+  random-regular-n128  random-regular       degree 16   n=128  topotest     units  2: mean +4.4%, 95% CI -20% to +29%; range +2% to +6%; lower with reduction in 2 of 2
+  random-regular-n128  random-regular       degree 4    n=128  topotest     units  2: mean +0.9%, 95% CI -61% to +63%; range -4% to +6%; lower with reduction in 1 of 2
+  random-regular-n128  random-regular       degree 8    n=128  topotest     units  2: mean +7.7%, 95% CI +7% to +8%; range +8% to +8%; lower with reduction in 2 of 2
+  random-regular-n256  random-regular       degree 4    n=256  topotest     units  2: mean +6.8%, 95% CI -185% to +198%; range -8% to +22%; lower with reduction in 1 of 2
+  random-regular-n256  random-regular       degree 8    n=256  topotest     units  2: mean -4.4%, 95% CI -11% to +2%; range -5% to -4%; lower with reduction in 0 of 2
+  random-regular-n64   random-regular       degree 12   n=64   topotest     units  2: mean +18.0%, 95% CI +10% to +26%; range +17% to +19%; lower with reduction in 2 of 2
+  random-regular-n64   random-regular       degree 16   n=64   topotest     units  2: mean +18.7%, 95% CI -6% to +43%; range +17% to +21%; lower with reduction in 2 of 2
+  random-regular-n64   random-regular       degree 24   n=64   topotest     units  2: mean +25.3%, 95% CI -68% to +119%; range +18% to +33%; lower with reduction in 2 of 2
+  random-regular-n64   random-regular       degree 3    n=64   topotest     units  2: mean +3.8%, 95% CI -118% to +126%; range -6% to +13%; lower with reduction in 1 of 2
+  random-regular-n64   random-regular       degree 32   n=64   topotest     units  2: mean +23.0%, 95% CI -75% to +121%; range +15% to +31%; lower with reduction in 2 of 2
+  random-regular-n64   random-regular       degree 4    n=64   topotest     units  2: mean -9.2%, 95% CI -58% to +40%; range -13% to -5%; lower with reduction in 0 of 2
+  random-regular-n64   random-regular       degree 6    n=64   topotest     units  2: mean -2.2%, 95% CI -48% to +43%; range -6% to +1%; lower with reduction in 1 of 2
+  random-regular-n64   random-regular       degree 8    n=64   topotest     units  2: mean +14.5%, 95% CI -44% to +73%; range +10% to +19%; lower with reduction in 2 of 2
+  seeds-n64            flattened-butterfly  degree -    n=64   topotest     units  2: mean +5.0%, 95% CI -40% to +50%; range +1% to +9%; lower with reduction in 2 of 2
+  seeds-n64            leaf-spine           degree -    n=64   topotest     units  2: mean +32.5%, 95% CI -11% to +76%; range +29% to +36%; lower with reduction in 2 of 2
+  seeds-n64            random-regular       degree 16   n=64   topotest     units  9: mean +10.2%, 95% CI +5% to +15%; range +2% to +22%; lower with reduction in 9 of 9
+  seeds-n64            random-regular       degree 4    n=64   topotest     units  9: mean -6.6%, 95% CI -26% to +13%; range -43% to +27%; lower with reduction in 4 of 9
+  seeds-n64            random-regular       degree 8    n=64   topotest     units  9: mean +3.3%, 95% CI -19% to +26%; range -46% to +45%; lower with reduction in 5 of 9
+  topology-zoo         zoo                  degree -    n=143  FRR defaults units  2: mean +1.5%, 95% CI -70% to +73%; range -4% to +7%; lower with reduction in 1 of 2
+  topology-zoo         zoo                  degree -    n=143  topotest     units  6: mean -1.2%, 95% CI -8% to +6%; range -10% to +8%; lower with reduction in 3 of 6
+  topology-zoo         zoo                  degree -    n=25   FRR defaults units  2: mean -399.4%, 95% CI -3023% to +2225%; range -606% to -193%; lower with reduction in 0 of 2
+  topology-zoo         zoo                  degree -    n=25   topotest     units  4: mean +29.9%, 95% CI +18% to +41%; range +23% to +39%; lower with reduction in 4 of 4
+  topology-zoo         zoo                  degree -    n=42   FRR defaults units  2: mean +1.1%, 95% CI -286% to +289%; range -22% to +24%; lower with reduction in 1 of 2
+  topology-zoo         zoo                  degree -    n=42   topotest     units  4: mean +25.7%, 95% CI -3% to +54%; range +2% to +43%; lower with reduction in 4 of 4
+  topology-zoo         zoo                  degree -    n=66   FRR defaults units  2: mean +2.6%, 95% CI -249% to +254%; range -17% to +22%; lower with reduction in 1 of 2
+  topology-zoo         zoo                  degree -    n=66   topotest     units  6: mean -1.3%, 95% CI -27% to +24%; range -26% to +37%; lower with reduction in 2 of 6
