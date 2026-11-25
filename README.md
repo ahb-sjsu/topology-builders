@@ -61,7 +61,7 @@ flowchart LR
 | Namespace labs: `measure --backend netns` | real FRR, a network namespace per router | Linux, root or `unshare -Urnm` | real time | the Colab results, and on Atlas the decision check, the failure replay (mechanism) and colab-shaped. With the same links as a Docker run on Atlas, Colab's LSP counts with flood reduction on nearly matched it, and without it were 5% to 15% lower. On Atlas, 256-router labs run (degree 4 and 8 converged in every run, at about 35 and 48 MiB per router; degree 16 never converged on 20 CPUs, with or without flood reduction); larger ones run in KVM guests since 2026-11-22 |
 | Colab: `tools/colab` | namespace labs on a Colab runtime | a Google account | real time, on the runtime's CPUs | passed `test_in_docker.sh` (Colab's permissions, 2 CPUs); on Colab itself, 16-router labs converged on free CPU and TPU runtimes, and 64-router labs of up to 768 links in four Pro sessions with 8 CPUs, whose LSP savings agreed within 1 point (2026-11-21) |
 | Emulated guest: `tools/overlay` | Docker labs inside QEMU, software emulation | QEMU; no root, no KVM | much slower: deploying a 16-router lab took 225 s, against 9 s on the host | a 16-router lab runs on the host and in a cluster pod; link-down LSP counts within 17% of the host's; link-up, router and multi-link windows 1.2 to 1.7 times, bring-up 1.5 to 2.6 times; scaling timers by 10 is not a fix; CPU and times not comparable |
-| Decision check: `tools/model` | FRR's logged decisions against the model's | as namespace labs | real time | all 1,186 decisions logged on five topologies match the model, given the snapshot each router used; after router and multi-link failures, it shows which relays decided with the topology from before the failure |
+| Decision check: `tools/model` | FRR's logged decisions against the model's | as namespace labs | real time | all 1,186 decisions logged on five topologies match the model, given the snapshot each router used; after router and multi-link failures, it shows which relays decided with a topology cached since their first decision after the failure |
 
 Kaggle's notebooks refuse user namespaces, so of the lab options only the emulated guest could run there (untested).
 Details: [the model](#a-model-of-flooding), [namespaces and Colab](#without-docker-and-on-colab),
@@ -98,8 +98,10 @@ attributes record:
 - the diameter and mean distance in hops, and the share of router pairs at most two hops apart (left out, as null,
   when routers x links is over 20 million);
 - the two-hop multiplicity: for two routers two hops apart, the mean number of neighbors they share, which is how
-  many two-hop paths join them (left out when the sum of squared degrees is over 20 million). A flooding rule that
-  looks two hops ahead can drop copies only where it is above 1. It is 2 in every flattened butterfly; in a random
+  many two-hop paths join them (left out when the sum of squared degrees is over 20 million). Above 1, a flooding
+  rule that looks two hops ahead can choose which neighbor passes an LSP on to a router two hops away; it is an
+  indicator, not a condition, since such a rule also drops copies across triangles, where it can be 1. It is 2 in
+  every flattened butterfly; in a random
   regular graph of degree d it is close to 1 while d²/N is small, then grows roughly as d²/N. That may be why
   butterflies gain far more from flood reduction than random graphs of the same degree;
 - the versions of this package, Python and networkx.
@@ -361,11 +363,13 @@ often seconds slower (up to 8 s), though every router still ended with the same 
 
 **Why flooding was slow after failures.** [results/mechanism](results/mechanism/README.md): the same failures again,
 with flooding, CSNP and PSNP logs (complete and partial sequence-number PDUs, which routers exchange to repair their
-databases). The routers that got a new LSP more than a second late got it through the periodic CSNP exchange (241 of
-249), because a neighbor that held it decided with the topology from before the failure and
-left them to a router that had just lost its links (shown for 172 of the 249, by the model reproducing the
-neighbor's logged decision only with that topology). Without flood reduction, on the same butterfly and failures,
-every router had every new LSP within 236 ms.
+databases). The routers that got a new LSP more than a second late got it through the periodic CSNP exchange (242 of
+250), because a neighbor that held it decided with a topology that still held failed links and left them to a router
+that had just lost its links (244 of the 250). isisd builds that topology at the neighbor's first flooding decision
+after the failure, holding only the first few new LSPs, and keeps it until its next route computation: on it, the
+model reproduces 245 of the 246 neighbors' logged decisions. The pull request leaves out the draft's faster repair
+(a PSNP after a short timer), so those routers waited for a CSNP. Without flood reduction, on the same butterfly and
+failures, every router had every new LSP within 236 ms.
 
 **Three graphs per degree, and where the CPU goes.** [results/seeds-n64](results/seeds-n64/README.md): three random
 graphs at each of degree 4, 8, 16 and 32, with isisd's CPU per event handler. The LSP saving barely depends on the

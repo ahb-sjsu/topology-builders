@@ -37,8 +37,10 @@ def distances(g):
 
 def two_hop_multiplicity(g):
     """The mean number of neighbours shared by two routers that are two hops apart: how many two-hop paths join
-    them. A flooding rule that looks two hops ahead can drop copies only where this is above 1. None when no two
-    routers are two hops apart (a full mesh, or no links)."""
+    them. Above 1, a router two hops from a sender can be reached through more than one of its neighbours, and a
+    two-hop flooding rule such as draft-ietf-lsr-distoptflood's can pick one of them. It is an indicator, not a
+    condition: such a rule also drops copies across triangles, where this can be 1. None when no two routers are two
+    hops apart (a full mesh, or no links)."""
     total = pairs = 0
     for v in g:
         near = g[v]

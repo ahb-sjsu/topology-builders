@@ -11,6 +11,11 @@ rebuild their LSPs):
   failed links touching the originators whose new LSPs it held when it decided; old: none removed), and whether the
   reproducing decision sends the LSP to the late router.
 
+Each new LSP is timed from its originator's first build of it, looked for from BEFORE seconds before the event's
+recorded time: that time is taken after the links are down (the earliest time at which one router had finished
+setting its links), and a failed router with many links starts the failure up to about 1.3 s earlier. Until
+2026-11-25 the window started 0.5 s before it, which left out or misdated four of the failures' new LSPs.
+
     python analyze_events.py mech/fb444-on [--late-ms 500]
 """
 import argparse
@@ -31,6 +36,7 @@ COMPARE = re.compile(TIME + r".*ISIS-Snp .*: Compare LSP " + LSPID + r" seq 0x([
 NEWER = re.compile(r".*ISIS-Snp .*:\s+is newer than ours")
 OLDER = re.compile(r".*ISIS-Snp .*:\s+is older than ours")
 CSNP_IN = re.compile(r".*ISIS-Snp .*: Rcvd L2 CSNP (?:from \S+ )?on (\S+?)[,\s]")
+BEFORE = 5  # seconds before an event's recorded time from which its new LSPs' builds are looked for
 
 
 def seconds(m):
@@ -90,7 +96,7 @@ def analyze(d, late_ms, verbose=False):
         failed = [(x["a"], x["b"]) for x in ev["links"]]
         dead = ev.get("router")
         origins = sorted({r for x in failed for r in x} - {dead})
-        logs = {r: parse(os.path.join(d, "logs", f"{r}.log"), t0 - 0.5, t1) for r in topo.adj}
+        logs = {r: parse(os.path.join(d, "logs", f"{r}.log"), t0 - BEFORE, t1) for r in topo.adj}
         built = {}
         for o in origins:
             mine = [x for x in logs[o]["own"] if x[1].endswith(".00-00")]  # a router's own LSP, fragment 0
@@ -121,8 +127,9 @@ def analyze(d, late_ms, verbose=False):
               f"LSPs, {len(rows)} router-LSP pairs, late (> {late_ms:.0f} ms) or missing {n_late}, of which via CSNP "
               f"{sum(1 for x in lates if x[4].startswith('csnp'))} (by flooding {sum(1 for x in lates if x[4].startswith('flood'))}); slowest {max((x[2] for x in rows if x[2]), default=0):.0f} ms")
         stale = 0
+        t_start = min((b[0] for b in built.values()), default=t0)  # the failure's first new LSP
         for r, o, lsp, ms, how, frm in lates:
-            relays = explain(r, o, lsp, logs, topo, failed, built, port, t0)
+            relays = explain(r, o, lsp, logs, topo, failed, built, port, t_start)
             # a relay skipped r because of a stale snapshot: its decision is reproduced only by snapshots that still
             # hold failed links, and with the fresh topology it would have sent the LSP to r
             culprits = [n for n, fits, fresh_sends in relays if fresh_sends and fits and "fresh" not in fits]
@@ -137,12 +144,13 @@ def analyze(d, late_ms, verbose=False):
             print(f"   late pairs with a stale relay: {stale} of {len(lates)}")
 
 
-def explain(r, o, lsp, logs, topo, failed, built, port, t0):
+def explain(r, o, lsp, logs, topo, failed, built, port, t_start):
     """For each neighbor n of r that held o's new LSP before r: which snapshots reproduce n's logged decision on it
     (fresh: every failed link removed; rebuilt: the failed links of the new LSPs n held at this decision; frozen:
-    those n held at its first flood-reduction decision after the failure, a snapshot FRR keeps until its next SPF
-    run; old: none removed), and whether the decision on the fresh topology sends the LSP to r. Returns
-    [(n, set of snapshot names, fresh sends to r)]."""
+    those n held at its first flood-reduction decision from `t_start`, the failure's first new LSP, a snapshot FRR
+    keeps until its next SPF run; old: none removed), and whether the decision on the fresh topology sends the LSP to
+    r. Returns [(n, set of snapshot names, fresh sends to r)]. check_builds.py finds the snapshot each neighbor
+    actually decided with from its route-computation log lines."""
     new = topo.without(failed)
     seq = built[o][2]
     t_r = min(t for t, i, s, _ in logs[r]["rcvd"] if i == lsp and int(s, 16) >= seq)
@@ -163,7 +171,7 @@ def explain(r, o, lsp, logs, topo, failed, built, port, t0):
                    if any(i == ll and int(s, 16) >= ss and tt <= t for tt, i, s, _ in logs[n]["rcvd"])}
             return out | ({n} if n in built and built[n][0] <= t else set())
 
-        t_first = min(dd[0] for dd in logs[n]["decisions"] if dd[0] >= t0)
+        t_first = min(dd[0] for dd in logs[n]["decisions"] if dd[0] >= t_start)
         snaps = {"fresh": new, "rebuilt": topo.without([x for x in failed if set(x) & (held(t_n) | {o})]),
                  "frozen": topo.without([x for x in failed if set(x) & held(t_first)]), "old": topo}
         fits = set()

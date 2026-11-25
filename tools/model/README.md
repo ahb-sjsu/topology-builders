@@ -33,18 +33,33 @@ the snapshot each router decided with ([results/model-decisions](../../results/m
    arrivals, which topology snapshot reproduces each relaying neighbor's logged decision, and whether the decision on
    the topology without the failed links would have sent the LSP to the late router.
 
+5. `check_builds.py`: for every relay `analyze_events.py` finds behind a late pair, when isisd built the topology
+   the relay decided with (its first flood-reduction decision after its last route-computation start, "SPF needed"
+   in `debug isis spf-events`), how many of the failure's new LSPs it had received by then, and whether the model
+   reproduces the relay's logged decision on that topology, on the one it held at the decision, and with no failed
+   link removed.
+6. `filter_logs.py`: copies a lab's output keeping only the log lines the two analyses read, so that they can be
+   published and rerun (`results/mechanism/logs.tar.gz`).
+
 ```
 unshare -Urnm python3 tools/model/collect_events.py --out mech --topology t.json --events events.json --reduction both
 python tools/model/analyze_events.py --verbose mech/*/
+python tools/model/check_builds.py mech/*-on
 ```
 
-**Status (2026-11-20):** on the 4x4x4 butterfly and leaf-spine with 16 spines, 241 of the 249 router-LSP pairs that
-arrived more than 1 s late got the LSP by CSNP, and for 172 a relay decided with the topology from before the
-failure ([results/mechanism](../../results/mechanism/README.md)).
+An event's recorded time (`events.json`) is taken after its links are down, and a router that fails with many links
+starts the failure up to about 1.3 s earlier. The analyses therefore look for each failure's new LSPs from
+`analyze_events.BEFORE` (5 s) before it. Until 2026-11-25 they looked from 0.5 s before it, which left out two of
+the new LSPs after one router failure and replaced two others with the recovery LSPs built 25 s later.
+
+**Status (2026-11-25):** on the 4x4x4 butterfly and leaf-spine with 16 spines, 242 of the 250 router-LSP pairs that
+arrived more than 1 s late got the LSP by CSNP. For 244 of them a relay skipped the late router because it decided
+with the topology isisd built at its first decision after the failure, which reproduces 245 of the 246 relays'
+logged decisions ([results/mechanism](../../results/mechanism/README.md)).
 
 ## The model against measured LSP counts
 
-5. `validate.py`: for every run in a measurements file, finds the topology file the lab was written from (by sha256,
+7. `validate.py`: for every run in a measurements file, finds the topology file the lab was written from (by sha256,
    under the folders in `TOPOLOGY_DIRS`) and prints, per topology, variant and window kind, the LSPs FRR sent against
    the model's count for the same links, in lockstep and with jittered link delays.
 

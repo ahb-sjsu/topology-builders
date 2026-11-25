@@ -6,11 +6,14 @@ last router, against well under half a second without it. This lab replays those
 logging, to see how the last routers got the new LSPs and why they got them late.
 
 **Answer.** The late routers got the new LSPs through the periodic CSNP exchange (complete sequence-number PDUs,
-which neighbors exchange to repair their databases), not through flooding: 241 of the
-249 router-LSP pairs that arrived more than 1 s late. In 172 of the 249, a neighbor that already held the LSP did not
-send it on because it decided with the topology from before the failure: it counted on a router that had just lost
-its links to cover the late router. Without flood reduction, on the same butterfly and the same failures, every
-router had every new LSP within 236 ms.
+which neighbors exchange to repair their databases), not through flooding: 242 of the
+250 router-LSP pairs that arrived more than 1 s late. In 244 of the 250, a neighbor that already held the LSP did not
+send it on because it decided with a topology that still held some of the failed links: it counted on a router that
+had just lost its links to cover the late router. That topology was the one isisd built at the neighbor's first
+flooding decision after the failure, when it had received only the first one to five of the failure's new LSPs, and
+kept until its next route computation (see [when the topology is built](#when-the-topology-is-built); an earlier
+version of this README said it was the topology from before the failure, which was wrong). Without flood reduction, on
+the same butterfly and the same failures, every router had every new LSP within 236 ms.
 
 ## Method
 
@@ -39,6 +42,15 @@ router had every new LSP within 236 ms.
   snapshot ([model-decisions](../model-decisions/README.md)), so this tells which topology the neighbor decided with.
   A **stale relay** is a neighbor whose decision only snapshots holding failed links reproduce, and which, deciding
   on the fresh topology, would have sent the LSP to the late router.
+- **Event times.** `events.json` gives, for each event, the earliest time at which one router had finished setting
+  its links down or up (`NetnsLab.apply`: each router runs its `ip link set` commands, then reads the clock). A failed
+  router sets all its own links, 9 on the butterfly and 48 on a spine, so the failure starts before that time: the
+  first new LSPs were built up to 1.33 s before it. The analysis therefore looks for each failure's new LSPs from 5 s
+  before the recorded time, and takes the "frozen" snapshot at the neighbor's first decision after the failure's
+  first new LSP. Until 2026-11-25 it looked from 0.5 s before the recorded time. After router r25 failed, that left
+  out two of the nine new LSPs and timed a third from the recovery LSP its router built 25 s later, and after spine
+  r1 failed it did the same for one leaf's LSP. It also took the "frozen" snapshot at the neighbor's first decision
+  after the recorded time, which can be later than its first decision after the failure.
 - **Setup:** 2026-11-20, 09:06 to 09:58 UTC, in the container shaped like Colab ([colab-shaped](../colab-shaped/README.md):
   Ubuntu 24.04, FRR from the same commit built by `tools/colab/setup.sh`), namespace backend, 64 routers on 4 CPUs.
   Those 4 CPUs share physical cores with 4 of the CPUs a measurement campaign was using at the same time, so
@@ -50,7 +62,7 @@ router had every new LSP within 236 ms.
 
 | Lab | Event | Router-LSP pairs | Later than 1 s | Via CSNP | Stale relay | Unmatched relay | Neither | Slowest, ms |
 |---|---|---:|---:|---:|---:|---:|---:|---:|
-| Butterfly 4x4x4, on | router r25 fails | 434 | 1 | 1 | 1 | 0 | 0 | 1,056 |
+| Butterfly 4x4x4, on | router r25 fails | 558 | 2 | 2 | 2 | 0 | 0 | 1,802 |
 | Butterfly 4x4x4, on | router r45 fails | 558 | 12 | 8 | 8 | 1 | 3 | 6,873 |
 | Butterfly 4x4x4, on | links r0-r2, r19-r31, r32-r40 fail | 378 | 7 | 6 | 7 | 0 | 0 | 2,981 |
 | Butterfly 4x4x4, on | links r48-r50, r52-r55, r52-r56 fail | 315 | 1 | 1 | 1 | 0 | 0 | 4,897 |
@@ -58,35 +70,37 @@ router had every new LSP within 236 ms.
 | Leaf-spine 48 x 16, on | spine r1 fails | 2,976 | 70 | 70 | 37 | 33 | 0 | 1,710 |
 | Leaf-spine 48 x 16, on | links r2-r49, r7-r40, r10-r46 fail | 378 | 2 | 2 | 2 | 0 | 0 | 2,414 |
 | Leaf-spine 48 x 16, on | links r4-r36, r4-r37, r13-r29 fail | 315 | 3 | 0 | 0 | 0 | 3 | 1,166 |
-| **All, flood reduction on** | | **8,330** | **249** | **241** | **172** | **71** | **6** | |
+| **All, flood reduction on** | | **8,454** | **250** | **242** | **173** | **71** | **6** | |
 | Butterfly 4x4x4, off | the same four events | 1,809 | 0 | | | | | 175, 179, 236, 163 |
 
 "Unmatched relay": a neighbor that, on the fresh topology, would have sent the LSP to the late router, but whose
-logged decision none of the four snapshots reproduces. "Router-LSP pairs" counts the new LSPs the analysis found
-being built in the window: after router r25 failed with flood reduction on, it found 7 of the 9.
+logged decision none of the four snapshots reproduces. Until 2026-11-25 the analysis looked for the new LSPs from
+0.5 s before each event's recorded time (see Event times above); this table then read 434 pairs, 1 late pair and
+1,056 ms for router r25, and 8,330, 249, 241 and 172 in all.
 
-- **Late routers were rescued by CSNPs.** 241 of the 249 late pairs got the LSP through the CSNP exchange: 1 to
+- **Late routers were rescued by CSNPs.** 242 of the 250 late pairs got the LSP through the CSNP exchange: 1 to
   8.8 s after it was built (median 2.8 s), within one CSNP interval.
-- **The relay decided with the topology from before the failure.** In 172 pairs a stale relay is found. Counting
-  each such relay once per pair, 173 of the 174 relay decisions are reproduced by the snapshot with none of the
-  failed links removed (in 19 of them a partial snapshot gives the same decision), and one only by a partial one. The
-  neighbor received the new LSP, but decided as if the failed router or links were still there: it left the late
-  router to a router that could no longer reach it.
+- **The relay decided with a topology that still held failed links.** In 173 pairs a stale relay is found. Counting
+  each such relay once per pair, there are 175 relay decisions: 174 are reproduced by the "frozen" snapshot (the
+  failed links of the new LSPs the relay held at its first decision after the failure removed), 173 of them also by
+  the snapshot with no failed link removed, and one only by "rebuilt". The neighbor had received the new LSP, but
+  decided as if the failed router or links were still there: it left the late router to a router that could no
+  longer reach it. [When the topology is built](#when-the-topology-is-built) shows which topology each one used.
 - **Leaf-spine, spine failure:** with flood reduction on, each leaf's new LSP is sent on to the other leaves by a few
   spines. After spine r6 failed, spines that decided as if r6 were still up left some leaves to r6. Those leaves got
   four leaves' LSPs from CSNPs, staggered from 0.5 to 8.8 s.
-- **The 71 unmatched pairs** fit the same picture but are not shown by it: the neighbor that should have sent the
-  LSP decided with some topology other than the four tried, for example one holding only some of the failed links.
-  For 6 pairs no relay explanation is found.
+- **The 71 unmatched pairs** have the same cause. None of the four snapshots reproduces the relay's decision, but
+  the topology the relay held when isisd built its decision topology does, in all 71 (next section). For 6 pairs no
+  relay explanation is found.
 - **The control.** Without flood reduction, on the same butterfly and the same four failures, no router got a new LSP
   later than 236 ms. The leaf-spine lab without flood reduction never converged on 4 CPUs with this much logging, so
   leaf-spine has no control here. In the timing runs, on 20 CPUs, three links failing together on leaf-spine flooded
   in 0.28 to 0.43 s without flood reduction; a spine failure took 1.5 to 1.9 s without it and 1.5 to 2.6 s with
   it.
-- **Below 1 s.** After spine r1 failed, a further 395 pairs arrived between 0.5 and 1 s, most of them by flooding. On
+- **Below 1 s.** After spine r1 failed, a further 399 pairs arrived between 0.5 and 1 s, most of them by flooding. On
   leaf-spine, router failures were slow with flood reduction off as well, so these are not counted as late.
 
-## When the snapshot is refreshed, and what is still open
+## When the topology is built
 
 - **From FRR's code at e263c441** (`isisd/isis_lsp.c`, `isisd/isis_spf.c`): the topology a router decides with is
   built from its LSP database at the first flooding decision after a route computation starts, and dropped only when
@@ -94,33 +108,52 @@ being built in the window: after router r25 failed with flood reduction on, it f
   of one per received LSP. Every LSP received schedules a route computation, at most one per `spf-interval` (1 s by
   default, counted in whole seconds). Between two route computations, decisions therefore use a topology without the
   LSPs that arrived after it was built.
-- That explains decisions made with some of the failed links still in place. It does not by itself explain the 154
-  relay decisions that only the topology from before the failure reproduces: for those, the topology must have been
-  built before the failure. `debug isis spf-events` logs the start of every route computation ("SPF needed"), which
-  is when the topology is dropped, so the full logs of this lab can show when each relay's topology was built. The
-  reduced logs in `logs.tar.gz` leave those lines out, so the check needs the full logs, which are not published,
-  or a new run. It has not been done yet. An earlier version of this README said these logs could not show it;
-  that was wrong.
+- **What the logs show** (`tools/model/check_builds.py`, on the full logs; `analysis-builds.txt`). `debug isis
+  spf-events` logs each route computation's start ("SPF needed"). For each of the 246 relay decisions behind the 244
+  late pairs with a stale or unmatched relay, the check takes the relay's last route-computation start before the
+  decision and its first flood-reduction decision after that start, when isisd built the topology the relay decided
+  with.
+  - Every topology was built after the failure had begun, when the relay had received 1 to 5 of the failure's new
+    LSPs. None was built before the failure.
+  - No route computation started between the build and the decision.
+  - On the topology held at the build (the failed links removed where the relay had received an end's new LSP), the
+    model reproduces 245 of the 246 logged decisions exactly. The other is reproduced by the topology the relay held
+    0.2 ms later, at the decision itself. The topology held at the decision reproduces none of the other 245.
+  - Most decisions came in the burst of LSPs that follows a failure: 99 within 1 ms of the build, 107 more than
+    100 ms after it (up to 0.96 s).
+
+  So a relay decides with the topology isisd built on the first of the failure's new LSPs it received, and its
+  decisions on the later ones still count on links those LSPs report down. An earlier version of this README said
+  the topology was built before the failure. That came from the analysis window (see Event times), not from isisd.
+- **Why the wait is seconds.** The draft (section 1.2.4) recommends that a router which does not reflood an LSP send
+  every neighbor a PSNP listing it after a short timer, much shorter than the CSNP interval, so that a neighbor
+  missing it asks for it. The pull request leaves this out and relies on periodic CSNPs, so the late routers waited
+  up to a CSNP interval.
 - Whether this can leave a router without an LSP for good. Here no router was: every router got every new LSP
   within the window, by CSNP if not by flooding, as in the timing runs. That relies on the periodic CSNPs.
 
-One way to avoid the delay would be to remove from the snapshot, before deciding, the adjacencies that the new LSPs
-in the database no longer report, so that a router never counts on a neighbor that has lost its links. We have not
-tested this.
+One way to avoid the misses would be to drop the cached topology whenever a newer LSP changes a router's adjacencies,
+or to remove from it the adjacencies that LSP no longer reports. That would change every one of these decisions;
+whether the late routers would then get the LSP by flooding is not checked. The draft's short-timer PSNP would
+shorten the wait whatever the cause. Neither is tested.
 
 ## Files
 
 - `analysis-fb444-on.txt`, `analysis-fb444-off.txt`, `analysis-ls16-on.txt`: `analyze_events.py --verbose`, with
   every late pair and every relay's snapshot matches.
 - `classify.py`: the table above, from those files: `python classify.py analysis-*-on.txt`.
+- `analysis-builds.txt`: `check_builds.py` on the two labs with flood reduction on: when each relay's decision
+  topology was built, and which topologies reproduce its decision, per relay decision.
 - `logs.tar.gz`: for each lab, the lab (`lab/lab.json`), the events with their times (`events.json`), and every
-  router's log reduced to the lines the analysis reads (LSPs built and received, flood-reduction decisions, CSNPs
-  received and the CSNP comparisons that found a newer or older copy), from 1 s before the first failure to 30 s
-  after the last. The analysis on these reduced logs prints exactly what it printed on the full logs (2.2 GB).
+  router's log reduced by `tools/model/filter_logs.py` to the lines the two analyses read (LSPs built and received,
+  flood-reduction decisions, route-computation starts, CSNPs received and the CSNP comparisons that found a newer or
+  older copy), from 6 s before the first event's recorded time to 30 s after the last. Both analyses print exactly
+  the same on these reduced logs as on the full logs (2.2 GB).
 
 ```
 mkdir mech && tar -xzf results/mechanism/logs.tar.gz -C mech
 python tools/model/analyze_events.py --verbose mech/fb444-on mech/fb444-off mech/ls16-on
+python tools/model/check_builds.py mech/fb444-on mech/ls16-on
 ```
 
 Run the lab again (Linux, root or `unshare -Urnm`, FRR with the pull request installed, as `tools/colab/setup.sh`

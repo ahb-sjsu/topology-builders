@@ -41,13 +41,14 @@ the four topologies. Convergence after a link went down, from 0.4 to 1 s, is set
   leaf-spine and in 2 of 4 on the butterfly. On the random graph of degree 16 the slowest window took 0.8 s.
 - Without flood reduction there was no such tail: every window in which links went down flooded in at most 0.43 s,
   except router failures on leaf-spine, which took 1.5 to 1.9 s with flood reduction on or off.
-- Every window still ended with every router holding the same LSPs. This is about speed, not correctness.
+- Every window still ended with every router holding the same LSPs. Forwarding during the delay was not measured.
 - The mechanism, from a lab that replays these failures with flooding, CSNP and PSNP logs
-  ([mechanism](../mechanism/README.md)): 241 of the 249 router-LSP pairs that arrived more than 1 s late came
+  ([mechanism](../mechanism/README.md)): 242 of the 250 router-LSP pairs that arrived more than 1 s late came
   through the periodic CSNP exchange (complete sequence-number PDUs, which neighbors exchange to repair their
-  databases), not through flooding. In 172 of them, a neighbor that held the LSP decided with the topology from
-  before the failure and left the late router to a router that had just lost its links. Why that topology
-  predates the failure is still open.
+  databases), not through flooding. In 244 of them, a neighbor that held the LSP decided with a topology that still
+  held failed links, and left the late router to a router that had just lost its links. isisd builds that topology
+  at the neighbor's first flooding decision after the failure and keeps it until its next route computation. The
+  pull request leaves out the draft's short-timer PSNP repair, so the late routers waited for a CSNP.
 
 ## Recoveries were not slower
 

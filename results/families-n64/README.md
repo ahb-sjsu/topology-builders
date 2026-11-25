@@ -103,8 +103,9 @@ Three topologies with a two-hop multiplicity near 2 save about the same share of
 degrees: the 6-cube (degree 6) 60%, leaf-spine with 2 spines (degree 3.9) 55%, and the random regular graph of degree
 12 (multiplicity 2.35) 59%, the last from the random-regular sweep. The random regular graph of degree 6 has a
 multiplicity of 1.18 and saves 23%, although its expansion (second adjacency eigenvalue over degree) is the same as
-the 6-cube's, 0.68 and 0.67. A flooding rule that decides from two hops can drop a copy only where two routers are
-joined by more than one two-hop path. Within the butterflies the multiplicity stays at 2 while the saving still rises
+the 6-cube's, 0.68 and 0.67. Where two routers are joined by more than one two-hop path, a flooding rule that decides
+from two hops can choose which neighbor passes the LSP on; it also drops copies across triangles, so the
+multiplicity is an indicator, not a condition. Within the butterflies the multiplicity stays at 2 while the saving still rises
 from 60% to 75% with degree, so degree matters as well. This is a pattern across a few graphs, one of each, not a
 fitted model.
 

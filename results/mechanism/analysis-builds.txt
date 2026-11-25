@@ -1,0 +1,277 @@
+Failures: each originator's first new LSP, from the event's recorded time
+  fb444-on node down r25: 9/9 originators built, first builds -1.327 to +0.431 s; more than 0.5 s before the recorded time: 3
+  fb444-on node down r45: 9/9 originators built, first builds +0.102 to +1.099 s; more than 0.5 s before the recorded time: 0
+  fb444-on multi down r0-r2, r19-r31, r32-r40: 6/6 originators built, first builds +0.107 to +0.127 s; more than 0.5 s before the recorded time: 0
+  fb444-on multi down r48-r50, r52-r55, r52-r56: 5/5 originators built, first builds +0.113 to +0.138 s; more than 0.5 s before the recorded time: 0
+  ls16-on node down r6: 48/48 originators built, first builds -0.354 to +0.695 s; more than 0.5 s before the recorded time: 0
+  ls16-on node down r1: 48/48 originators built, first builds -0.513 to +0.438 s; more than 0.5 s before the recorded time: 1
+  ls16-on multi down r2-r49, r7-r40, r10-r46: 6/6 originators built, first builds +0.100 to +0.475 s; more than 0.5 s before the recorded time: 0
+  ls16-on multi down r4-r36, r4-r37, r13-r29: 5/5 originators built, first builds +0.684 to +2.220 s; more than 0.5 s before the recorded time: 0
+
+Stale relay decisions (a relay counted once per late pair): 175, in 173 pairs; reproduced only by the topology with no failed link removed among analyze_events.py's snapshots: 0
+  topology built before any of the failure's new LSPs existed: 0
+  the failure's new LSPs the relay had received at the build: {1: 52, 2: 83, 3: 40}
+  a route computation started between the build and the decision: 0
+  reproduced by the topology held at the build: 174 of 175
+  reproduced by the same, without the LSP decided at the build: 174 of 175
+  reproduced by the topology held at the decision: 1 of 175
+  reproduced by no failed link removed: 173 of 175
+  decision after the build: under 1 ms 98, 1 to 10 ms 38, 10 to 100 ms 2, over 100 ms 37; longest 0.960 s
+
+Unmatched relay decisions (a relay counted once per late pair): 71, in 71 pairs; reproduced only by the topology with no failed link removed among analyze_events.py's snapshots: 0
+  topology built before any of the failure's new LSPs existed: 0
+  the failure's new LSPs the relay had received at the build: {2: 33, 3: 1, 5: 37}
+  a route computation started between the build and the decision: 0
+  reproduced by the topology held at the build: 71 of 71
+  reproduced by the same, without the LSP decided at the build: 71 of 71
+  reproduced by the topology held at the decision: 0 of 71
+  reproduced by no failed link removed: 0 of 71
+  decision after the build: under 1 ms 1, 1 to 10 ms 0, 10 to 100 ms 0, over 100 ms 70; longest 0.249 s
+
+kind | lab | event | late router | originator | relay | published snapshots | held at build | build, decision (s from the recorded time) | reproduced by build / build without / decision / old
+stale | fb444-on | node down r25 | r40 | r17 | r24 | rebuilt | 1 | -1.2354, -1.2352 | False / False / True / False
+stale | fb444-on | node down r25 | r27 | r29 | r31 | frozen,old | 1 | -1.2259, -0.2655 | True / True / False / True
+stale | fb444-on | node down r45 | r28 | r13 | r29 | frozen,old | 1 | +0.1073, +0.1074 | True / True / False / True
+stale | fb444-on | node down r45 | r30 | r13 | r29 | frozen,old | 1 | +0.1073, +0.1074 | True / True / False / True
+stale | fb444-on | node down r45 | r60 | r13 | r61 | frozen,old | 1 | +0.1061, +0.1063 | True / True / False / True
+stale | fb444-on | node down r45 | r62 | r13 | r61 | frozen,old | 1 | +0.1061, +0.1063 | True / True / False / True
+stale | fb444-on | node down r45 | r23 | r47 | r31 | frozen | 2 | +0.1880, +0.1882 | True / True / False / False
+unmatched | fb444-on | node down r45 | r7 | r47 | r15 |  | 3 | +0.1745, +0.1746 | True / True / False / False
+stale | fb444-on | node down r45 | r25 | r61 | r29 | frozen,old | 1 | +0.1073, +0.1170 | True / True / False / True
+stale | fb444-on | node down r45 | r58 | r61 | r62 | frozen,old | 2 | +0.1435, +0.1437 | True / True / False / True
+stale | fb444-on | node down r45 | r59 | r61 | r63 | frozen,old | 2 | +0.1919, +0.1924 | True / True / False / True
+stale | fb444-on | multi down r0-r2, r19-r31, r32-r40 | r5 | r0 | r4 | frozen,old | 1 | +0.1184, +0.1185 | True / True / False / True
+stale | fb444-on | multi down r0-r2, r19-r31, r32-r40 | r17 | r40 | r16 | frozen,old | 2 | +0.1636, +0.1644 | True / True / False / True
+stale | fb444-on | multi down r0-r2, r19-r31, r32-r40 | r18 | r40 | r16 | frozen,old | 2 | +0.1636, +0.1644 | True / True / False / True
+stale | fb444-on | multi down r0-r2, r19-r31, r32-r40 | r19 | r40 | r16 | frozen,old | 2 | +0.1636, +0.1644 | True / True / False / True
+stale | fb444-on | multi down r0-r2, r19-r31, r32-r40 | r20 | r40 | r16 | frozen,old | 2 | +0.1636, +0.1644 | True / True / False / True
+stale | fb444-on | multi down r0-r2, r19-r31, r32-r40 | r20 | r40 | r24 | frozen,old | 1 | +0.1208, +0.1209 | True / True / False / True
+stale | fb444-on | multi down r0-r2, r19-r31, r32-r40 | r26 | r40 | r24 | frozen,old | 1 | +0.1208, +0.1209 | True / True / False / True
+stale | fb444-on | multi down r0-r2, r19-r31, r32-r40 | r28 | r40 | r16 | frozen,old | 2 | +0.1636, +0.1644 | True / True / False / True
+stale | fb444-on | multi down r0-r2, r19-r31, r32-r40 | r28 | r40 | r24 | frozen,old | 1 | +0.1208, +0.1209 | True / True / False / True
+stale | fb444-on | multi down r48-r50, r52-r55, r52-r56 | r63 | r52 | r60 | frozen,old | 1 | +0.1390, +0.1391 | True / True / False / True
+stale | ls16-on | node down r6 | r16 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r17 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r19 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r20 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r21 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r22 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r23 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r27 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r28 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r29 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r30 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r31 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r32 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r33 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r34 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r35 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r36 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r37 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r38 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r39 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r40 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r41 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r42 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r43 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r44 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r45 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r46 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r47 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r48 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r53 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r54 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r55 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r56 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r57 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r58 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r59 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r60 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r61 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r62 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r63 | r18 | r1 | frozen,old | 1 | -0.3132, -0.3130 | True / True / False / True
+stale | ls16-on | node down r6 | r17 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r18 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r19 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r20 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r22 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r23 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r27 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r28 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r29 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r30 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r31 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r32 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r33 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r34 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r35 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r36 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r37 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r38 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r39 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r40 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r41 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r42 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r43 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r44 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r45 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r46 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r47 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r48 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r49 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r53 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r54 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r55 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r56 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r57 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r58 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r59 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r60 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r61 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r62 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r63 | r21 | r14 | frozen,old | 3 | -0.1409, -0.1407 | True / True / False / True
+stale | ls16-on | node down r6 | r17 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r22 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r23 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r24 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r28 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r29 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r30 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r31 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r32 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r33 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r34 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r35 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r36 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r38 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r39 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r40 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r41 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r42 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r43 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r44 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r45 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r46 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r47 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r48 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r49 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r50 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r54 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r55 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r56 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r57 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r58 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r59 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r60 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r61 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r62 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+stale | ls16-on | node down r6 | r63 | r37 | r2 | frozen,old | 2 | -0.1152, -0.0005 | True / True / False / True
+unmatched | ls16-on | node down r6 | r17 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r22 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r23 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r24 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r28 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r29 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r30 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r31 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r32 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r33 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r34 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r35 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r36 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r37 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r38 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r39 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r40 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r41 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r42 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r43 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r44 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r45 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r46 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r47 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r48 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r49 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r50 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r54 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r55 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r56 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r57 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r58 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r59 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r60 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r61 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r62 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+unmatched | ls16-on | node down r6 | r63 | r53 | r7 |  | 5 | -0.1598, +0.0895 | True / True / False / False
+stale | ls16-on | node down r1 | r22 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r23 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r24 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r25 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r26 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r27 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r28 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r29 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r30 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r31 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r33 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r34 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r35 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r36 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r37 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r38 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r39 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r40 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r41 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r42 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r43 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r48 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r49 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r50 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r51 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r52 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r53 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r54 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r55 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r56 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r57 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r58 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r59 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r60 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r61 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r62 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+stale | ls16-on | node down r1 | r63 | r32 | r13 | frozen,old | 2 | -0.2334, -0.2313 | True / True / False / True
+unmatched | ls16-on | node down r1 | r22 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r24 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r25 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r26 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r28 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r30 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r31 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r33 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r34 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r35 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r36 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r37 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r38 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r39 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r40 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r41 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r42 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r43 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r49 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r50 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r51 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r52 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r53 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r54 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r55 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r56 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r57 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r58 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r59 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r60 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r61 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r62 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+unmatched | ls16-on | node down r1 | r63 | r48 | r2 |  | 2 | +0.1909, +0.2988 | True / True / False / False
+stale | ls16-on | multi down r2-r49, r7-r40, r10-r46 | r46 | r10 | r11 | frozen,old | 2 | +0.4368, +0.4549 | True / True / False / True
+stale | ls16-on | multi down r2-r49, r7-r40, r10-r46 | r40 | r7 | r8 | frozen,old | 2 | +0.3459, +0.3974 | True / True / False / True

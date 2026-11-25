@@ -1,55 +1,65 @@
-fb444-on: node down r25: 7/9 new LSPs, 434 router-LSP pairs, late (> 500 ms) or missing 6, of which via CSNP 5 (by flooding 1); slowest 1056 ms
+fb444-on: node down r25: 9/9 new LSPs, 558 router-LSP pairs, late (> 500 ms) or missing 7, of which via CSNP 6 (by flooding 1); slowest 1802 ms
+   late: r40 got r17's LSP after 1802 ms via csnp-sent, from r43; stale relay: r24
+      r24: reproduced by rebuilt; fresh topology sends to r40: True
+      r32: reproduced by fresh, frozen, old, rebuilt; fresh topology sends to r40: False
+      r36: reproduced by fresh, frozen, old, rebuilt; fresh topology sends to r40: False
+      r41: reproduced by rebuilt; fresh topology sends to r40: False
+      r42: reproduced by rebuilt; fresh topology sends to r40: False
+      r43: reproduced by rebuilt; fresh topology sends to r40: False
+      r44: reproduced by fresh, frozen, old, rebuilt; fresh topology sends to r40: False
+      r56: reproduced by fresh, frozen, old, rebuilt; fresh topology sends to r40: False
+      r8: reproduced by frozen, old, rebuilt; fresh topology sends to r40: False
    late: r29 got r27's LSP after 848 ms via csnp-sent, from r30; stale relay: r30, r31
-      r13: reproduced by fresh, old; fresh topology sends to r29: False
-      r17: reproduced by fresh, old; fresh topology sends to r29: False
-      r21: reproduced by fresh, frozen, old; fresh topology sends to r29: False
+      r13: reproduced by fresh, frozen, old; fresh topology sends to r29: False
+      r17: reproduced by fresh, frozen, old, rebuilt; fresh topology sends to r29: False
+      r21: reproduced by fresh, frozen, old, rebuilt; fresh topology sends to r29: False
       r28: reproduced by fresh, frozen, old; fresh topology sends to r29: False
-      r30: reproduced by old, rebuilt; fresh topology sends to r29: True
-      r31: reproduced by old; fresh topology sends to r29: True
-      r45: reproduced by fresh, old; fresh topology sends to r29: False
-      r61: reproduced by fresh, old; fresh topology sends to r29: False
+      r30: reproduced by frozen, old, rebuilt; fresh topology sends to r29: True
+      r31: reproduced by frozen, old; fresh topology sends to r29: True
+      r45: reproduced by fresh, frozen, old; fresh topology sends to r29: False
+      r61: reproduced by fresh, frozen, old; fresh topology sends to r29: False
    late: r24 got r29's LSP after 936 ms via csnp-asked, from r8; stale relay: r28
-      r16: reproduced by fresh, old; fresh topology sends to r24: False
-      r20: reproduced by fresh, old; fresh topology sends to r24: False
+      r16: reproduced by fresh, frozen, old; fresh topology sends to r24: False
+      r20: reproduced by fresh, frozen, old; fresh topology sends to r24: False
       r26: reproduced by fresh, frozen, old, rebuilt; fresh topology sends to r24: False
-      r28: reproduced by old; fresh topology sends to r24: True
+      r28: reproduced by frozen, old; fresh topology sends to r24: True
       r40: reproduced by fresh, frozen, old, rebuilt; fresh topology sends to r24: False
       r56: reproduced by fresh, frozen, old, rebuilt; fresh topology sends to r24: False
-      r8: reproduced by none; fresh topology sends to r24: False
+      r8: reproduced by rebuilt; fresh topology sends to r24: False
    late: r26 got r29's LSP after 623 ms via csnp-sent, from r58; stale relay: r30
-      r10: reproduced by fresh, old; fresh topology sends to r26: False
-      r18: reproduced by fresh, old; fresh topology sends to r26: False
-      r22: reproduced by fresh, old; fresh topology sends to r26: False
-      r30: reproduced by old; fresh topology sends to r26: True
-      r42: reproduced by fresh, old; fresh topology sends to r26: False
+      r10: reproduced by fresh, frozen, old; fresh topology sends to r26: False
+      r18: reproduced by fresh, frozen, old; fresh topology sends to r26: False
+      r22: reproduced by fresh, frozen, old; fresh topology sends to r26: False
+      r30: reproduced by frozen, old; fresh topology sends to r26: True
+      r42: reproduced by fresh, frozen, old; fresh topology sends to r26: False
       r58: reproduced by fresh, frozen, old, rebuilt; fresh topology sends to r26: False
    late: r27 got r29's LSP after 1056 ms via csnp-asked, from r31; stale relay: r31
-      r11: reproduced by fresh, old; fresh topology sends to r27: False
+      r11: reproduced by fresh, frozen, old; fresh topology sends to r27: False
       r19: reproduced by fresh, frozen, old, rebuilt; fresh topology sends to r27: False
       r23: reproduced by fresh, frozen, old, rebuilt; fresh topology sends to r27: False
-      r24: reproduced by fresh, frozen, old; fresh topology sends to r27: False
+      r24: reproduced by fresh, frozen, old, rebuilt; fresh topology sends to r27: False
       r26: reproduced by fresh, frozen, old, rebuilt; fresh topology sends to r27: False
-      r31: reproduced by old; fresh topology sends to r27: True
-      r43: reproduced by fresh, old; fresh topology sends to r27: False
+      r31: reproduced by frozen, old; fresh topology sends to r27: True
+      r43: reproduced by fresh, frozen, old; fresh topology sends to r27: False
       r59: reproduced by fresh, frozen, old, rebuilt; fresh topology sends to r27: False
    late: r40 got r29's LSP after 787 ms via flood, from r56; stale relay: r41
       r32: reproduced by fresh, frozen, old, rebuilt; fresh topology sends to r40: False
       r36: reproduced by fresh, frozen, old, rebuilt; fresh topology sends to r40: False
       r41: reproduced by frozen, old, rebuilt; fresh topology sends to r40: True
-      r42: reproduced by fresh, old; fresh topology sends to r40: False
-      r43: reproduced by fresh, old; fresh topology sends to r40: False
-      r44: reproduced by fresh, old; fresh topology sends to r40: False
+      r42: reproduced by fresh, frozen, old; fresh topology sends to r40: False
+      r43: reproduced by fresh, frozen, old; fresh topology sends to r40: False
+      r44: reproduced by fresh, frozen, old; fresh topology sends to r40: False
       r56: reproduced by fresh, frozen, old, rebuilt; fresh topology sends to r40: True
-      r8: reproduced by none; fresh topology sends to r40: False
+      r8: reproduced by rebuilt; fresh topology sends to r40: False
    late: r56 got r29's LSP after 787 ms via csnp-sent, from r58; no stale relay found
       r48: reproduced by fresh, frozen, old, rebuilt; fresh topology sends to r56: False
       r52: reproduced by fresh, frozen, old, rebuilt; fresh topology sends to r56: False
       r57: reproduced by none; fresh topology sends to r56: False
       r58: reproduced by fresh, frozen, old, rebuilt; fresh topology sends to r56: False
       r59: reproduced by fresh, frozen, old, rebuilt; fresh topology sends to r56: False
-      r60: reproduced by fresh, old; fresh topology sends to r56: False
-      r8: reproduced by none; fresh topology sends to r56: False
-   late pairs with a stale relay: 5 of 6
+      r60: reproduced by fresh, frozen, old; fresh topology sends to r56: False
+      r8: reproduced by rebuilt; fresh topology sends to r56: False
+   late pairs with a stale relay: 6 of 7
 fb444-on: node down r45: 9/9 new LSPs, 558 router-LSP pairs, late (> 500 ms) or missing 12, of which via CSNP 8 (by flooding 4); slowest 6873 ms
    late: r28 got r13's LSP after 3189 ms via flood, from r30; stale relay: r29
       r12: reproduced by rebuilt; fresh topology sends to r28: False
