@@ -6,6 +6,11 @@
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Code: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE)
 [![Text and data: CC BY 4.0](https://img.shields.io/badge/text%20%26%20data-CC%20BY%204.0-lightgrey.svg)](LICENSE-TEXT)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24521591.svg)](https://doi.org/10.5281/zenodo.24521591)
+
+**Archived version.** Tag `artifact-2026-11-25` (commit 9699e04) is archived on Zenodo as
+[10.5281/zenodo.24521591](https://doi.org/10.5281/zenodo.24521591): cite that DOI for the code and data as they were
+then. The analyses in `tools/` use code newer than the PyPI release, so install from a checkout (`pip install -e .`).
 
 This repository is first an evaluation of IS-IS distributed flooding reduction, draft-ietf-lsr-distoptflood as FRR
 implements it in pull request 24128, and second a topology library. The measurements, their data and the scripts
